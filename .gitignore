@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+/out
+/cmake-*/*
+/.idea
+/gtfs/cmake-*/*
+/gtfs/.idea
+/test/cmake-*/*
+/.vscode
