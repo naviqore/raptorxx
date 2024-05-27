@@ -4,6 +4,8 @@ project("gtfs"
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
+add_subdirectory(test)
+
 if (MSVC)
     add_compile_options(/W4 /WX)
 elseif (GCC)
@@ -21,31 +23,17 @@ if (CMAKE_CXX_STANDARD LESS 20)
     message(FATAL_ERROR "At least C++20 required but have ${CMAKE_CXX_STANDARD}")
 endif ()
 
+include_directories(${CMAKE_SOURCE_DIR}/common/logging/include)
 
-include(FetchContent)
-FetchContent_Declare(
-        spdlog
-        GIT_REPOSITORY https://github.com/gabime/spdlog.git
-        GIT_TAG v1.x
-)
-message(STATUS "Fetching spdlog...")
-message(STATUS "spdlog_SOURCE_DIR: ${spdlog_SOURCE_DIR}")
-FetchContent_MakeAvailable(spdlog)
-
-list(
-        APPEND
-        CMAKE_MODULE_PATH "${spdlog_SOURCE_DIR}/include"
+add_library(${PROJECT_NAME}
+        src/TestObject.cpp
+        src/TestObject.h
 )
 
-if (NOT TARGET spdlog)
-    # Stand-alone build
-    find_package(spdlog REQUIRED)
-endif ()
-
-add_executable(${PROJECT_NAME}
-        src/main.cpp
+target_include_directories(${PROJECT_NAME} PUBLIC
+        ${CMAKE_SOURCE_DIR}/common/logging
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-        spdlog::spdlog
+        logging
 )

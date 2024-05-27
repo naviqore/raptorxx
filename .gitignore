@@ -36,5 +36,5 @@
 /.idea
 /gtfs/cmake-*/*
 /gtfs/.idea
-/test/cmake-*/*
+/gtfs/test/cmake-*/*
 /.vscode
