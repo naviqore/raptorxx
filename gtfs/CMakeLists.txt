@@ -26,6 +26,8 @@ endif ()
 
 include_directories(${CMAKE_SOURCE_DIR}/common/logging/include)
 
+add_compile_definitions(LIBRARY_EXPORTS)
+
 add_library(${PROJECT_NAME}
         src/TestObject.cpp
         src/TestObject.h
