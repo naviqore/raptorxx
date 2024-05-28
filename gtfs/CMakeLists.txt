@@ -9,12 +9,12 @@ add_subdirectory(benchmarks)
 
 if (MSVC)
     add_compile_options(/W4 /WX)
-elseif (GCC)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-Wall -Wextra -pedantic -Werror)
 else ()
     # neither MSVC nor GCC is being used
     # TODO add compiler specific options
-    message(using another compiler)
+    message(STATUS "Using another compiler")
 endif ()
 
 set(CMAKE_CXX_STANDARD 20)
@@ -24,11 +24,7 @@ if (CMAKE_CXX_STANDARD LESS 20)
     message(FATAL_ERROR "At least C++20 required but have ${CMAKE_CXX_STANDARD}")
 endif ()
 
-include_directories(${CMAKE_SOURCE_DIR}/common/logging/include)
-
-add_compile_definitions(LIBRARY_EXPORTS)
-
-add_library(${PROJECT_NAME}
+add_library(${PROJECT_NAME} SHARED
         src/TestObject.cpp
         src/TestObject.h
         src/DataReader.h
@@ -39,11 +35,11 @@ add_library(${PROJECT_NAME}
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-        ${CMAKE_SOURCE_DIR}/common/logging
+        ${CMAKE_SOURCE_DIR}/common/logging/include
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         logging
 )
 
-# target_compile_definitions(${PROJECT_NAME} PRIVATE LIBRARY_EXPORTS)
+target_compile_definitions(${PROJECT_NAME} PRIVATE LIBRARY_EXPORTS)

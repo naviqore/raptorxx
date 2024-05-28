@@ -62,11 +62,12 @@ add_executable(${PROJECT_NAME}
         test_addition.cpp
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC
+target_link_libraries(${PROJECT_NAME}
+        gtfs
+        gtest gtest_main
+)
+
+target_include_directories(${PROJECT_NAME} PRIVATE
         ${CMAKE_SOURCE_DIR}/gtfs/src
 )
 
-target_link_libraries(${PROJECT_NAME}
-        gtest gtest_main
-        gtfs
-)
