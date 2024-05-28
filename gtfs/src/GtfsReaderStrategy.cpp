@@ -5,6 +5,7 @@
 #include "GtfsReaderStrategy.h"
 
 #include <iostream>
+#include <tuple>
 
 void gtfs::GtfsReaderStrategy::operator()(GtfsReader const& aReader) const {
   std::ignore = aReader;
