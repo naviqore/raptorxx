@@ -1,11 +1,9 @@
-﻿cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.28)
 
-project("gtfs"
-        DESCRIPTION "C++ implementation of GTFS reader"
+project("raptor"
+        DESCRIPTION "C++ implementation of raptor algorithm"
 )
 
-add_subdirectory(test)
-add_subdirectory(benchmarks)
 
 if (MSVC)
     add_compile_options(/W4 /WX)
@@ -27,13 +25,7 @@ endif ()
 include_directories(${CMAKE_SOURCE_DIR}/common/logging/include)
 
 add_library(${PROJECT_NAME}
-        src/TestObject.cpp
-        src/TestObject.h
-        src/DataReader.h
-        src/GTFSReader.cpp
-        src/GTFSReader.h
-        src/GtfsReaderStrategy.cpp
-        src/GtfsReaderStrategy.h
+        src/main.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC

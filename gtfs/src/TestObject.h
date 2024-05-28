@@ -13,6 +13,8 @@ public:
   void testFunction();
 };
 
+_declspec(dllexport) void testFunction();
+
 
 
 #endif //TEST_H

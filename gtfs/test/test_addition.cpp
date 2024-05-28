@@ -17,3 +17,7 @@ TEST(MathTest, Addition) {
   EXPECT_EQ(add(5, 8), 13);
   EXPECT_EQ(add(5, -8), -3);
 }
+
+TEST(GTFS, TestFunction) {
+  testFunction();
+}

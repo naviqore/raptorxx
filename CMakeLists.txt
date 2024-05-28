@@ -3,3 +3,4 @@ project(raptorxx)
 
 add_subdirectory(common)
 add_subdirectory(gtfs)
+add_subdirectory(raptor)
