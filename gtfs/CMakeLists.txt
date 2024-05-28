@@ -44,4 +44,4 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         logging
 )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE LIBRARY_EXPORTS)
+# target_compile_definitions(${PROJECT_NAME} PRIVATE LIBRARY_EXPORTS)
