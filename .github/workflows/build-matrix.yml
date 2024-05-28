@@ -5,44 +5,27 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
 jobs:
   build:
-
-    name: ${{ matrix.config.name }}
-    runs-on: ${{ matrix.config.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
-        config:
-          - {
-            name: "Windows Latest MSVC", artifact: "Windows-MSVC.7z",
-            os: windows-latest,
-            cc: "cl", cxx: "cl",
-            environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Professional/VC/Auxiliary/Build/vcvars64.bat",
-            # doxygen_install: choco install doxygen.install
-          }
-          - {
-            name: "Ubuntu Latest GCC", artifact: "Linux.7z",
-            os: ubuntu-latest,
-            cc: "gcc", cxx: "g++",
-            # doxygen_install: sudo apt-get install doxygen
-          }
-          - {
-            name: "macOS Latest Clang", artifact: "macOS.7z",
-            os: macos-latest,
-            cc: "clang", cxx: "clang++",
-            # doxygen_install: brew install doxygen
-          }
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
+        include:
+          - os: windows-latest
+            compiler: msvc
+          - os: ubuntu-latest
+            compiler: gcc
+          - os: macos-latest
+            compiler: clang
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.4
 
-      - name: Check cmake version
+      - name: Configure CMake
         run: |
-          cmake --version
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
 
-      - name: build code
+      - name: Build
         run: |
-          cmake -B build -S . -G "Ninja" -DCMAKE_C_COMPILER=${{ matrix.config.cc }} -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }}
           cmake --build build --config Release
