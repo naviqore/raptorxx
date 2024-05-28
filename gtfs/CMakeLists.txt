@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required(VERSION 3.28)
 
-project("gtfs"
+project(gtfs
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
