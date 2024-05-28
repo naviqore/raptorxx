@@ -5,15 +5,30 @@
 #ifndef TEST_H
 #define TEST_H
 
+// TODO just for testing purposes - move later to a separate file
+
+#ifdef _WIN32
+    #ifdef LIBRARY_EXPORTS
+        #define GTFS_API __declspec(dllexport)
+    #else
+        #define GTFS_API __declspec(dllimport)
+    #endif
+#else
+    #ifdef LIBRARY_EXPORTS
+        #define GTFS_API __attribute__((visibility("default")))
+    #else
+        #define GTFS_API
+    #endif
+#endif
 
 
-class _declspec(dllexport) TestObject
+class GTFS_API TestObject
 {
 public:
   void testFunction();
 };
 
-_declspec(dllexport) void testFunction();
+GTFS_API void testFunction();
 
 
 

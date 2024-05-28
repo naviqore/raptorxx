@@ -43,3 +43,5 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} PRIVATE
         logging
 )
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE LIBRARY_EXPORTS)
