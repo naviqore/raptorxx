@@ -30,8 +30,8 @@ add_library(${PROJECT_NAME}
         src/TestObject.cpp
         src/TestObject.h
         src/DataReader.h
-        src/GTFSReader.cpp
-        src/GTFSReader.h
+        src/GtfsReader.cpp
+        src/GtfsReader.h
         src/GtfsReaderStrategy.cpp
         src/GtfsReaderStrategy.h
 )
