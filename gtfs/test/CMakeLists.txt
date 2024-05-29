@@ -9,8 +9,6 @@ if (MSVC)
 elseif (GCC)
     add_compile_options(-Wall -Wextra -pedantic -Werror)
 else ()
-    # neither MSVC nor GCC is being used
-    # TODO add compiler specific options
     message(using another compiler)
 endif ()
 
@@ -30,44 +28,16 @@ FetchContent_Declare(
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
+
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
-
-include(CMakePrintHelpers)
-include(CheckCXXSourceCompiles)
-
-check_cxx_source_compiles(
-        "#include <iostream>
-  int main()
-  {
-    std::cout << \"Hello World!\" << std::endl;
-    return 0;
-  }"
-        CodeTest1
-)
-
-check_cxx_source_compiles(
-        "int main()
-  {
-    int position[2] = {1,2};
-    auto [x,y] = position;
-    return 0;
-  }"
-        CodeTest3
-        FAIL_REGEX "[Ww]arn"
-)
-
-cmake_print_variables(CodeTest1 CodeTest3)
+include_directories(${CMAKE_SOURCE_DIR}/gtfs/src)
 
 add_executable(${PROJECT_NAME}
         test_addition.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}
-        gtfs
-        gtest gtest_main
-)
+target_link_libraries(${PROJECT_NAME} gtest gtest_main)
 
-target_include_directories(${PROJECT_NAME} PRIVATE
-        ${CMAKE_SOURCE_DIR}/gtfs/src
-)
+target_link_libraries(${PROJECT_NAME} gtfs)
+
 

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.28)
 project("logging")
 
 if (MSVC)
-    add_compile_options(/W4 /WX)
+    add_compile_options(/W3)
 elseif (GCC)
     add_compile_options(-Wall -Wextra -pedantic -Werror)
 else ()

@@ -7,6 +7,8 @@
 
 // TODO just for testing purposes - move later to a separate file
 
+#define LIBRARY_EXPORTS // TODO add in cmakelists as compile definition
+
 #ifdef _WIN32
     #ifdef LIBRARY_EXPORTS
         #define GTFS_API __declspec(dllexport)

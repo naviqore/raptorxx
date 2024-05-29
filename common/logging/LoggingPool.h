@@ -5,9 +5,7 @@
 #ifndef LOGGINGPOOL_H
 #define LOGGINGPOOL_H
 
-#include <unordered_map>
-#include "spdlog/logger.h"
-#include <memory>
+#pragma warning(disable : 4251)
 
 #define COMMON_EXPORTS // TODO add in cmakelists as compile definition
 
@@ -25,6 +23,11 @@
     #endif
 #endif
 
+#include <unordered_map>
+#include "spdlog/logger.h"
+#include <memory>
+
+
 enum class Target : int
 {
   CONSOLE,
@@ -33,14 +36,18 @@ enum class Target : int
 
 class COMMON_API LoggingPool
 {
-  LoggingPool() = default;
-  static std::unordered_map<Target, std::unique_ptr<LoggingPool>> instances;
-  std::shared_ptr<spdlog::logger> current;
-
 public:
   static LoggingPool* getInstance(Target aTarget);
-
   std::shared_ptr<spdlog::logger> getLogger();
+
+  ~LoggingPool();
+  LoggingPool(const LoggingPool&) = delete;
+  LoggingPool& operator=(const LoggingPool&) = delete;
+private:
+  LoggingPool();
+
+  class LoggingPoolImpl;
+  std::unique_ptr<LoggingPoolImpl> const impl;
 };
 
 /*
