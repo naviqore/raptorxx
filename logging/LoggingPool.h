@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include "spdlog/logger.h"
 #include <memory>
+#include <logging_export.h>
 
 
 enum class Target : int

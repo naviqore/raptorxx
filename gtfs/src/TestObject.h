@@ -5,6 +5,8 @@
 #ifndef TEST_H
 #define TEST_H
 
+#include <gtfs_export.h>
+
 class GTFS_API TestObject
 {
 public:

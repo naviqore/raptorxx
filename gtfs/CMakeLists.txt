@@ -19,34 +19,27 @@ target_link_libraries(${PROJECT_NAME}
         spdlog::spdlog
 )
 
-if (WIN32)
-    if (BUILD_SHARED_LIBS)
-        target_compile_definitions(${PROJECT_NAME}
-                PRIVATE "GTFS_API=__declspec(dllexport)"
-                INTERFACE "GTFS_API=__declspec(dllimport)"
-                "LOGGER_API=__declspec(dllimport)"
-        )
-    else ()
-        target_compile_definitions(${PROJECT_NAME}
-                PUBLIC "GTFS_API"
-                "LOGGER_API"
-        )
-    endif ()
-else ()
-    if (BUILD_SHARED_LIBS)
-        target_compile_definitions(${PROJECT_NAME}
-                PRIVATE "GTFS_API=__attribute__((visibility(\"default\")))"
-                INTERFACE "GTFS_API"
-                "LOGGER_API=__attribute__((visibility(\"default\")))"
-        )
-    else ()
-        target_compile_definitions(${PROJECT_NAME}
-                PUBLIC "GTFS_API"
-                "LOGGER_API"
-        )
-    endif ()
-endif ()
+#target_link_libraries(ProjectA PRIVATE CommonInterfaces)
+#target_include_directories(ProjectA PRIVATE ${CMAKE_SOURCE_DIR}/CommonInterfaces/include)
 
+
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)
+
+set(LIBRARY_INSTALL_DIR lib)
+set(INCLUDE_INSTALL_DIR include)
+
+install(TARGETS ${PROJECT_NAME} DESTINATION ${LIBRARY_INSTALL_DIR})
+install(FILES
+        LoggingPool.h
+        ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_export.h DESTINATION ${INCLUDE_INSTALL_DIR}
+)
 
 # target_compile_definitions(${PROJECT_NAME} PRIVATE LIBRARY_EXPORTS)
 message(BINARY_DIR: ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
