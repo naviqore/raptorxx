@@ -5,7 +5,9 @@
 #ifndef LOGGINGPOOL_H
 #define LOGGINGPOOL_H
 
+#ifdef _MSC_VER
 #pragma warning(disable : 4251)
+#endif
 
 #define COMMON_EXPORTS // TODO add in cmakelists as compile definition
 
