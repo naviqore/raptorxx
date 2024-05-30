@@ -38,3 +38,4 @@
 /gtfs/.idea
 /gtfs/test/cmake-*/*
 /.vscode
+/output

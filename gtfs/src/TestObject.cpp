@@ -13,7 +13,6 @@
 #include <iostream>
 
 void TestObject::testFunction() {
-  LoggingPool::getInstance(Target::FILE)->getLogger()->info("Hello from Test {}", 123);
   std::cout << "hello world" << std::endl;
 }
 

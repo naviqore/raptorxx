@@ -4,6 +4,7 @@
 
 #include "GtfsReader.h"
 
+#include <stdexcept>
 #include <utility>
 
 namespace gtfs {
@@ -14,6 +15,10 @@ namespace gtfs {
 
     /* Checking that the given filename is valid and that
        the given 'std::function' instance is not empty */
+    if (strategy == nullptr)
+    {
+      throw std::invalid_argument("Strategy cannot be empty");
+    }
   }
 
 

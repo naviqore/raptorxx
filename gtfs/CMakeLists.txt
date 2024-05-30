@@ -12,7 +12,7 @@ add_library(${PROJECT_NAME} SHARED
         src/GtfsReaderStrategy.h
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging/src)
 
 target_link_libraries(${PROJECT_NAME}
         logging

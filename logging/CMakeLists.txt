@@ -10,8 +10,8 @@ CPMAddPackage(
 )
 
 add_library(${PROJECT_NAME} SHARED
-        LoggingPool.cpp
-        LoggingPool.h
+        src/LoggingPool.cpp
+        src/LoggingPool.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
@@ -37,6 +37,6 @@ set(INCLUDE_INSTALL_DIR include)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${LIBRARY_INSTALL_DIR})
 install(FILES
-        LoggingPool.h
+        src/LoggingPool.h
         ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_export.h DESTINATION ${INCLUDE_INSTALL_DIR}
 )
