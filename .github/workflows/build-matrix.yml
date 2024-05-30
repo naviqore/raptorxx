@@ -22,10 +22,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4.1.4
 
+      - name: Set up cache
+        id: cache-cpm
+        uses: actions/cache@v2
+        with:
+          path: ~/cpm-cache
+          key: ${{ runner.os }}-cpm-${{ hashFiles('**/') }}
+          restore-keys: |
+            ${{ runner.os }}-cpm-
+
       - name: Configure CMake
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCPM_SOURCE_CACHE=~/cpm-cache
 
       - name: Build
         run: |
-          cmake --build build --config Release
+          cmake --build build --config Release -- -j2
