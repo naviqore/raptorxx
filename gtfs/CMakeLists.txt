@@ -12,14 +12,35 @@ add_library(${PROJECT_NAME} SHARED
         src/GtfsReaderStrategy.h
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC
-        ${CMAKE_SOURCE_DIR}/common/logging
-        ${CMAKE_SOURCE_DIR}/common/logging/include
-)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging)
 
 target_link_libraries(${PROJECT_NAME}
         logging
 )
+
+if(WIN32)
+    if(BUILD_SHARED_LIBS)
+        target_compile_definitions(${PROJECT_NAME}
+                PRIVATE "GTFS_API=__declspec(dllexport)"
+                INTERFACE "GTFS_API=__declspec(dllimport)"
+        )
+    else()
+        target_compile_definitions(${PROJECT_NAME}
+                PUBLIC "GTFS_API"
+        )
+    endif()
+else()
+    if(BUILD_SHARED_LIBS)
+        target_compile_definitions(${PROJECT_NAME}
+                PRIVATE "GTFS_API=__attribute__((visibility(\"default\")))"
+                INTERFACE "GTFS_API"
+        )
+    else()
+        target_compile_definitions(${PROJECT_NAME}
+                PUBLIC "GTFS_API"
+        )
+    endif()
+endif()
 
 # target_compile_definitions(${PROJECT_NAME} PRIVATE LIBRARY_EXPORTS)
 message(BINARY_DIR: ${CMAKE_BINARY_DIR}/${PROJECT_NAME})

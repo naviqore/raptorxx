@@ -8,12 +8,12 @@
 #include "GtfsReader.h"
 #include "GtfsReaderStrategy.h"
 #include <memory>
-// #include "LoggingPool.h"
+#include <LoggingPool.h>
 
 #include <iostream>
 
 void TestObject::testFunction() {
-  // LoggingPool::getInstance(Target::FILE)->getLogger()->info("Hello from Test {}", 123);
+  LoggingPool::getInstance(Target::FILE)->getLogger()->info("Hello from Test {}", 123);
   std::cout << "hello world" << std::endl;
 }
 

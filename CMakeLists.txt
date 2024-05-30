@@ -3,6 +3,7 @@ project(raptorxx VERSION 0.0.1)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build)
 
 if (CMAKE_CXX_STANDARD LESS 23)
     message(FATAL_ERROR "At least C++23 required but have ${CMAKE_CXX_STANDARD}")
@@ -21,7 +22,7 @@ configure_file (
         "${PROJECT_BINARY_DIR}/ProjectConfig.h"
 )
 
-
+set(BUILD_SHARED_LIBS ON)
 
 add_subdirectory(logging)
 add_subdirectory(gtfs)

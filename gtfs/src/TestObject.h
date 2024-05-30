@@ -5,25 +5,6 @@
 #ifndef TEST_H
 #define TEST_H
 
-// TODO just for testing purposes - move later to a separate file
-
-#define LIBRARY_EXPORTS // TODO add in cmakelists as compile definition
-
-#ifdef _WIN32
-    #ifdef LIBRARY_EXPORTS
-        #define GTFS_API __declspec(dllexport)
-    #else
-        #define GTFS_API __declspec(dllimport)
-    #endif
-#else
-    #ifdef LIBRARY_EXPORTS
-        #define GTFS_API __attribute__((visibility("default")))
-    #else
-        #define GTFS_API
-    #endif
-#endif
-
-
 class GTFS_API TestObject
 {
 public:

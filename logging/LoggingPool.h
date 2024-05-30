@@ -9,22 +9,6 @@
 #pragma warning(disable : 4251)
 #endif
 
-#define COMMON_EXPORTS // TODO add in cmakelists as compile definition
-
-#ifdef _WIN32
-#ifdef COMMON_EXPORTS
-#define COMMON_API __declspec(dllexport)
-#else
-#define COMMON_API __declspec(dllimport)
-#endif
-#else
-#ifdef LIBRARY_EXPORTS
-#define COMMON_API __attribute__((visibility("default")))
-#else
-#define COMMON_API
-#endif
-#endif
-
 #include <unordered_map>
 #include "spdlog/logger.h"
 #include <memory>
@@ -36,7 +20,7 @@ enum class Target : int
   FILE
 };
 
-class COMMON_API LoggingPool
+class LOGGER_API LoggingPool
 {
 public:
   static LoggingPool* getInstance(Target aTarget);
