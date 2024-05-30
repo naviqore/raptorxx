@@ -24,10 +24,12 @@ if(WIN32)
         target_compile_definitions(${PROJECT_NAME}
                 PRIVATE "GTFS_API=__declspec(dllexport)"
                 INTERFACE "GTFS_API=__declspec(dllimport)"
+                "LOGGER_API=__declspec(dllimport)"
         )
     else()
         target_compile_definitions(${PROJECT_NAME}
                 PUBLIC "GTFS_API"
+                "LOGGER_API"
         )
     endif()
 else()
@@ -35,13 +37,16 @@ else()
         target_compile_definitions(${PROJECT_NAME}
                 PRIVATE "GTFS_API=__attribute__((visibility(\"default\")))"
                 INTERFACE "GTFS_API"
+                "LOGGER_API=__attribute__((visibility(\"default\")))"
         )
     else()
         target_compile_definitions(${PROJECT_NAME}
                 PUBLIC "GTFS_API"
+                "LOGGER_API"
         )
     endif()
 endif()
+
 
 # target_compile_definitions(${PROJECT_NAME} PRIVATE LIBRARY_EXPORTS)
 message(BINARY_DIR: ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
