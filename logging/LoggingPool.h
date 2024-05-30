@@ -10,17 +10,17 @@
 #define COMMON_EXPORTS // TODO add in cmakelists as compile definition
 
 #ifdef _WIN32
-    #ifdef COMMON_EXPORTS
-        #define COMMON_API __declspec(dllexport)
-    #else
-        #define COMMON_API __declspec(dllimport)
-    #endif
+#ifdef COMMON_EXPORTS
+#define COMMON_API __declspec(dllexport)
 #else
-    #ifdef LIBRARY_EXPORTS
-        #define COMMON_API __attribute__((visibility("default")))
-    #else
-        #define COMMON_API
-    #endif
+#define COMMON_API __declspec(dllimport)
+#endif
+#else
+#ifdef LIBRARY_EXPORTS
+#define COMMON_API __attribute__((visibility("default")))
+#else
+#define COMMON_API
+#endif
 #endif
 
 #include <unordered_map>
@@ -38,16 +38,17 @@ class COMMON_API LoggingPool
 {
 public:
   static LoggingPool* getInstance(Target aTarget);
-  std::shared_ptr<spdlog::logger> getLogger();
+  [[nodiscard]] static std::shared_ptr<spdlog::logger> getLogger();
 
   ~LoggingPool();
   LoggingPool(const LoggingPool&) = delete;
   LoggingPool& operator=(const LoggingPool&) = delete;
+
 private:
   LoggingPool();
 
   class LoggingPoolImpl;
-  std::unique_ptr<LoggingPoolImpl> const impl;
+  static std::unique_ptr<LoggingPoolImpl> impl;
 };
 
 /*

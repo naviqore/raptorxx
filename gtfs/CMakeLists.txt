@@ -4,9 +4,6 @@ project(gtfs
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
-add_subdirectory(test)
-add_subdirectory(benchmarks)
-
 if (MSVC)
     add_compile_options(/W4 /WX)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

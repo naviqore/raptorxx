@@ -19,9 +19,12 @@ if (CMAKE_CXX_STANDARD LESS 20)
     message(FATAL_ERROR "At least C++20 required but have ${CMAKE_CXX_STANDARD}")
 endif ()
 
-include_directories("./include")
-
 add_library(${PROJECT_NAME}
         LoggingPool.cpp
         LoggingPool.h
 )
+
+include(../cmake/CPM.cmake)
+CPMAddPackage("gh:gabime/spdlog#v1.x")
+
+target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
