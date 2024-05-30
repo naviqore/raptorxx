@@ -22,14 +22,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4.1.4
 
-      - name: Set up cache
-        id: cache-cpm
-        uses: actions/cache@v4.0.2
-        with:
-          path: ~/cpm-cache
-          key: ${{ runner.os }}-cpm-${{ hashFiles('**/') }}
-          restore-keys: |
-            ${{ runner.os }}-cpm-
+#      - name: Set up cache
+#        id: cache-cpm
+#        uses: actions/cache@v4.0.2
+#        with:
+#          path: ~/cpm-cache
+#          key: ${{ runner.os }}-cpm-${{ hashFiles('**/') }}
+#          restore-keys: |
+#            ${{ runner.os }}-cpm-
 
       - name: Configure CMake
         run: |
