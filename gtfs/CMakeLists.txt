@@ -16,6 +16,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging)
 
 target_link_libraries(${PROJECT_NAME}
         logging
+        spdlog::spdlog
 )
 
 if(WIN32)
