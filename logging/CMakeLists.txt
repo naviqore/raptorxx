@@ -5,7 +5,6 @@ project("logging")
 include(${CMAKE_SOURCE_DIR}/cmake/CPM.cmake)
 CPMAddPackage("gh:gabime/spdlog#v1.x")
 
-
 add_library(${PROJECT_NAME} SHARED
         LoggingPool.cpp
         LoggingPool.h
@@ -16,28 +15,23 @@ target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
 if(WIN32)
     if(BUILD_SHARED_LIBS)
         target_compile_definitions(${PROJECT_NAME}
-                PRIVATE "GTFS_API=__declspec(dllexport)"
-                INTERFACE "GTFS_API=__declspec(dllimport)"
-                "LOGGER_API=__declspec(dllimport)"
+                PRIVATE "LOGGER_API=__declspec(dllexport)"
+                INTERFACE "LOGGER_API=__declspec(dllimport)"
         )
     else()
         target_compile_definitions(${PROJECT_NAME}
-                PUBLIC "GTFS_API"
-                "LOGGER_API"
+                PUBLIC "LOGGER_API"
         )
     endif()
 else()
     if(BUILD_SHARED_LIBS)
         target_compile_definitions(${PROJECT_NAME}
-                PRIVATE "GTFS_API=__attribute__((visibility(\"default\")))"
-                INTERFACE "GTFS_API"
-                "LOGGER_API=__attribute__((visibility(\"default\")))"
+                PRIVATE "LOGGER_API=__attribute__((visibility(\"default\")))"
+                INTERFACE "LOGGER_API"
         )
     else()
         target_compile_definitions(${PROJECT_NAME}
-                PUBLIC "GTFS_API"
-                "LOGGER_API"
+                PUBLIC "LOGGER_API"
         )
     endif()
 endif()
-
