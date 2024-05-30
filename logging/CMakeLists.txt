@@ -37,5 +37,3 @@ else()
         )
     endif()
 endif()
-
-# rest of your CMakeLists.txt file...
