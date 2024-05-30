@@ -29,12 +29,12 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
-include_directories(${CMAKE_SOURCE_DIR}/gtfs/src)
-
 add_executable(${PROJECT_NAME}
         test_addition.cpp
 )
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/gtfs/src)
 
 target_link_libraries(${PROJECT_NAME} gtest gtest_main)
 

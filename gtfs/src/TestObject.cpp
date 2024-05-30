@@ -7,6 +7,7 @@
 #include "DataReader.h"
 #include "GtfsReader.h"
 #include "GtfsReaderStrategy.h"
+#include <memory>
 // #include "LoggingPool.h"
 
 #include <iostream>
