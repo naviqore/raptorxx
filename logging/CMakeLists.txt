@@ -10,28 +10,32 @@ add_library(${PROJECT_NAME} SHARED
         LoggingPool.h
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
-
 if(WIN32)
     if(BUILD_SHARED_LIBS)
         target_compile_definitions(${PROJECT_NAME}
-                PRIVATE "LOGGER_API=__declspec(dllexport)"
-                INTERFACE "LOGGER_API=__declspec(dllimport)"
+                PRIVATE "GTFS_API=__declspec(dllexport)"
+                INTERFACE "GTFS_API=__declspec(dllimport)"
+                "LOGGER_API=__declspec(dllimport)"
         )
     else()
         target_compile_definitions(${PROJECT_NAME}
-                PUBLIC "LOGGER_API"
+                PUBLIC "GTFS_API"
+                "LOGGER_API="
         )
     endif()
 else()
     if(BUILD_SHARED_LIBS)
         target_compile_definitions(${PROJECT_NAME}
-                PRIVATE "LOGGER_API=__attribute__((visibility(\"default\")))"
-                INTERFACE "LOGGER_API"
+                PRIVATE "GTFS_API=__attribute__((visibility(\"default\")))"
+                INTERFACE "GTFS_API"
+                "LOGGER_API=__attribute__((visibility(\"default\")))"
         )
     else()
         target_compile_definitions(${PROJECT_NAME}
-                PUBLIC "LOGGER_API"
+                PUBLIC "GTFS_API"
+                "LOGGER_API="
         )
     endif()
 endif()
+
+# rest of your CMakeLists.txt file...
