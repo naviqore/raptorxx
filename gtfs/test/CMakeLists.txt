@@ -4,8 +4,9 @@ project("test"
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
-include(${CMAKE_SOURCE_DIR}/cmake/CPM.cmake)
+include(${CPM_DOWNLOAD_LOCATION})
 CPMAddPackage("gh:google/googletest#main")
+
 
 add_executable(${PROJECT_NAME}
         test_addition.cpp

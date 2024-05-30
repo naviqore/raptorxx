@@ -24,6 +24,8 @@ configure_file (
 
 set(BUILD_SHARED_LIBS ON)
 
+set(CPM_DOWNLOAD_LOCATION "${CMAKE_SOURCE_DIR}/cmake/CPM.cmake")
+
 add_subdirectory(logging)
 add_subdirectory(gtfs)
 add_subdirectory(gtfs/test)
