@@ -15,7 +15,7 @@ namespace gtfs {
 
     /* Checking that the given filename is valid and that
        the given 'std::function' instance is not empty */
-    if (strategy == nullptr)
+    if (nullptr == strategy)
     {
       throw std::invalid_argument("Strategy cannot be empty");
     }
@@ -23,6 +23,7 @@ namespace gtfs {
 
 
   void GtfsReader::readData() {
-    strategy(*this);
+    // strategy(*this);
+    strategy.operator()(*this);
   }
 } // gtfs

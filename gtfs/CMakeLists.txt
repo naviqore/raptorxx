@@ -10,6 +10,8 @@ add_library(${PROJECT_NAME} SHARED
         src/GtfsReader.h
         src/GtfsReaderStrategy.cpp
         src/GtfsReaderStrategy.h
+        src/fields/Agency.cpp
+        src/fields/Agency.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging/src)
