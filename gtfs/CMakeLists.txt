@@ -1,8 +1,9 @@
 ﻿project(gtfs
         DESCRIPTION "C++ implementation of GTFS reader"
 )
-
-set(CXX_SCAN_FOR_MODULES ON)
+if (MSVC)
+    set(CXX_SCAN_FOR_MODULES ON)
+endif ()
 
 add_library(${PROJECT_NAME} SHARED
         src/TestObject.cpp
