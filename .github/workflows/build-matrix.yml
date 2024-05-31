@@ -22,19 +22,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4.1.4
 
-#      - name: Set up cache
-#        id: cache-cpm
-#        uses: actions/cache@v4.0.2
-#        with:
-#          path: ~/cpm-cache
-#          key: ${{ runner.os }}-cpm-${{ hashFiles('**/') }}
-#          restore-keys: |
-#            ${{ runner.os }}-cpm-
+      - name: Install Ninja
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            sudo apt-get install ninja-build
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            brew install ninja
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            choco install ninja
+          fi
 
       - name: Configure CMake
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release
-# cmake -B build -DCMAKE_BUILD_TYPE=Release -DCPM_SOURCE_CACHE=~/cpm-cache
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -G Ninja
 
       - name: Build
         run: |
