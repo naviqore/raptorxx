@@ -11,7 +11,7 @@ endif ()
 
 if(MSVC)
     add_compile_options(/W4 /WX /std:c++latest)
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
     add_compile_options(-Wall -Wextra -pedantic -Werror -std=c++23)
 else()
     message(WARNING "You are using an unsupported compiler! Compilation has only been tested with MSVC, GCC and Clang.")
