@@ -11,9 +11,11 @@
 #include <LoggingPool.h>
 
 #include <iostream>
+import test.cxxmodule;
 
 void TestObject::testFunction() {
   std::cout << "hello world" << std::endl;
+  testModules();
 }
 
 void testFunction() {
