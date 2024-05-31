@@ -2,9 +2,6 @@
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
-set(CXX_SCAN_FOR_MODULES ON)
-
-
 add_library(${PROJECT_NAME} SHARED
         src/TestObject.cpp
         src/TestObject.h
@@ -15,12 +12,6 @@ add_library(${PROJECT_NAME} SHARED
         src/GtfsReaderStrategy.h
         src/fields/Agency.cpp
         src/fields/Agency.h
-)
-
-target_sources(${PROJECT_NAME}
-        PUBLIC
-        FILE_SET CXX_MODULES FILES
-        src/test.cxxmodule.ixx
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging/src)
