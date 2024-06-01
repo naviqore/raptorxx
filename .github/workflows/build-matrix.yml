@@ -26,19 +26,9 @@ jobs:
         uses: johnwason/vcpkg-action@v6
         id: vcpkg
         with:
-          pkgs: vcpkg-cmake-config vcpkg-cmake gtest spdlog benchmark
           triplet: x64-windows-release
           token: ${{ github.token }}
-          # github-binarycache: true
-
-      #      - name: Set up cache
-      #        id: cache-cpm
-      #        uses: actions/cache@v4.0.2
-      #        with:
-      #          path: ~/cpm-cache
-      #          key: ${{ runner.os }}-cpm-${{ hashFiles('**/') }}
-      #          restore-keys: |
-      #            ${{ runner.os }}-cpm-
+          github-binarycache: false
 
       - name: Configure CMake
         run: |
