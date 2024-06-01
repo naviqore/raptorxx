@@ -10,15 +10,16 @@
 #include <stdexcept>
 #include <fstream>
 #include <ranges>
+#include <utility>
 
 namespace gtfs {
 
   void GtfsAgencyReader::operator()(GtfsReader& aReader) const {
-    std::ifstream infile(aReader.getFilename().data());
+    std::ifstream infile(filename);
     if (!infile.is_open())
     {
       // TODO log error
-      throw std::runtime_error("Error opening file: " + std::string(aReader.getFilename()));
+      throw std::runtime_error("Error opening file: " + std::string(filename));
     }
 
     std::string line;
@@ -38,7 +39,11 @@ namespace gtfs {
       std::string timezone = fields[3].substr(1, fields[3].size() - quoteSize);
 
       aReader.getData().agencies.emplace_back(std::move(id), std::move(name), std::move(timezone));
-     // aReader.agencies.emplace_back(std::move(id), std::move(name), std::move(timezone));
+      // aReader.agencies.emplace_back(std::move(id), std::move(name), std::move(timezone));
     }
+  }
+
+  GtfsAgencyReader::GtfsAgencyReader(std::string  filename)
+    : filename(std::move(filename)) {
   }
 } // gtfs

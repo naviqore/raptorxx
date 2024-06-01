@@ -18,10 +18,12 @@ void TestObject::testFunction() {
 }
 
 void readAgencyTestFunction(std::string const& aFileName) {
-  std::function strategy = gtfs::GtfsAgencyReader();
+  const std::function strategy = gtfs::GtfsAgencyReader(aFileName);
+  std::vector strategies = {strategy};
   // auto currentDirectory = std::filesystem::current_path();
   // auto parentDirectory = currentDirectory.parent_path();
-  const std::unique_ptr<DataReader> reader = std::make_unique<gtfs::GtfsReader>(aFileName, std::move(strategy));
+
+  const std::unique_ptr<DataReader> reader = std::make_unique<gtfs::GtfsReader>(std::move(strategies));
   reader->readData();
   const auto data = reader->getData();
   std::ranges::for_each(data.agencies, [](const auto& agency) {

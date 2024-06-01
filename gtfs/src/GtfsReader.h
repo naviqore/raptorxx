@@ -10,6 +10,7 @@
 #include "fields/Agency.h"
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <string>
 
@@ -17,14 +18,19 @@ namespace gtfs {
 
   class GtfsReader final : public DataReader
   {
+
   public:
+    enum GTFS_TYPE
+    {
+      agency,
+    };
     using GtfsStrategy = std::function<void(GtfsReader& /*, ...*/)>;
 
-    explicit GtfsReader(std::string_view filename, GtfsStrategy&& strategy);
+    // explicit GtfsReader(std::string_view filename, GtfsStrategy&& strategy);
+
+    explicit GtfsReader(std::vector<std::function<void(GtfsReader&)>>&& strategies);
 
     void readData() override;
-
-    [[nodiscard]] std::string const& getFilename() const;
 
     [[nodiscard]] const GtfsData& getData() const override;
 
@@ -32,8 +38,7 @@ namespace gtfs {
 
 
   private:
-    std::string filename;
-    GtfsStrategy strategy;
+    std::vector<std::function<void(GtfsReader&)>> strategies;
     GtfsData data;
   };
 

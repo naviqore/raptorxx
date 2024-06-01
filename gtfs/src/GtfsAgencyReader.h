@@ -18,8 +18,9 @@ namespace gtfs {
 
   class GtfsAgencyReader
   {
+    std::string filename;
   public:
-    GtfsAgencyReader() = default;
+    explicit GtfsAgencyReader(std::string  filename);
 
     void operator()(GtfsReader& aReader) const;
   };
