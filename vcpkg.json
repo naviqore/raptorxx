@@ -1,7 +1,6 @@
 {
   "name" : "raptorxx",
   "version-string" : "1.0.0",
-  "builtin-baseline" : "f4862747d9d353851c15950977c5a456ab47f059",
   "dependencies" : [ {
     "name" : "vcpkg-cmake-config",
     "version>=" : "2022-02-06#1"
