@@ -7,6 +7,8 @@
 #include <functional>
 #include <iterator>
 #include <algorithm>
+#include <iostream>
+#include <memory>
 #include <ranges>
 
 
@@ -42,7 +44,6 @@ static void use_std_function(benchmark::State& state) {
 
 struct Student
 {
-
   int year_{};
   int score_{};
   std::string name_{};
@@ -80,8 +81,42 @@ static void BM_get_max_score(benchmark::State& state) {
   }
 }
 
+static void BM_pointer(benchmark::State& state) {
+  // auto ptr = std::make_shared<int>(12);
+  auto vec = std::vector<int*>();
+
+  vec.resize(10'000, new int(12));
+
+  auto printValue = [](const int* value) { return *value; };
+
+  for (auto _ : state)
+  {
+    for (const auto& f : vec)
+    {
+      benchmark::DoNotOptimize(printValue(f));
+    }
+  }
+}
+
+static void BM_reference(benchmark::State& state) {
+  const auto ref = 12;
+  auto vec = std::vector<int>();
+  vec.resize(10'000, ref);
+  auto printValue = [](const auto value) { return value; };
+
+  for (auto _ : state)
+  {
+    for (const auto& f : vec)
+    {
+      benchmark::DoNotOptimize(printValue(f));
+    }
+  }
+}
+
 BENCHMARK(BM_get_max_score);
 BENCHMARK(use_lambda);
 BENCHMARK(use_std_function);
+BENCHMARK(BM_pointer);
+BENCHMARK(BM_reference);
 
 BENCHMARK_MAIN();

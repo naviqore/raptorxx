@@ -15,9 +15,9 @@ namespace gtfs {
 
     /* Checking that the given filename is valid and that
        the given 'std::function' instance is not empty */
-    if (nullptr == strategy)
+    if (filename.empty())
     {
-      throw std::invalid_argument("Strategy cannot be empty");
+      throw std::invalid_argument("Filename cannot be empty");
     }
   }
 

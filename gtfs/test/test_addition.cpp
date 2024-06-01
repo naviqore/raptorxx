@@ -7,6 +7,14 @@
 #include <TestObject.h>
 #include <ProjectConfig.h>
 
+
+#include <cstdint>
+
+uint64_t fibonacci(uint64_t number) {
+  return number < 2 ? number : fibonacci(number - 1) + fibonacci(number - 2);
+}
+
+
 auto add(const int a, const int b) {
   return a + b;
 }

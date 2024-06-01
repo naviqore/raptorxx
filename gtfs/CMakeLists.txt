@@ -16,7 +16,9 @@ add_library(${PROJECT_NAME} SHARED
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging/src)
 
-target_link_libraries(${PROJECT_NAME}
+find_package(spdlog CONFIG REQUIRED)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
         logging
         spdlog::spdlog
 )

@@ -17,6 +17,11 @@ void TestObject::testFunction() {
 }
 
 void testFunction() {
-  const std::unique_ptr<DataReader> reader = std::make_unique<gtfs::GtfsReader>("file.txt", gtfs::GtfsReaderStrategy());
+  std::function strategy = gtfs::GtfsReaderStrategy();
+  auto lambda = [](gtfs::GtfsReader const& aReader) {
+    std::ignore = aReader;
+    std::cout << "do something in lambda" << std::endl;
+  };
+  const std::unique_ptr<DataReader> reader = std::make_unique<gtfs::GtfsReader>("file.txt", std::move(strategy));
   reader->readData();
 }

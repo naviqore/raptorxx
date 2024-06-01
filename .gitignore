@@ -39,3 +39,7 @@
 /gtfs/test/cmake-*/*
 /.vscode
 /output
+/.vs/raptorxx/FileContentIndex
+/.vs/raptorxx/v17
+/.vs
+/vcpkg_installed

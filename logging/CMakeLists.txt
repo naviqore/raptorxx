@@ -2,18 +2,12 @@ cmake_minimum_required(VERSION 3.28)
 
 project("logging")
 
-include(${CPM_DOWNLOAD_LOCATION})
-CPMAddPackage(
-        NAME spdlog
-        GITHUB_REPOSITORY gabime/spdlog
-        VERSION 1.x
-)
-
 add_library(${PROJECT_NAME} SHARED
         src/LoggingPool.cpp
         src/LoggingPool.h
-)
+    )
 
+find_package(spdlog CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
