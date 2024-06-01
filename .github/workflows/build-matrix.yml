@@ -10,14 +10,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ windows-latest ] #, ubuntu-latest, macos-latest
+        os: [ windows-latest, ubuntu-latest, macos-latest ] #
         include:
           - os: windows-latest
             compiler: msvc
-#          - os: ubuntu-latest
-#            compiler: gcc
-#          - os: macos-latest
-#            compiler: clang
+          - os: ubuntu-latest
+            compiler: gcc
+          - os: macos-latest
+            compiler: clang
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.4
@@ -26,9 +26,14 @@ jobs:
         run: |
           git clone https://github.com/microsoft/vcpkg.git
           cd vcpkg
-          ./bootstrap-vcpkg.bat
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            ./bootstrap-vcpkg.bat
+          else
+            ./bootstrap-vcpkg.sh
+          fi
           ./vcpkg integrate install
           ./vcpkg install 
+
 
       - name: Configure CMake
         run: |

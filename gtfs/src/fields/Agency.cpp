@@ -4,8 +4,6 @@
 
 #include "Agency.h"
 
-#include <utility>
-
 namespace gtfs {
   // Agency::Agency(std::string&& aAgencyId, std::string&& aName, std::string&& aTimezone)
   //   : agencyId(std::move(aAgencyId))
