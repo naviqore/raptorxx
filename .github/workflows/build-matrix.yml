@@ -26,7 +26,7 @@ jobs:
         uses: johnwason/vcpkg-action@v6
         id: vcpkg
         with:
-          pkgs: boost-date-time boost-system
+          # pkgs: boost-date-time boost-system
           triplet: x64-windows-release
           token: ${{ github.token }}
           github-binarycache: true
