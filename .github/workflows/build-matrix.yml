@@ -37,4 +37,4 @@ jobs:
 
       - name: Build
         run: |
-          cmake --build build --config Release --preset release
+          cmake --build build --config Release

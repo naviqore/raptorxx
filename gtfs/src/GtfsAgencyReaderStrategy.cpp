@@ -4,6 +4,8 @@
 
 #include "GtfsAgencyReaderStrategy.h"
 
+#include "fields/Agency.h"
+
 #include <stdexcept>
 
 namespace gtfs {
@@ -19,6 +21,52 @@ namespace gtfs {
 } // gtfs
 
 
+/*
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
+
+int main() {
+  // Open the input file
+  std::ifstream infile("tfs_agency.txt");
+  if (!infile.is_open()) {
+    std::cerr << "Error opening file." << std::endl;
+    return 1;
+  }
+
+  // Create a vector to store agency data
+  std::vector<gtfs::Agency> agencies;
+
+  // Read data from the file
+  std::string line;
+  while (std::getline(infile, line)) {
+    gtfs::Agency agency;
+    std::size_t comma1 = line.find(',');
+    std::size_t comma2 = line.find(',', comma1 + 1);
+
+    if (comma1 != std::string::npos && comma2 != std::string::npos) {
+      agency.name = line.substr(0, comma1);
+      agency.location = line.substr(comma1 + 1, comma2 - comma1 - 1);
+      agency.employees = std::stoi(line.substr(comma2 + 1));
+      agencies.push_back(agency);
+    }
+  }
+
+  // Close the file
+  infile.close();
+
+  // Print agency data
+  for (const auto& ag : agencies) {
+    std::cout << "Agency Name: " << ag.name << std::endl;
+    std::cout << "Location: " << ag.location << std::endl;
+    std::cout << "Employees: " << ag.employees << std::endl;
+    std::cout << "-------------------------" << std::endl;
+  }
+
+  return 0;
+}*/
 
 
 /*
