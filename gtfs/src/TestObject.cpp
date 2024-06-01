@@ -5,8 +5,8 @@
 #include "TestObject.h"
 
 #include "DataReader.h"
+#include "GtfsAgencyReader.h"
 #include "GtfsReader.h"
-#include "GtfsReaderStrategy.h"
 #include <memory>
 #include <LoggingPool.h>
 
@@ -17,11 +17,10 @@ void TestObject::testFunction() {
 }
 
 void testFunction() {
-  std::function strategy = gtfs::GtfsReaderStrategy();
-  auto lambda = [](gtfs::GtfsReader const& aReader) {
-    std::ignore = aReader;
-    std::cout << "do something in lambda" << std::endl;
-  };
-  const std::unique_ptr<DataReader> reader = std::make_unique<gtfs::GtfsReader>("file.txt", std::move(strategy));
+  std::function strategy = gtfs::GtfsAgencyReader();
+  // auto currentDirectory = std::filesystem::current_path();
+  // auto parentDirectory = currentDirectory.parent_path();
+  const auto lFileName = R"(C:\Users\MichaelBrunner\source\master-thesis\raptorxx\gtfs\src\test-data\agency.txt)";
+  const std::unique_ptr<DataReader> reader = std::make_unique<gtfs::GtfsReader>(lFileName, std::move(strategy));
   reader->readData();
 }

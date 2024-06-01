@@ -4,6 +4,8 @@
 
 #include "GtfsReader.h"
 
+#include <algorithm>
+#include <iostream>
 #include <stdexcept>
 #include <utility>
 
@@ -21,9 +23,12 @@ namespace gtfs {
     }
   }
 
-
   void GtfsReader::readData() {
     // strategy(*this);
     strategy.operator()(*this);
+  }
+
+  std::string const& GtfsReader::getFilename() const {
+    return filename;
   }
 } // gtfs
