@@ -23,6 +23,7 @@ jobs:
         uses: actions/checkout@v4.1.4
 
       - name: vcpkg installation
+        shell: bash
         run: |
           git clone https://github.com/microsoft/vcpkg.git
           cd vcpkg
@@ -32,7 +33,7 @@ jobs:
             ./bootstrap-vcpkg.sh
           fi
           ./vcpkg integrate install
-          ./vcpkg install 
+          ./vcpkg install
 
 
       - name: Configure CMake
