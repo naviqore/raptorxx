@@ -18,14 +18,10 @@ namespace gtfs {
 
   class GtfsAgencyReader
   {
-    std::vector<Agency> agencies;
-
   public:
     GtfsAgencyReader() = default;
 
     void operator()(GtfsReader& aReader) const;
-
-    [[nodiscard]] std::vector<Agency> const& getAgencies() const;
   };
 
 } // gtfs

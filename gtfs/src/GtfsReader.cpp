@@ -31,4 +31,10 @@ namespace gtfs {
   std::string const& GtfsReader::getFilename() const {
     return filename;
   }
+  const GtfsData& GtfsReader::getData() const {
+    return data;
+  }
+  GtfsData& GtfsReader::getData() {
+    return data;
+  }
 } // gtfs

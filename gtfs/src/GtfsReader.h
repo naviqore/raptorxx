@@ -6,6 +6,7 @@
 #define GTFSREADER_H
 
 #include "DataReader.h"
+#include "GtfsData.h"
 #include "fields/Agency.h"
 
 #include <functional>
@@ -25,12 +26,15 @@ namespace gtfs {
 
     [[nodiscard]] std::string const& getFilename() const;
 
-    std::vector<Agency> agencies;
+    [[nodiscard]] const GtfsData& getData() const override;
+
+    GtfsData& getData();
+
 
   private:
     std::string filename;
     GtfsStrategy strategy;
-
+    GtfsData data;
   };
 
 

@@ -21,7 +21,7 @@ auto add(const int a, const int b) {
 
 
 TEST(MathTest, Addition) {
-  TestObject lTest = TestObject();
+  auto lTest = TestObject();
   lTest.testFunction();
   std::cout << "v" << PROJECT_VERSION_MAJOR << "." << PROJECT_VERSION_MINOR << "." << PROJECT_VERSION_PATCH << std::endl;
   EXPECT_EQ(add(5, 8), 13);
@@ -29,5 +29,6 @@ TEST(MathTest, Addition) {
 }
 
 TEST(GTFS, TestFunction) {
-  testFunction();
+  const auto lFileName = R"(C:\Users\MichaelBrunner\source\master-thesis\raptorxx\gtfs\test\test-data\agency.txt)";
+  readAgencyTestFunction(lFileName);
 }

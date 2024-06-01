@@ -15,6 +15,8 @@ add_library(${PROJECT_NAME} SHARED
         src/GtfsAgencyReader.cpp
         src/GtfsAgencyReader.h
         src/utils/utils.h
+        src/GtfsData.cpp
+        src/GtfsData.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging/src)

@@ -37,12 +37,8 @@ namespace gtfs {
       std::string name = fields[1].substr(1, fields[1].size() - quoteSize);
       std::string timezone = fields[3].substr(1, fields[3].size() - quoteSize);
 
-      aReader.agencies.emplace_back(std::move(id), std::move(name), std::move(timezone));
-    }
-  }
-  std::vector<Agency> const& GtfsAgencyReader::getAgencies() const {
-    {
-      return agencies;
+      aReader.getData().agencies.emplace_back(std::move(id), std::move(name), std::move(timezone));
+     // aReader.agencies.emplace_back(std::move(id), std::move(name), std::move(timezone));
     }
   }
 } // gtfs
