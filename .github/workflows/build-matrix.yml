@@ -28,7 +28,7 @@ jobs:
           cd vcpkg
           ./bootstrap-vcpkg.bat
           ./vcpkg integrate install
-          ./vcpkg/vcpkg install 
+          ./vcpkg install 
 
       - name: Configure CMake
         run: |
