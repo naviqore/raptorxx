@@ -5,17 +5,20 @@
 #ifndef AGENCY_H
 #define AGENCY_H
 
+
 #include <string>
+#include <cstring>
 
 namespace gtfs {
   struct Agency
   {
-   Agency(std::string&& aAgencyId, std::string&& aName, std::string&& aTimezone);
+    Agency(std::string&& aAgencyId, std::string&& aName, std::string&& aTimezone);
 
     std::string agencyId;
     std::string name;
     std::string timezone;
   };
+
 } // gtfs
 
 #endif //AGENCY_H

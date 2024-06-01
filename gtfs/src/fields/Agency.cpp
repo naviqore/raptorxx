@@ -10,4 +10,5 @@ namespace gtfs {
     , name(std::move(aName))
     , timezone(std::move(aTimezone)) {
   }
+
 } // gtfs

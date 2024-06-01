@@ -15,6 +15,9 @@ public:
 
 GTFS_API void testFunction();
 
+extern "C" GTFS_API size_t stringLength(const char* str);
+
+
 
 
 #endif //TEST_H

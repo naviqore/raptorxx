@@ -24,3 +24,7 @@ void testFunction() {
   const std::unique_ptr<DataReader> reader = std::make_unique<gtfs::GtfsReader>(lFileName, std::move(strategy));
   reader->readData();
 }
+
+size_t stringLength(const char* str) {
+  return strlen(str);
+}
