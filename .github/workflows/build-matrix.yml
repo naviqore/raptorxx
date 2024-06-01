@@ -22,12 +22,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4.1.4
 
-      - uses: lukka/get-cmake@latest
-
-      - name: Run vcpkg to build packages
+      - name: Set up vcpkg
         uses: lukka/run-vcpkg@v11.5
         with:
-          vcpkg-dir: '${{ runner.workspace }}/vcpkg'
+          vcpkg-json: vcpkg.json
+
+      - name: Install dependencies
+        run: vcpkg install
 
 #      - name: run-vcpkg
 #        uses: lukka/run-vcpkg@v11.5
