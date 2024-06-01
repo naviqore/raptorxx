@@ -10,7 +10,7 @@
 namespace gtfs {
   struct Agency
   {
-   // explicit Agency(std::string&& aAgencyId, std::string&& aName, std::string&& aTimezone);
+   Agency(std::string&& aAgencyId, std::string&& aName, std::string&& aTimezone);
 
     std::string agencyId;
     std::string name;

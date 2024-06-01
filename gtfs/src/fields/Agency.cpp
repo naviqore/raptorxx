@@ -5,10 +5,9 @@
 #include "Agency.h"
 
 namespace gtfs {
-  // Agency::Agency(std::string&& aAgencyId, std::string&& aName, std::string&& aTimezone)
-  //   : agencyId(std::move(aAgencyId))
-  //   , name(std::move(aName))
-  //   , timezone(std::move(aTimezone)) {
-  // }
+  Agency::Agency(std::string&& aAgencyId, std::string&& aName, std::string&& aTimezone)
+    : agencyId(std::move(aAgencyId))
+    , name(std::move(aName))
+    , timezone(std::move(aTimezone)) {
+  }
 } // gtfs
-
