@@ -24,15 +24,10 @@ jobs:
 
       - uses: lukka/get-cmake@latest
 
-      - name: Run CMake consuming CMakePreset.json and run vcpkg to build packages
+      - name: Run vcpkg to build packages
         uses: lukka/run-vcpkg@v11.5
         with:
-          configurePreset: 'ninja-multi-vcpkg'
-          configurePresetAdditionalArgs: "['-DENABLE_YOUR_FEATURE=1']"
-          buildPreset: 'ninja-multi-vcpkg'
-          buildPresetAdditionalArgs: "['--config Release']"
-          testPreset: 'ninja-multi-vcpkg'
-          testPresetAdditionalArgs: "['--config Release']"
+          vcpkg-dir: '${{ runner.workspace }}/vcpkg'
 
 #      - name: run-vcpkg
 #        uses: lukka/run-vcpkg@v11.5
@@ -43,7 +38,7 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
         run: |
