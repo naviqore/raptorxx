@@ -22,20 +22,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4.1.4
 
-      - name: Set up vcpkg
-        uses: lukka/run-vcpkg@v11.5
+      - name: vcpkg-action
+        uses: johnwason/vcpkg-action@v6
         with:
           vcpkg-json: vcpkg.json
 
       - name: Install dependencies
         run: vcpkg install
-
-#      - name: run-vcpkg
-#        uses: lukka/run-vcpkg@v11.5
-#        with:
-#          vcpkg-dir: '${{ runner.workspace }}/vcpkg'
-#          # vcpkg-triplet: x64-windows
-#          appendedCacheKey: ${{hashFiles('vcpkg.json')}}
 
       - name: Configure CMake
         run: |
@@ -44,3 +37,26 @@ jobs:
       - name: Build
         run: |
           cmake --build build --config Release
+
+  buildme:
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      matrix:
+        config:
+          - os: ubuntu-latest
+            vcpkg_triplet: x64-linux-release
+          - os: macos-latest
+            vcpkg_triplet: x64-osx-release
+          - os: windows-latest
+            vcpkg_triplet: x64-windows-release
+    steps:
+      - name: vcpkg build
+        uses: johnwason/vcpkg-action@v6
+        id: vcpkg
+        with:
+          pkgs: boost-date-time
+          triplet: ${{ matrix.config.vcpkg_triplet }}
+          # cache-key: ${{ matrix.config.os }}
+          # revision: master
+          # token: ${{ github.token }}
+          # github-binarycache: true
