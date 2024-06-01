@@ -22,13 +22,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4.1.4
 
-      - name: vcpkg build
-        uses: johnwason/vcpkg-action@v6
-        id: vcpkg
-        with:
-          triplet: x64-windows-release
-          token: ${{ github.token }}
-          github-binarycache: false
+      - name: vcpkg installation
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+          ./bootstrap-vcpkg.bat
+          ./vcpkg integrate install
+          ./vcpkg/vcpkg install 
 
       - name: Configure CMake
         run: |
@@ -37,4 +37,4 @@ jobs:
 
       - name: Build
         run: |
-          cmake --build build --config Release
+          cmake --build build --config Release --preset release
