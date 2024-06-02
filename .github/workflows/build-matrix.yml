@@ -10,14 +10,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
+        os: [windows-latest, ubuntu-latest, macos-latest] #
         include:
           - os: windows-latest
             compiler: msvc
           - os: ubuntu-latest
             compiler: gcc
           - os: macos-latest
-            compiler: gcc
+            compiler: clang
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.4
@@ -35,21 +35,10 @@ jobs:
           ./vcpkg integrate install
           ./vcpkg install
 
-      - name: Set up GCC
-        if: matrix.os == 'macos-latest'
-        run: |
-          brew install gcc
-          echo "CC=/usr/local/bin/gcc-11" >> $GITHUB_ENV
-          echo "CXX=/usr/local/bin/g++-11" >> $GITHUB_ENV
-
       - name: Configure CMake
         run: |
-          if [[ "${{ runner.os }}" == "macOS" ]]; then
-            export CC=/usr/local/bin/gcc-11
-            export CXX=/usr/local/bin/g++-11
-          fi
           cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
-
+      # cmake -B build -DCMAKE_BUILD_TYPE=Release -DCPM_SOURCE_CACHE=~/cpm-cache
       - name: Build
         run: |
           cmake --build build --config Release

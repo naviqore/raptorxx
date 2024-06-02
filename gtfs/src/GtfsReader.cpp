@@ -5,8 +5,12 @@
 #include "GtfsReader.h"
 
 #include <algorithm>
-#include <execution>
 #include <utility>
+
+#if __has_include(<execution>)
+#include <execution> // Apple Clang does not support this header
+#define HAS_EXECUTION
+#endif
 
 namespace gtfs {
 
@@ -18,15 +22,16 @@ namespace gtfs {
     }
   }
 
-  // void GtfsReader::readData() {
-  //   std::ranges::for_each(strategies, [this](const auto& strategy) {
-  //     strategy(*this);
-  //   });
-
   void GtfsReader::readData() {
+#ifdef HAS_EXECUTION
     std::for_each(std::execution::par, strategies.begin(), strategies.end(), [this](const auto& strategy) {
       strategy(*this);
     });
+#else
+    std::for_each(strategies.begin(), strategies.end(), [this](const auto& strategy) {
+      strategy(*this);
+    });
+#endif
   }
 
   const GtfsData& GtfsReader::getData() const {
