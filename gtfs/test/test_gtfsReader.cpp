@@ -17,6 +17,34 @@
 
 #include <gtest/gtest.h>
 
+namespace fmt {
+  template <>
+  struct formatter<std::chrono::year> {
+    template <typename ParseContext>
+    constexpr auto parse(ParseContext& ctx) {
+      return ctx.begin();
+    }
+
+    template <typename FormatContext>
+    auto format(const std::chrono::year& y, FormatContext& ctx) {
+      return format_to(ctx.out(), "{}", static_cast<int>(y));
+    }
+  };
+
+  template <>
+  struct formatter<std::chrono::month> {
+    template <typename ParseContext>
+    constexpr auto parse(ParseContext& ctx) {
+      return ctx.begin();
+    }
+
+    template <typename FormatContext>
+    auto format(const std::chrono::month& m, FormatContext& ctx) {
+      return format_to(ctx.out(), "{}", static_cast<unsigned>(m));
+    }
+  };
+}
+
 
 TEST(GTFS, TestFunction) {
   const auto agencyFile = R"(C:\Users\MichaelBrunner\source\master-thesis\raptorxx\gtfs\test\test-data\agency.txt)";
