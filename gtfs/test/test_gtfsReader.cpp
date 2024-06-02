@@ -62,7 +62,6 @@ namespace fmt {
 }
 
 
-
 TEST(GTFS, TestFunction) {
   const auto agencyFile = R"(C:\Users\MichaelBrunner\source\master-thesis\raptorxx\gtfs\test\test-data\agency.txt)";
   const auto calendarFile = R"(C:\Users\MichaelBrunner\source\master-thesis\raptorxx\gtfs\test\test-data\calendar.txt)";
