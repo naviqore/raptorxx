@@ -5,19 +5,20 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["main"]
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest] # , macos-latest
+        os: [windows-latest, ubuntu-latest, macos-latest]
         include:
           - os: windows-latest
             compiler: msvc
           - os: ubuntu-latest
             compiler: gcc
-          # - os: macos-latest
-          #   compiler: clang
+          - os: macos-latest
+            compiler: clang
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.4
@@ -26,12 +27,16 @@ jobs:
         shell: bash
         run: |
           if [[ "${{ runner.os }}" == "Windows" ]]; then
-            choco install ninja
+            choco upgrade ninja --version=latest
           elif [[ "${{ runner.os }}" == "Linux" ]]; then
             sudo apt-get install -y ninja-build
           elif [[ "${{ runner.os }}" == "macOS" ]]; then
-            brew install ninja
+            brew upgrade ninja || brew install ninja
           fi
+
+      - name: Install LLVM (macOS only)
+        if: matrix.os == 'macos-latest'
+        run: brew upgrade llvm || brew install llvm
 
       - name: Cache vcpkg
         uses: actions/cache@v4.0.2
@@ -46,17 +51,22 @@ jobs:
         run: |
           git clone https://github.com/microsoft/vcpkg.git
           cd vcpkg
+          git pull origin master
           if [[ "${{ runner.os }}" == "Windows" ]]; then
             ./bootstrap-vcpkg.bat
           else
             ./bootstrap-vcpkg.sh
           fi
           ./vcpkg integrate install
-          ./vcpkg install
+          ./vcpkg upgrade --no-dry-run
 
       - name: Configure CMake
         run: |
-          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+          if [[ "${{ runner.os }}" == "macOS" ]]; then
+            cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_COMPILER=/usr/local/opt/llvm/bin/clang++
+          else
+            cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+          fi
 
       - name: Build
         run: |
