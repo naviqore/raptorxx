@@ -27,7 +27,7 @@ jobs:
         shell: bash
         run: |
           if [[ "${{ runner.os }}" == "Windows" ]]; then
-            choco upgrade ninja --version=latest
+          choco install ninja --version 1.12.1
           elif [[ "${{ runner.os }}" == "Linux" ]]; then
             sudo apt-get install -y ninja-build
           elif [[ "${{ runner.os }}" == "macOS" ]]; then
