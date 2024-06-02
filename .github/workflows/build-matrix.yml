@@ -5,48 +5,22 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["main"]
-
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, macos-latest] # , ubuntu-latest
+        os: [windows-latest, ubuntu-latest, macos-latest] #
         include:
           - os: windows-latest
             compiler: msvc
-          # - os: ubuntu-latest
-          #   compiler: gcc
+          - os: ubuntu-latest
+            compiler: gcc
           - os: macos-latest
             compiler: clang
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.4
-
-      - name: Install Ninja
-        shell: bash
-        run: |
-          if [[ "${{ runner.os }}" == "Windows" ]]; then
-            choco install ninja --yes --force
-          elif [[ "${{ runner.os }}" == "Linux" ]]; then
-            sudo apt-get install -y ninja-build
-          elif [[ "${{ runner.os }}" == "macOS" ]]; then
-            brew upgrade ninja || brew install ninja
-          fi
-
-      - name: Install LLVM (macOS only)
-        if: matrix.os == 'macos-latest'
-        run: |
-          brew install llvm
-          echo "/usr/local/opt/llvm/bin" >> $GITHUB_PATH
-
-      - name: Cache vcpkg
-        uses: actions/cache@v4.0.2
-        with:
-          path: |
-            vcpkg
-            vcpkg_installed
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
 
       - name: vcpkg installation
         shell: bash
@@ -63,12 +37,8 @@ jobs:
 
       - name: Configure CMake
         run: |
-          if [[ "${{ runner.os }}" == "macOS" ]]; then
-            cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_COMPILER=/usr/local/opt/llvm/bin/clang++
-          else
-            cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
-          fi
-
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+      # cmake -B build -DCMAKE_BUILD_TYPE=Release -DCPM_SOURCE_CACHE=~/cpm-cache
       - name: Build
         run: |
           cmake --build build --config Release

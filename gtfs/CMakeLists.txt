@@ -26,11 +26,11 @@ add_library(${PROJECT_NAME} SHARED
         src/strategies/GtfsCalendarReader.h
 )
 
-target_sources(${PROJECT_NAME}
-        PUBLIC
-        FILE_SET all_my_modules TYPE CXX_MODULES FILES
-        src/mod.test.cppm
-)
+# target_sources(${PROJECT_NAME}
+#         PUBLIC
+#         FILE_SET all_my_modules TYPE CXX_MODULES FILES
+#         src/mod.test.cppm
+# )
 
 message("CU_LIST_DIR UO: ${CMAKE_CURRENT_LIST_DIR}")
 

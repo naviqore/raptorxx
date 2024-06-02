@@ -10,11 +10,11 @@ if (CMAKE_CXX_STANDARD LESS 23)
 endif ()
 
 if (MSVC)
-    add_compile_options(/W4 /WX /experimental:module /std:c++latest)
+    add_compile_options(/W4 /WX /std:c++latest)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     add_compile_options(-Wall -Wextra -pedantic -Werror -std=c++23)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-    add_compile_options(-Wall -Wextra -pedantic -Werror -fmodules -fbuiltin-module-map -c -std=c++2b)
+    add_compile_options(-Wall -Wextra -pedantic -Werror -std=c++2b)
 else ()
     message(WARNING "You are using an unsupported compiler! Compilation has only been tested with MSVC, GCC and Clang.")
 endif ()
@@ -25,7 +25,6 @@ configure_file(
 )
 
 set(BUILD_SHARED_LIBS ON)
-set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 set(CPM_DOWNLOAD_LOCATION "${CMAKE_SOURCE_DIR}/cmake/CPM.cmake")
 
