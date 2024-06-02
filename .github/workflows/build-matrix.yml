@@ -51,14 +51,13 @@ jobs:
         run: |
           git clone https://github.com/microsoft/vcpkg.git
           cd vcpkg
-          git pull origin master
           if [[ "${{ runner.os }}" == "Windows" ]]; then
             ./bootstrap-vcpkg.bat
           else
             ./bootstrap-vcpkg.sh
           fi
           ./vcpkg integrate install
-          ./vcpkg upgrade --no-dry-run
+          ./vcpkg install
 
       - name: Configure CMake
         run: |
