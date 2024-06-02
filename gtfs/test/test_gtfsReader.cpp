@@ -46,7 +46,8 @@ TEST(GTFS, TestFunction) {
     LoggingPool::getLogger()->info("Weekday Service: ");
     for (const auto& [day, service] : calendar.weekdayService)
     {
-      LoggingPool::getLogger()->info("{}: {}", fmt::format("{:%A}", day), (service ? "Service" : "No service"));
+      auto day_name = fmt::format("{:%A}", day);
+      LoggingPool::getLogger()->info("{}: {}", day_name, (service ? "Service" : "No service"));
     }
   });
 }
