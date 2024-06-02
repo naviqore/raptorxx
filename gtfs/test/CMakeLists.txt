@@ -4,11 +4,11 @@ project("test"
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
+enable_testing()
+
 add_executable(${PROJECT_NAME}
         test_addition.cpp
 )
-
-enable_testing()
 
 find_package(GTest CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE
