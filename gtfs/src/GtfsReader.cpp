@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <utility>
 
-#if __has_include(<execution>)
+#if __has_include(<execution> )
 #include <execution> // Apple Clang does not support this header
 #define HAS_EXECUTION
 #endif
@@ -23,7 +23,7 @@ namespace gtfs {
   }
 
   void GtfsReader::readData() {
-#ifdef HAS_EXECUTION
+#if defined(HAS_EXECUTION) && !(defined(__clang__) && defined(__apple_build_version__))
     std::for_each(std::execution::par, strategies.begin(), strategies.end(), [this](const auto& strategy) {
       strategy(*this);
     });
