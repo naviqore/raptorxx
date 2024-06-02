@@ -28,7 +28,7 @@ namespace fmt {
 
     template<typename FormatContext>
     auto format(const std::chrono::year& y, FormatContext& ctx) {
-      return format_to(ctx.out(), "{}", static_cast<int>(y));
+      return fmt::format_to(ctx.out(), "{}", static_cast<int>(y));
     }
   };
 
@@ -42,7 +42,7 @@ namespace fmt {
 
     template<typename FormatContext>
     auto format(const std::chrono::month& m, FormatContext& ctx) {
-      return format_to(ctx.out(), "{}", static_cast<unsigned>(m));
+      return fmt::format_to(ctx.out(), "{}", static_cast<unsigned>(m));
     }
   };
 
@@ -56,7 +56,7 @@ namespace fmt {
 
     template<typename FormatContext>
     auto format(const std::chrono::day& d, FormatContext& ctx) {
-      return format_to(ctx.out(), "{}", static_cast<unsigned>(d));
+      return fmt::format_to(ctx.out(), "{}", static_cast<unsigned>(d));
     }
   };
 }
@@ -96,7 +96,7 @@ TEST(GTFS, TestFunction) {
 
     std::ranges::for_each(calendar.weekdayService, [&](const auto& dayService) {
       auto [day, service] = dayService;
-      auto day_name = weekday_names[day.c_encoding() - 1];
+      auto day_name = weekday_names[day.c_encoding()];
       LoggingPool::getLogger()->info("{}: {}", day_name, (service ? "Service" : "No service"));
     });
   });
