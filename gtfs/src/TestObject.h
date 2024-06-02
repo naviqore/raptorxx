@@ -6,7 +6,7 @@
 #define TEST_H
 
 #include <gtfs_export.h>
-
+#include  <cstdlib>
 
 class GTFS_API TestObject
 {

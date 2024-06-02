@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <iomanip> // std::get_time
 
 namespace gtfs::utils {
   constexpr int YEAR_OFFSET = 1900;
