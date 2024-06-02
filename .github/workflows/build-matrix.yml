@@ -36,7 +36,9 @@ jobs:
 
       - name: Install LLVM (macOS only)
         if: matrix.os == 'macos-latest'
-        run: brew upgrade llvm || brew install llvm
+        run: |
+          brew install llvm
+          echo "/usr/local/opt/llvm/bin" >> $GITHUB_PATH
 
       - name: Cache vcpkg
         uses: actions/cache@v4.0.2
