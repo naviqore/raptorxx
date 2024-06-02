@@ -27,8 +27,3 @@ TEST(MathTest, Addition) {
   EXPECT_EQ(add(5, 8), 13);
   EXPECT_EQ(add(5, -8), -3);
 }
-
-TEST(GTFS, TestFunction) {
-  const auto lFileName = R"(C:\Users\MichaelBrunner\source\master-thesis\raptorxx\gtfs\test\test-data\agency.txt)";
-  readAgencyTestFunction(lFileName);
-}

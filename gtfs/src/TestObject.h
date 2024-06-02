@@ -6,8 +6,7 @@
 #define TEST_H
 
 #include <gtfs_export.h>
-#include <cstdio>
-#include <string>
+
 
 class GTFS_API TestObject
 {
@@ -15,10 +14,8 @@ public:
   void testFunction();
 };
 
-GTFS_API void readAgencyTestFunction(std::string const& aFileName);
-
+// JAVA Foreign Function and Memory API - test function
 extern "C" GTFS_API size_t stringLength(const char* str);
-
 
 
 

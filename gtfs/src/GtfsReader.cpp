@@ -5,22 +5,26 @@
 #include "GtfsReader.h"
 
 #include <algorithm>
-#include <iostream>
+#include <execution>
 #include <utility>
 
 namespace gtfs {
 
-  GtfsReader::GtfsReader(std::vector<std::function<void(GtfsReader&)>>&& strategies)
+  GtfsReader::GtfsReader(std::vector<GtfsStrategy<GtfsReader>>&& strategies)
     : strategies(std::move(strategies)) {
-    // if (auto keys = std::views::keys(strategies);
-    //     std::ranges::any_of(keys, std::mem_fn(&std::string::empty)))
-    // {
-    //   throw std::invalid_argument("Filename cannot be empty");
-    // }
+    if (this->strategies.empty())
+    {
+      throw std::invalid_argument("No strategies provided");
+    }
   }
 
+  // void GtfsReader::readData() {
+  //   std::ranges::for_each(strategies, [this](const auto& strategy) {
+  //     strategy(*this);
+  //   });
+
   void GtfsReader::readData() {
-    std::ranges::for_each(strategies, [this](const auto& strategy) {
+    std::for_each(std::execution::par, strategies.begin(), strategies.end(), [this](const auto& strategy) {
       strategy(*this);
     });
   }

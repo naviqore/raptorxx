@@ -4,23 +4,21 @@
 
 #ifndef GTFSAGENCYREADERSTRATEGY_H
 #define GTFSAGENCYREADERSTRATEGY_H
-#include "DataReader.h"
-#include "model/Agency.h"
 
 
-#include <string_view>
-#include <vector>
-
+#include <gtfs_export.h>
+#include <string>
 
 namespace gtfs {
 
   class GtfsReader;
 
-  class GtfsAgencyReader
+  class GTFS_API GtfsAgencyReader
   {
     std::string filename;
+
   public:
-    explicit GtfsAgencyReader(std::string  filename);
+    explicit GtfsAgencyReader(std::string filename);
 
     void operator()(GtfsReader& aReader) const;
   };

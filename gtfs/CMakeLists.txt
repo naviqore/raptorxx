@@ -2,30 +2,42 @@
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
-add_library(${PROJECT_NAME} SHARED)
-
-message("CU_LIST_DIR UO: ${CMAKE_CURRENT_LIST_DIR}")
-
-target_sources(${PROJECT_NAME}
-        PRIVATE
+add_library(${PROJECT_NAME} SHARED
         src/TestObject.cpp
         src/TestObject.h
         src/DataReader.h
         src/GtfsReader.cpp
         src/GtfsReader.h
-        src/GtfsReaderStrategy.cpp
-        src/GtfsReaderStrategy.h
+        src/strategies/GtfsReaderStrategy.cpp
+        src/strategies/GtfsReaderStrategy.h
         src/model/Agency.h
-        src/GtfsAgencyReader.cpp
-        src/GtfsAgencyReader.h
+        src/strategies/GtfsAgencyReader.cpp
+        src/strategies/GtfsAgencyReader.h
         src/utils/utils.h
-        src/GtfsData.cpp
         src/GtfsData.h
-
-        PRIVATE
-        FILE_SET cxx_modules TYPE CXX_MODULES FILES
-        src/mod.ixx
+        src/model/Stop.h
+        src/model/Route.h
+        src/model/Trip.h
+        src/model/stopTime.h
+        src/model/Calendar.h
+        src/model/CalendarDate.h
+        src/model/Transfer.h
+        src/strategies/GtfsCalendarReader.cpp
+        src/strategies/GtfsCalendarReader.h
 )
+
+target_sources(${PROJECT_NAME}
+        PUBLIC
+        FILE_SET all_my_modules TYPE CXX_MODULES FILES
+        src/mod.test.cppm
+)
+
+message("CU_LIST_DIR UO: ${CMAKE_CURRENT_LIST_DIR}")
+
+#[[target_sources(${PROJECT_NAME}
+        PRIVATE
+
+)]]
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging/src)
 

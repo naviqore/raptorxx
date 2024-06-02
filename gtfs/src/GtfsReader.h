@@ -7,16 +7,14 @@
 
 #include "DataReader.h"
 #include "GtfsData.h"
-#include "model/Agency.h"
 
 #include <functional>
-#include <map>
-#include <memory>
-#include <string>
+#include <gtfs_export.h>
+
 
 namespace gtfs {
 
-  class GtfsReader final : public DataReader
+  class GTFS_API GtfsReader final : public DataReader
   {
 
   public:
@@ -24,11 +22,11 @@ namespace gtfs {
     {
       agency,
     };
-    using GtfsStrategy = std::function<void(GtfsReader& /*, ...*/)>;
+    template<typename ReaderType>
+    using GtfsStrategy = std::function<void(ReaderType&)>;
+    // using GtfsStrategy = std::function<void(GtfsReader& /*, ...*/)>; std::function<void(GtfsReader&)>
 
-    // explicit GtfsReader(std::string_view filename, GtfsStrategy&& strategy);
-
-    explicit GtfsReader(std::vector<std::function<void(GtfsReader&)>>&& strategies);
+    explicit GtfsReader(std::vector<GtfsStrategy<GtfsReader>>&& strategies);
 
     void readData() override;
 

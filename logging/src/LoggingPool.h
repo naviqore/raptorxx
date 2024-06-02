@@ -33,6 +33,7 @@ public:
 
 private:
   LoggingPool();
+  static std::unique_ptr<LoggingPool> createInstance();
 
   class LoggingPoolImpl;
   static std::unique_ptr<LoggingPoolImpl> impl;

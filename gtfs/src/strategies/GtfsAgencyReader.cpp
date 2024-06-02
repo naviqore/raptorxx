@@ -4,12 +4,14 @@
 
 #include "GtfsAgencyReader.h"
 
-#include "GtfsReader.h"
-#include "utils/utils.h"
+#include "src/GtfsReader.h"
+#include "src/utils/utils.h"
+
 
 #include <stdexcept>
 #include <fstream>
 #include <ranges>
+#include <string>
 #include <utility>
 
 namespace gtfs {
@@ -27,7 +29,7 @@ namespace gtfs {
 
     while (std::getline(infile, line))
     {
-      auto fields = split_line(line);
+      auto fields = utils::splitLine(line);
       if (fields.size() < 4)
       {
         // TODO: Handle error
@@ -39,11 +41,11 @@ namespace gtfs {
       std::string timezone = fields[3].substr(1, fields[3].size() - quoteSize);
 
       aReader.getData().agencies.emplace_back(std::move(id), std::move(name), std::move(timezone));
-      // aReader.agencies.emplace_back(std::move(id), std::move(name), std::move(timezone));
     }
   }
 
-  GtfsAgencyReader::GtfsAgencyReader(std::string  filename)
+  GtfsAgencyReader::GtfsAgencyReader(std::string filename)
     : filename(std::move(filename)) {
   }
+
 } // gtfs
