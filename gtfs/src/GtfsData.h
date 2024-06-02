@@ -4,7 +4,7 @@
 
 #ifndef GTFSDATA_H
 #define GTFSDATA_H
-#include "fields/Agency.h"
+#include "model/Agency.h"
 
 
 #include <vector>

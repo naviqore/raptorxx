@@ -7,7 +7,7 @@
 
 #include "DataReader.h"
 #include "GtfsData.h"
-#include "fields/Agency.h"
+#include "model/Agency.h"
 
 #include <functional>
 #include <map>

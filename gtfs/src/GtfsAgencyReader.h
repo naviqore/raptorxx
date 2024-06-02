@@ -5,7 +5,7 @@
 #ifndef GTFSAGENCYREADERSTRATEGY_H
 #define GTFSAGENCYREADERSTRATEGY_H
 #include "DataReader.h"
-#include "fields/Agency.h"
+#include "model/Agency.h"
 
 
 #include <string_view>

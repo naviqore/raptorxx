@@ -2,7 +2,12 @@
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} SHARED)
+
+message("CU_LIST_DIR UO: ${CMAKE_CURRENT_LIST_DIR}")
+
+target_sources(${PROJECT_NAME}
+        PRIVATE
         src/TestObject.cpp
         src/TestObject.h
         src/DataReader.h
@@ -10,13 +15,16 @@ add_library(${PROJECT_NAME} SHARED
         src/GtfsReader.h
         src/GtfsReaderStrategy.cpp
         src/GtfsReaderStrategy.h
-        src/fields/Agency.cpp
-        src/fields/Agency.h
+        src/model/Agency.h
         src/GtfsAgencyReader.cpp
         src/GtfsAgencyReader.h
         src/utils/utils.h
         src/GtfsData.cpp
         src/GtfsData.h
+
+        PRIVATE
+        FILE_SET cxx_modules TYPE CXX_MODULES FILES
+        src/mod.ixx
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging/src)
