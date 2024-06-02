@@ -15,6 +15,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "
     add_compile_options(-Wall -Wextra -pedantic -Werror -std=c++23)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
     add_compile_options(-Wall -Wextra -pedantic -Werror -std=c++2b)
+    message(WARNING "You are using an unsupported compiler! Compilation has only been tested with MSVC, GCC and Clang.")
 else ()
     message(WARNING "You are using an unsupported compiler! Compilation has only been tested with MSVC, GCC and Clang.")
 endif ()
