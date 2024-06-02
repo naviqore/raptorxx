@@ -93,11 +93,11 @@ TEST(GTFS, TestFunction) {
     LoggingPool::getLogger()->info("Start Date: {}-{}-{}", calendar.startDate.year(), calendar.startDate.month(), calendar.startDate.day());
     LoggingPool::getLogger()->info("End Date: {}-{}-{}", calendar.endDate.year(), calendar.endDate.month(), calendar.endDate.day());
     LoggingPool::getLogger()->info("Weekday Service: ");
-    for (const auto& [day, service] : calendar.weekdayService)
-    {
+
+    std::ranges::for_each(calendar.weekdayService, [&](const auto& dayService) {
+      auto [day, service] = dayService;
       auto day_name = weekday_names[day.c_encoding() - 1];
-      auto day_name_formatted = fmt::format("{:%A}", day_name);
-      LoggingPool::getLogger()->info("{}: {}", day_name_formatted, (service ? "Service" : "No service"));
-    }
+      LoggingPool::getLogger()->info("{}: {}", day_name, (service ? "Service" : "No service"));
+    });
   });
 }
