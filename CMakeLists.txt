@@ -25,6 +25,7 @@ configure_file(
 )
 
 set(BUILD_SHARED_LIBS ON)
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 set(CPM_DOWNLOAD_LOCATION "${CMAKE_SOURCE_DIR}/cmake/CPM.cmake")
 
