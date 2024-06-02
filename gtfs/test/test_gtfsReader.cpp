@@ -41,12 +41,12 @@ TEST(GTFS, TestFunction) {
 
   std::ranges::for_each(data.calendars, [&](const auto& calendar) {
     LoggingPool::getLogger()->info("Service ID: {}", calendar.serviceId);
-    LoggingPool::getLogger()->info("Start Date: {}", std::format("{:%F}", calendar.startDate));
-    LoggingPool::getLogger()->info("End Date: {}", std::format("{:%F}", calendar.endDate));
+    LoggingPool::getLogger()->info("Start Date: {}", fmt::format("{:%F}", calendar.startDate));
+    LoggingPool::getLogger()->info("End Date: {}", fmt::format("{:%F}", calendar.endDate));
     LoggingPool::getLogger()->info("Weekday Service: ");
     for (const auto& [day, service] : calendar.weekdayService)
     {
-      LoggingPool::getLogger()->info("{}: {}", std::format("{:%A}", day), (service ? "Service" : "No service"));
+      LoggingPool::getLogger()->info("{}: {}", fmt::format("{:%A}", day), (service ? "Service" : "No service"));
     }
   });
 }
