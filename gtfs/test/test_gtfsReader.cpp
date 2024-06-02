@@ -11,10 +11,12 @@
 #include <memory>
 #include <LoggingPool.h>
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <iostream>
 
 #include <gtest/gtest.h>
+
 
 TEST(GTFS, TestFunction) {
   const auto agencyFile = R"(C:\Users\MichaelBrunner\source\master-thesis\raptorxx\gtfs\test\test-data\agency.txt)";
@@ -39,6 +41,8 @@ TEST(GTFS, TestFunction) {
     LoggingPool::getLogger()->info("Agency: {} {} {}", agency.agencyId, agency.name, agency.timezone);
   });
 
+  std::array<std::string, 7> weekday_names = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+
   std::ranges::for_each(data.calendars, [&](const auto& calendar) {
     LoggingPool::getLogger()->info("Service ID: {}", calendar.serviceId);
     LoggingPool::getLogger()->info("Start Date: {}", fmt::format("{:%F}", calendar.startDate));
@@ -46,8 +50,9 @@ TEST(GTFS, TestFunction) {
     LoggingPool::getLogger()->info("Weekday Service: ");
     for (const auto& [day, service] : calendar.weekdayService)
     {
-      auto day_name = fmt::format("{:%A}", day);
-      LoggingPool::getLogger()->info("{}: {}", day_name, (service ? "Service" : "No service"));
+      auto day_name = weekday_names[day.c_encoding() - 1];
+      auto day_name_formatted = fmt::format("{:%A}", day_name);
+      LoggingPool::getLogger()->info("{}: {}", day_name_formatted, (service ? "Service" : "No service"));
     }
   });
 }
