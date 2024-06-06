@@ -10,6 +10,7 @@
 
 #include <fstream>
 #include <map>
+#include <source_location>
 
 namespace gtfs {
 
@@ -28,9 +29,9 @@ namespace gtfs {
     while (std::getline(infile, line))
     {
       auto fields = utils::splitLine(line);
-      if (fields.size() < 10)
+      if (fields.size() != 10)
       {
-        LoggingPool::getLogger()->error("Invalid calendar line: {}", line);
+        LoggingPool::getLogger()->error("Invalid calendar filename: {} line: {} GTFS data {}", std::source_location::current().file_name(), std::source_location::current().line(), line);
         continue;
       }
       constexpr uint8_t quoteSize = 2; // this is needed to remove the quotes from the fields

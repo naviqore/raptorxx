@@ -2,7 +2,9 @@
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} SHARED)
+
+target_sources(${PROJECT_NAME} PRIVATE
         src/TestObject.cpp
         src/TestObject.h
         src/DataReader.h
@@ -24,6 +26,8 @@ add_library(${PROJECT_NAME} SHARED
         src/model/Transfer.h
         src/strategies/GtfsCalendarReader.cpp
         src/strategies/GtfsCalendarReader.h
+        src/strategies/GtfsCalendarDateReader.cpp
+        src/strategies/GtfsCalendarDateReader.h
 )
 
 # target_sources(${PROJECT_NAME}

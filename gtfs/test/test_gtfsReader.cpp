@@ -2,6 +2,7 @@
 // Created by MichaelBrunner on 02/06/2024.
 //
 
+#include "strategies/GtfsCalendarDateReader.h"
 #include "utils/utils.h"
 #include <DataReader.h>
 #include <GtfsReader.h>
@@ -61,33 +62,10 @@ namespace fmt {
   };
 }
 
-
-TEST(GTFS, TestFunction) {
-  const auto agencyFile = R"(C:\Users\MichaelBrunner\source\master-thesis\raptorxx\gtfs\test\test-data\agency.txt)";
-  const auto calendarFile = R"(C:\Users\MichaelBrunner\source\master-thesis\raptorxx\gtfs\test\test-data\calendar.txt)";
-
-  const std::map<gtfs::utils::GTFS_FILE_TYPE, std::string> lFileNameMap = {
-    {gtfs::utils::GTFS_FILE_TYPE::AGENCY, agencyFile},
-    {gtfs::utils::GTFS_FILE_TYPE::CALENDAR, calendarFile}};
-
-
-  std::ignore = LoggingPool::getInstance(Target::CONSOLE);
-  LoggingPool::getLogger()->set_level(spdlog::level::info);
-
-  const std::function agencyStrategy = gtfs::GtfsAgencyReader(lFileNameMap.at(gtfs::utils::GTFS_FILE_TYPE::AGENCY));
-  const std::function calendarStrategy = gtfs::GtfsCalendarReader(lFileNameMap.at(gtfs::utils::GTFS_FILE_TYPE::CALENDAR));
-
-  std::vector strategies = {agencyStrategy, calendarStrategy};
-  const std::unique_ptr<DataReader> reader = std::make_unique<gtfs::GtfsReader>(std::move(strategies));
-  reader->readData();
-  const auto data = reader->getData();
-  std::ranges::for_each(data.agencies, [](const auto& agency) {
-    LoggingPool::getLogger()->info("Agency: {} {} {}", agency.agencyId, agency.name, agency.timezone);
-  });
-
+void printCalendar(const std::vector<gtfs::Calendar>& calendars) {
   std::array<std::string, 7> weekday_names = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
 
-  std::ranges::for_each(data.calendars, [&](const auto& calendar) {
+  std::ranges::for_each(calendars, [&](const auto& calendar) {
     LoggingPool::getLogger()->info("Service ID: {}", calendar.serviceId);
     LoggingPool::getLogger()->info("Start Date: {}-{}-{}", calendar.startDate.year(), calendar.startDate.month(), calendar.startDate.day());
     LoggingPool::getLogger()->info("End Date: {}-{}-{}", calendar.endDate.year(), calendar.endDate.month(), calendar.endDate.day());
@@ -99,4 +77,47 @@ TEST(GTFS, TestFunction) {
       LoggingPool::getLogger()->info("{}: {}", day_name, (service ? "Service" : "No service"));
     });
   });
+}
+
+void printAgency(const std::vector<gtfs::Agency>& agencies) {
+  std::ranges::for_each(agencies, [](const auto& agency) {
+    LoggingPool::getLogger()->info("Agency: {} {} {}", agency.agencyId, agency.name, agency.timezone);
+  });
+}
+
+void printCalendarDates(const std::vector<gtfs::CalendarDate>& calendarDates) {
+  std::ranges::for_each(calendarDates, [](const auto& calendarDate) {
+    LoggingPool::getLogger()->info("Service ID: {} Date: {}-{}-{} Exception Type: {}", calendarDate.serviceId, calendarDate.date.year(), calendarDate.date.month(), calendarDate.date.day(), calendarDate.exceptionType);
+  });
+}
+
+// TEST(TestSuiteName, TestName)
+TEST(GTFS, TestFunction) {
+  const auto agencyFile = R"(C:\Users\MichaelBrunner\source\master-thesis\raptorxx\gtfs\test\test-data\agency.txt)";
+  const auto calendarFile = R"(C:\Users\MichaelBrunner\source\master-thesis\raptorxx\gtfs\test\test-data\calendar.txt)";
+  const auto calendarDatesFile = R"(C:\Users\MichaelBrunner\source\master-thesis\raptorxx\gtfs\test\test-data\calendar_dates.txt)";
+
+  // register GTFS file names
+  const std::map<gtfs::utils::GTFS_FILE_TYPE, std::string> lFileNameMap = {
+    {gtfs::utils::GTFS_FILE_TYPE::AGENCY, agencyFile},
+    {gtfs::utils::GTFS_FILE_TYPE::CALENDAR, calendarFile},
+    {gtfs::utils::GTFS_FILE_TYPE::CALENDAR_DATES, calendarDatesFile}};
+
+  std::ignore = LoggingPool::getInstance(Target::CONSOLE);
+  LoggingPool::getLogger()->set_level(spdlog::level::info);
+
+  // create strategy callable objects
+  const std::function agencyStrategy = gtfs::GtfsAgencyReader(lFileNameMap.at(gtfs::utils::GTFS_FILE_TYPE::AGENCY));
+  const std::function calendarStrategy = gtfs::GtfsCalendarReader(lFileNameMap.at(gtfs::utils::GTFS_FILE_TYPE::CALENDAR));
+  const std::function calendarDatesStrategy = gtfs::GtfsCalendarDateReader(lFileNameMap.at(gtfs::utils::GTFS_FILE_TYPE::CALENDAR_DATES));
+
+  std::vector strategies = {agencyStrategy, calendarStrategy, calendarDatesStrategy};
+
+  const std::unique_ptr<DataReader> reader = std::make_unique<gtfs::GtfsReader>(std::move(strategies));
+  reader->readData();
+  const auto data = reader->getData();
+
+  printAgency(data.agencies);
+  printCalendar(data.calendars);
+  printCalendarDates(data.calendarDates);
 }

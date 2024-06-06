@@ -4,6 +4,7 @@
 
 #include "GtfsAgencyReader.h"
 
+#include "LoggingPool.h"
 #include "src/GtfsReader.h"
 #include "src/utils/utils.h"
 
@@ -11,6 +12,7 @@
 #include <stdexcept>
 #include <fstream>
 #include <ranges>
+#include <source_location>
 #include <string>
 #include <utility>
 
@@ -32,6 +34,7 @@ namespace gtfs {
       auto fields = utils::splitLine(line);
       if (fields.size() < 4)
       {
+        // throw std::runtime_error("Error: insufficient number of fields. " + std::string(filename));
         // TODO: Handle error
         continue;
       }
@@ -46,6 +49,18 @@ namespace gtfs {
 
   GtfsAgencyReader::GtfsAgencyReader(std::string filename)
     : filename(std::move(filename)) {
+#ifdef NDEBUG
+    // Release configuration.
+#else
+    // Debug configuration. NDEBUG is not defined.
+    const auto threadId = std::this_thread::get_id();
+    std::stringstream ss;
+    ss << threadId;
+    std::string threadIdString = ss.str();
+    auto fileName = std::source_location::current().file_name();
+    auto functionName = std::source_location::current().function_name();
+    LoggingPool::getLogger()->info("{} line: {} GTFS data thread_id {}", fileName, functionName, threadIdString);
+#endif
   }
 
 } // gtfs

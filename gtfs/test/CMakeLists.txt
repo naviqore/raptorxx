@@ -6,10 +6,14 @@ project("test"
 
 enable_testing()
 
-add_executable(${PROJECT_NAME}
+add_executable(${PROJECT_NAME})
+
+target_sources(${PROJECT_NAME} PRIVATE
         test_testGoogleFramework.cpp
         test_gtfsReader.cpp
-)
+        test_exploreGTest.cpp
+        test_main.cpp
+        )
 
 find_package(GTest CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)

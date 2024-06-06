@@ -23,6 +23,7 @@ namespace gtfs {
   }
 
   void GtfsReader::readData() {
+    // execute registered strategies
 #if defined(HAS_EXECUTION) && !(defined(__clang__) && defined(__apple_build_version__))
     std::for_each(std::execution::par, strategies.begin(), strategies.end(), [this](const auto& strategy) {
       strategy(*this);
