@@ -2,7 +2,11 @@
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
-add_library(${PROJECT_NAME} SHARED)
+add_library(${PROJECT_NAME} SHARED
+        src/strategies/GtfsTransferReader.cpp
+        src/strategies/GtfsTransferReader.h
+        src/strategies/GtfsTripReader.cpp
+        src/strategies/GtfsTripReader.h)
 
 target_sources(${PROJECT_NAME} PRIVATE
         src/TestObject.cpp
@@ -28,27 +32,26 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/strategies/GtfsCalendarReader.h
         src/strategies/GtfsCalendarDateReader.cpp
         src/strategies/GtfsCalendarDateReader.h
+        src/strategies/GtfsRouteReader.cpp
+        src/strategies/GtfsRouteReader.h
+        src/strategies/GtfsStopReader.cpp
+        src/strategies/GtfsStopReader.h
+        src/strategies/GtfsStopTimeReader.cpp
+        src/strategies/GtfsStopTimeReader.h
 )
 
-# target_sources(${PROJECT_NAME}
-#         PUBLIC
-#         FILE_SET all_my_modules TYPE CXX_MODULES FILES
-#         src/mod.test.cppm
-# )
 
 message("CU_LIST_DIR UO: ${CMAKE_CURRENT_LIST_DIR}")
 
-#[[target_sources(${PROJECT_NAME}
-        PRIVATE
-
-)]]
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging/src)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/geometry/src)
 
 find_package(spdlog CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         logging
+        # geometry
         spdlog::spdlog
 )
 

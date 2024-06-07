@@ -29,7 +29,7 @@ namespace gtfs {
     while (std::getline(infile, line))
     {
       auto fields = utils::splitLine(line);
-      if (fields.size() != 10)
+      if (constexpr uint8_t expectedNumberOfFields = 10; fields.size() != expectedNumberOfFields)
       {
         LoggingPool::getLogger()->error("Invalid calendar filename: {} line: {} GTFS data {}", std::source_location::current().file_name(), std::source_location::current().line(), line);
         continue;

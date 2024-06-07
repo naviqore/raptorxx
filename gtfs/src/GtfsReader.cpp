@@ -23,8 +23,18 @@ namespace gtfs {
   }
 
   void GtfsReader::readData() {
+#ifdef NDEBUG
+    std::for_each(std::execution::par, strategies.begin(), strategies.end(), [this](const auto& strategy) {
+     strategy(*this);
+   });
+#else
+    std::ranges::for_each(strategies, [this](const auto& strategy) {
+   strategy(*this);
+ });
+#endif
+
     // execute registered strategies
-#if defined(HAS_EXECUTION) && !(defined(__clang__) && defined(__apple_build_version__))
+/*#if defined(HAS_EXECUTION) && !(defined(__clang__) && defined(__apple_build_version__))
     std::for_each(std::execution::par, strategies.begin(), strategies.end(), [this](const auto& strategy) {
       strategy(*this);
     });
@@ -32,7 +42,7 @@ namespace gtfs {
     std::for_each(strategies.begin(), strategies.end(), [this](const auto& strategy) {
       strategy(*this);
     });
-#endif
+#endif*/
   }
 
   const GtfsData& GtfsReader::getData() const {

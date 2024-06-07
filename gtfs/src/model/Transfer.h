@@ -7,11 +7,21 @@
 
 #include <string>
 #include <stdexcept>
+#include <cstdint>
 
 // https://gtfs.org/schedule/reference/#transferstxt
 namespace gtfs {
   struct Transfer
   {
+
+    enum TransferType : uint8_t
+    {
+      RECOMMENDED,
+      TIMED,
+      MINIMUM_TIME,
+      NOT_POSSIBLE
+    };
+
     Transfer(std::string&& aFromStopId, std::string&& aToStopId, int aTransferType)
       : fromStopId(std::move(aFromStopId))
       , toStopId(std::move(aToStopId))

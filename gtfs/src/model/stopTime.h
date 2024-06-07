@@ -11,7 +11,7 @@
 namespace gtfs {
   struct StopTime
   {
-    StopTime(std::string&& aTripId, std::string&& aArrivalTime, std::string&& aDepartureTime, std::string&& aStopId, int aStopSequence)
+    StopTime(std::string&& aTripId, std::string&& aArrivalTime, std::string&& aDepartureTime, std::string&& aStopId, int const aStopSequence)
       : tripId(std::move(aTripId))
       , arrivalTime(std::move(aArrivalTime))
       , departureTime(std::move(aDepartureTime))

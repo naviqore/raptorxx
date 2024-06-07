@@ -5,6 +5,10 @@
 #ifndef STOP_H
 #define STOP_H
 
+#include <Coordinate.h>
+#include <CoordinateComponent.h>
+
+
 #include <string>
 #include <stdexcept>
 
@@ -14,11 +18,10 @@
 namespace gtfs {
   struct Stop
   {
-    Stop(std::string&& aStopId, std::string&& aStopName, const double aStopLat, const double aStopLon)
+    Stop(std::string&& aStopId, std::string&& aStopName, const geometry::Coordinate<double> aStopLat, const geometry::Coordinate<double> aStopLon)
       : stopId(std::move(aStopId))
       , stopName(std::move(aStopName))
-      , stopLat(aStopLat)
-      , stopLon(aStopLon) {
+      , stopPoint(aStopLat, aStopLon) {
       if (stopId.empty()
           || stopName.empty())
       {
@@ -27,8 +30,7 @@ namespace gtfs {
     }
     std::string stopId;
     std::string stopName;
-    double stopLat;
-    double stopLon;
+    geometry::CoordinateComponent<geometry::Coordinate<double>> stopPoint;
   };
 
 } // gtfs

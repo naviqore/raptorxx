@@ -16,7 +16,14 @@
 namespace gtfs {
   struct CalendarDate
   {
-    CalendarDate(std::string&& aServiceId, std::string&& aDate, int aExceptionType)
+
+    enum ExceptionType
+    {
+      SERVICE_ADDED = 1,
+      SERVICE_REMOVED = 2
+    };
+
+    CalendarDate(std::string&& aServiceId, std::string&& aDate, ExceptionType const aExceptionType)
       : serviceId(std::move(aServiceId))
       , date(utils::parseDate(aDate))
       , exceptionType(aExceptionType) {
@@ -28,7 +35,7 @@ namespace gtfs {
     }
     std::string serviceId;
     std::chrono::year_month_day date;
-    int exceptionType;
+    ExceptionType exceptionType;
   };
 
 } // gtfs

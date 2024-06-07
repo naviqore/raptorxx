@@ -40,7 +40,12 @@ namespace gtfs::utils {
   {
     AGENCY,
     CALENDAR,
-    CALENDAR_DATES
+    CALENDAR_DATES,
+    ROUTES,
+    STOP,
+    STOP_TIMES,
+    TRANSFERS,
+    TRIPS
   };
 
 

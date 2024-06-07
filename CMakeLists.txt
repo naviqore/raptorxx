@@ -45,6 +45,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/output/lib/releas
 
 add_subdirectory(interfaces)
 add_subdirectory(logging)
+add_subdirectory(geometry)
 add_subdirectory(gtfs)
 add_subdirectory(gtfs/test)
 add_subdirectory(gtfs/benchmarks)

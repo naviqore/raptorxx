@@ -28,11 +28,10 @@ namespace gtfs {
 
     std::string line;
     std::getline(infile, line); // Skip header line
-
     while (std::getline(infile, line))
     {
       auto fields = utils::splitLine(line);
-      if (fields.size() < 4)
+      if (constexpr uint8_t expectedNumberOfFields = 4; fields.size() < expectedNumberOfFields)
       {
         // throw std::runtime_error("Error: insufficient number of fields. " + std::string(filename));
         // TODO: Handle error
@@ -53,13 +52,13 @@ namespace gtfs {
     // Release configuration.
 #else
     // Debug configuration. NDEBUG is not defined.
-    const auto threadId = std::this_thread::get_id();
-    std::stringstream ss;
-    ss << threadId;
-    std::string threadIdString = ss.str();
-    auto fileName = std::source_location::current().file_name();
-    auto functionName = std::source_location::current().function_name();
-    LoggingPool::getLogger()->info("{} line: {} GTFS data thread_id {}", fileName, functionName, threadIdString);
+    // const auto threadId = std::this_thread::get_id();
+    // std::stringstream ss;
+    // ss << threadId;
+    // std::string threadIdString = ss.str();
+    // auto fileName = std::source_location::current().file_name();
+    // auto functionName = std::source_location::current().function_name();
+    // LoggingPool::getLogger()->info("{} line: {} GTFS data thread_id {}", fileName, functionName, threadIdString);
 #endif
   }
 
