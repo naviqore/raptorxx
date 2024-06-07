@@ -3,10 +3,7 @@
 )
 
 add_library(${PROJECT_NAME} SHARED
-        src/strategies/GtfsTransferReader.cpp
-        src/strategies/GtfsTransferReader.h
-        src/strategies/GtfsTripReader.cpp
-        src/strategies/GtfsTripReader.h)
+        src/utils/scopedTimer.h)
 
 target_sources(${PROJECT_NAME} PRIVATE
         src/TestObject.cpp
@@ -38,6 +35,10 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/strategies/GtfsStopReader.h
         src/strategies/GtfsStopTimeReader.cpp
         src/strategies/GtfsStopTimeReader.h
+        src/strategies/GtfsTransferReader.cpp
+        src/strategies/GtfsTransferReader.h
+        src/strategies/GtfsTripReader.cpp
+        src/strategies/GtfsTripReader.h
 )
 
 
@@ -57,6 +58,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 #target_link_libraries(${PROJECT_NAME} PRIVATE CommonInterfaces)
 #target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/CommonInterfaces/include)
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE GTFS_DLL_EXPORTS)
+target_include_directories(${PROJECT_NAME} PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/gtfs/src>
+        $<INSTALL_INTERFACE:include>
+)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
@@ -80,6 +87,7 @@ set(INCLUDE_INSTALL_DIR include)
 install(TARGETS ${PROJECT_NAME} DESTINATION ${LIBRARY_INSTALL_DIR})
 install(FILES
         src/TestObject.h
+        src/GtfsReader.h
         ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_export.h DESTINATION ${INCLUDE_INSTALL_DIR}
 )
 

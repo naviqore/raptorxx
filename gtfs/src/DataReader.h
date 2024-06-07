@@ -5,11 +5,13 @@
 #ifndef DATAREADER_H
 #define DATAREADER_H
 
+#include <gtfs_export.h>
+
 namespace gtfs {
   struct GtfsData;
 }
 
-class DataReader
+class GTFS_API DataReader
 {
 public:
   virtual ~DataReader() = default;

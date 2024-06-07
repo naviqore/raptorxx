@@ -10,7 +10,7 @@ if (CMAKE_CXX_STANDARD LESS 23)
 endif ()
 
 if (MSVC)
-    add_compile_options(/W4 /WX /experimental:module /std:c++latest)
+    add_compile_options(/W3 /wd4251 /experimental:module /std:c++latest) #/W4 /WX https://github.com/open-simulation-platform/libcosim/issues/307
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     add_compile_options(-Wall -Wextra -pedantic -Werror -std=c++23)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")

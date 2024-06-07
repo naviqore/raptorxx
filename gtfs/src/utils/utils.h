@@ -30,10 +30,10 @@ namespace gtfs::utils {
   }
 
   inline std::chrono::year_month_day parseDate(const std::string& date_str) {
-    std::istringstream ss(date_str);
-    auto tm = std::tm{};
-    ss >> std::get_time(&tm, "%Y%m%d");
-    return std::chrono::year{tm.tm_year + YEAR_OFFSET} / (tm.tm_mon + gtfs::utils::MONTH_OFFSET) / tm.tm_mday;
+    const int year = std::stoi(date_str.substr(0, 4));
+    const int month = std::stoi(date_str.substr(4, 2));
+    const int day = std::stoi(date_str.substr(6, 2));
+    return std::chrono::year{year} / month / day;
   }
 
   enum class GTFS_FILE_TYPE

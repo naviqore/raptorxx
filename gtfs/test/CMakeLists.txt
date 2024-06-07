@@ -1,18 +1,16 @@
-cmake_minimum_required(VERSION 3.28)
-
 project("test"
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
 enable_testing()
 
-add_executable(${PROJECT_NAME}
-        test_gtfs.cpp)
+add_executable(${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME} PRIVATE
         test_testGoogleFramework.cpp
         test_gtfsReader.cpp
         test_exploreGTest.cpp
+        test_gtfs.cpp
         test_main.cpp
         )
 

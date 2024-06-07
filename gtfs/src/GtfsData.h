@@ -4,6 +4,7 @@
 
 #ifndef GTFSDATA_H
 #define GTFSDATA_H
+
 #include "model/Agency.h"
 #include "model/Calendar.h"
 #include "model/CalendarDate.h"

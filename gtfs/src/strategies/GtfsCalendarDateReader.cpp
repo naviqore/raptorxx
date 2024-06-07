@@ -5,6 +5,7 @@
 #include "GtfsCalendarDateReader.h"
 
 #include "src/GtfsReader.h"
+#include "src/utils/scopedTimer.h"
 #include "src/utils/utils.h"
 
 #include <algorithm>
@@ -12,6 +13,7 @@
 #include <stdexcept>
 #include <exception>
 #include <expected>
+#include <source_location>
 
 
 std::vector<std::string_view> splitLineAndRemoveQuotes(std::string_view line) {
@@ -37,9 +39,11 @@ namespace gtfs {
   }
 
   void GtfsCalendarDateReader::operator()(GtfsReader& aReader) const {
+    MEASURE_FUNCTION();
     std::ifstream infile(filename);
     if (!infile.is_open()) {
-      throw std::runtime_error("Error opening file: " + std::string(filename));
+      // throw std::runtime_error("Error opening file: " + std::string(filename));
+      return;
     }
 
     constexpr size_t bufferSize = 1 << 20; // 1 MB buffer size - this is used to speed up reading the file
@@ -52,9 +56,10 @@ namespace gtfs {
     // Reserve memory for vector
     constexpr size_t expectedSizec = 5'600'000;
     aReader.getData().calendarDates.reserve(expectedSizec);
-
+    std::vector<std::string_view> fields;
+    fields.reserve(3);
     while (std::getline(infile, line)) {
-      auto fields = splitLineAndRemoveQuotes(line);
+      fields = splitLineAndRemoveQuotes(line);
       if (fields.size() < 3) {
         // TODO: Handle error
         continue;
@@ -69,7 +74,8 @@ namespace gtfs {
           exceptionType = CalendarDate::ExceptionType::SERVICE_REMOVED;
         break;
         default:
-          throw std::runtime_error("Error: invalid exception type.");
+          break;
+          //throw std::runtime_error("Error: invalid exception type.");
       }
 
       aReader.getData().calendarDates.emplace_back(
