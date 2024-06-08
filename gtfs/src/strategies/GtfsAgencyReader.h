@@ -6,12 +6,14 @@
 #define GTFSAGENCYREADERSTRATEGY_H
 
 
+#include "GtfsCalendarDateReader.h"
+#include "GtfsData.h"
+
+
 #include <gtfs_export.h>
 #include <string>
 
 namespace gtfs {
-
-  class GtfsReader;
 
   class GTFS_API GtfsAgencyReader
   {

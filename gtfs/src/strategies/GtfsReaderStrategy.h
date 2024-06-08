@@ -4,10 +4,9 @@
 
 #ifndef GTFSREADERSTRATEGY_H
 #define GTFSREADERSTRATEGY_H
+#include "GtfsReader.h"
 
 namespace gtfs {
-
-  class GtfsReader;
 
   class GtfsReaderStrategy
   {

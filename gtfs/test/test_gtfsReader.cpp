@@ -92,7 +92,7 @@ void printAgency(const std::vector<gtfs::Agency>& agencies) {
 void printCalendarDates(const std::vector<gtfs::CalendarDate>& calendarDates) {
   std::ranges::for_each(calendarDates, [](const auto& calendarDate) {
     LoggingPool::getLogger()->info("Service ID: {} Date: {}-{}-{} Exception Type: {}", calendarDate.serviceId, calendarDate.date.year(), calendarDate.date.month(), calendarDate.date.day(),
-      static_cast<int>(calendarDate.exceptionType));
+                                   static_cast<int>(calendarDate.exceptionType));
   });
 }
 
@@ -143,7 +143,7 @@ TEST(GTFS, TestFunction) {
                             transferStrategy,
                             tripStrategy};
 
-  const std::unique_ptr<DataReader> reader = std::make_unique<gtfs::GtfsReader>(std::move(strategies));
+  const std::unique_ptr<DataReader<gtfs::GtfsData>> reader = std::make_unique<gtfs::GtfsReader>(std::move(strategies));
   reader->readData();
   const auto data = reader->getData();
 
@@ -153,4 +153,3 @@ TEST(GTFS, TestFunction) {
 
   EXPECT_EQ(1, 1);
 }
-

@@ -9,19 +9,15 @@
 #include "GtfsData.h"
 
 #include <functional>
+
 #include <gtfs_export.h>
 
 
 namespace gtfs {
 
-  class GTFS_API GtfsReader final : public DataReader
+  class GTFS_API GtfsReader final : public DataReader<GtfsData>
   {
-
   public:
-    enum GTFS_TYPE
-    {
-      agency,
-    };
     template<typename ReaderType>
     using GtfsStrategy = std::function<void(ReaderType&)>;
     // using GtfsStrategy = std::function<void(GtfsReader& /*, ...*/)>; std::function<void(GtfsReader&)>
@@ -30,14 +26,8 @@ namespace gtfs {
 
     void readData() override;
 
-    [[nodiscard]] const GtfsData& getData() const override;
-
-    GtfsData& getData();
-
-
   private:
     std::vector<std::function<void(GtfsReader&)>> strategies;
-    GtfsData data;
   };
 
 

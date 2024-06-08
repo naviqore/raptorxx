@@ -2,6 +2,7 @@
 
 #include "DataReader.h"
 #include "GtfsReader.h"
+#include "GtfsData.h"
 #include "LoggingPool.h"
 #include "strategies/GtfsAgencyReader.h"
 #include "strategies/GtfsCalendarDateReader.h"
@@ -27,7 +28,7 @@
 class GtfsReaderStrategiesTest : public ::testing::Test
 {
 protected:
-  std::unique_ptr<DataReader> reader;
+  std::unique_ptr<DataReader<gtfs::GtfsData>> reader;
 
   const std::string basePath = TEST_DATA_DIR;
 
@@ -67,7 +68,7 @@ TEST_F(GtfsReaderStrategiesTest, testAgencyReader) {
   strategy.push_back(agencyStrategy);
   reader = std::make_unique<gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
-  const auto& data = reader->getData();
+  const gtfs::GtfsData& data = reader->getData();
   std::cout << "agencies: " << data.agencies.size() << std::endl;
   ASSERT_TRUE(data.agencies.empty() == false);
 }

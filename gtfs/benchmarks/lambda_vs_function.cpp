@@ -121,15 +121,14 @@ static void BM_reference(benchmark::State& state) {
 
 static void BM_read_calendar_dates(benchmark::State& state) {
   auto strategy = std::vector<std::function<void(gtfs::GtfsReader&)>>();
-  std::string basePath = TEST_DATA_DIR_B;
+  const std::string basePath = TEST_DATA_DIR_B;
   const std::function calendarDateStrategy = gtfs::GtfsCalendarDateReader(basePath + "calendar_dates.txt");
   strategy.push_back(calendarDateStrategy);
-  std::unique_ptr<DataReader> reader = std::make_unique<gtfs::GtfsReader>(std::move(strategy));
+  const std::unique_ptr<DataReader<gtfs::GtfsData>> reader = std::make_unique<gtfs::GtfsReader>(std::move(strategy));
   for (auto _ : state)
   {
     reader->readData();
   }
-  auto s = benchmark::kSecond;
 }
 
 BENCHMARK(BM_read_calendar_dates);

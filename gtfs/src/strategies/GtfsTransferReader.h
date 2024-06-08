@@ -5,12 +5,13 @@
 #ifndef GTFSTRANSFERREADER_H
 #define GTFSTRANSFERREADER_H
 
+#include "GtfsReader.h"
+
+
 #include <gtfs_export.h>
 #include <string>
 
 namespace gtfs {
-
-  class GtfsReader;
 
   class GTFS_API GtfsTransferReader
   {

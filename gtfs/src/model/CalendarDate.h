@@ -10,6 +10,7 @@
 #include <string>
 #include <stdexcept>
 #include <chrono>
+#include <cstdint>
 
 // https://gtfs.org/schedule/reference/#calendar_datestxt
 
@@ -17,7 +18,7 @@ namespace gtfs {
   struct CalendarDate
   {
 
-    enum ExceptionType
+    enum ExceptionType : uint8_t
     {
       SERVICE_ADDED = 1,
       SERVICE_REMOVED = 2

@@ -35,7 +35,28 @@ namespace gtfs {
       constexpr uint8_t quoteSize = 2; // this is needed to remove the quotes from the fields
       std::string fromStopId = fields[0].substr(1, fields[0].size() - quoteSize);
       std::string toStopId = fields[1].substr(1, fields[1].size() - quoteSize);
-      const int transferType = std::stoi(fields[2].substr(1, fields[2].size() - quoteSize));
+      // const int transferType = std::stoi(fields[2].substr(1, fields[2].size() - quoteSize));
+
+      Transfer::TransferType transferType;
+
+      switch (fields[2][0])
+      {
+        case '0':
+          transferType = Transfer::TransferType::RECOMMENDED;
+          break;
+        case '1':
+          transferType = Transfer::TransferType::TIMED;
+          break;
+        case '2':
+          transferType = Transfer::TransferType::MINIMUM_TIME;
+          break;
+        case '3':
+          transferType = Transfer::TransferType::NOT_POSSIBLE;
+          break;
+        default:
+          break;
+          //throw std::runtime_error("Error: invalid transfer type.");
+      }
 
       aReader.getData().transfers.emplace_back(std::move(fromStopId), std::move(toStopId), transferType);
     }

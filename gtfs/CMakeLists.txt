@@ -3,13 +3,12 @@
 )
 
 add_library(${PROJECT_NAME} SHARED
-        src/utils/scopedTimer.h)
+        src/GtfsReader.cpp)
 
 target_sources(${PROJECT_NAME} PRIVATE
         src/TestObject.cpp
         src/TestObject.h
         src/DataReader.h
-        src/GtfsReader.cpp
         src/GtfsReader.h
         src/strategies/GtfsReaderStrategy.cpp
         src/strategies/GtfsReaderStrategy.h
@@ -39,6 +38,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/strategies/GtfsTransferReader.h
         src/strategies/GtfsTripReader.cpp
         src/strategies/GtfsTripReader.h
+        src/utils/scopedTimer.h
 )
 
 

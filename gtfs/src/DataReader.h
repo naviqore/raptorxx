@@ -11,12 +11,25 @@ namespace gtfs {
   struct GtfsData;
 }
 
+template<typename T>
 class GTFS_API DataReader
 {
+protected:
+  T data;
+
+  DataReader() = default;
+
 public:
   virtual ~DataReader() = default;
   virtual void readData() = 0;
-  [[nodiscard]] virtual gtfs::GtfsData const& getData() const = 0;
+
+  [[nodiscard]] T const& getData() const {
+    return data;
+  }
+
+  [[nodiscard]] T& getData() {
+    return data;
+  }
 };
 
 #endif //DATAREADER_H

@@ -5,11 +5,13 @@
 #ifndef GTFSCALENDARDATEREADER_H
 #define GTFSCALENDARDATEREADER_H
 
+#include "GtfsReader.h"
+
+
 #include <string>
 #include <gtfs_export.h>
 
 namespace gtfs {
-  class GtfsReader;
 
   class GTFS_API GtfsCalendarDateReader
   {

@@ -14,6 +14,8 @@
 namespace gtfs {
   struct Route
   {
+    // TODO add route type enum
+
     Route(std::string&& aRouteId, std::string&& aRouteShortName, std::string&& aRouteLongName, const int aRouteType)
       : routeId(std::move(aRouteId))
       , routeShortName(std::move(aRouteShortName))

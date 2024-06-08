@@ -22,7 +22,7 @@ namespace gtfs {
       NOT_POSSIBLE
     };
 
-    Transfer(std::string&& aFromStopId, std::string&& aToStopId, int aTransferType)
+    Transfer(std::string&& aFromStopId, std::string&& aToStopId, TransferType const aTransferType)
       : fromStopId(std::move(aFromStopId))
       , toStopId(std::move(aToStopId))
       , transferType(aTransferType) {
@@ -34,7 +34,7 @@ namespace gtfs {
     }
     std::string fromStopId;
     std::string toStopId;
-    int transferType;
+    TransferType transferType;
   };
 
 } // gtfs
