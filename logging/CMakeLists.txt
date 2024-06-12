@@ -5,7 +5,8 @@ project("logging")
 add_library(${PROJECT_NAME} SHARED
         src/LoggingPool.cpp
         src/LoggingPool.h
-    )
+        src/LoggerBridge.h
+)
 
 find_package(spdlog CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)

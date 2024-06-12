@@ -30,16 +30,28 @@ LoggingPool* LoggingPool::getInstance(const Target aTarget) {
     {
       case Target::CONSOLE:
         impl->instances[aTarget]->impl->current = spdlog::stdout_color_mt("console");
-      break;
+        break;
       case Target::FILE:
         impl->instances[aTarget]->impl->current = spdlog::basic_logger_mt("file", "logs/file.log");
-      break;
+        break;
     }
   }
   return impl->instances[aTarget].get();
 }
 
-std::shared_ptr<spdlog::logger> LoggingPool::getLogger() {
-  return impl->current;
-}
 LoggingPool::~LoggingPool() = default;
+void LoggingPool::info(const std::string& message) {
+  impl->current->info(message);
+}
+void LoggingPool::warn(const std::string& message) {
+  impl->current->warn(message);
+}
+void LoggingPool::error(const std::string& message) {
+  impl->current->error(message);
+}
+void LoggingPool::setLevel(Level level) {
+  impl->current->set_level(static_cast<spdlog::level::level_enum>(level));
+}
+LoggerBridge::Level LoggingPool::getLevel() const {
+  return static_cast<LoggerBridge::Level>(impl->current->level());
+}

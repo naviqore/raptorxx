@@ -34,9 +34,9 @@
 /out
 /cmake-*/*
 /.idea
-/gtfs/cmake-*/*
-/gtfs/.idea
-/gtfs/test/cmake-*/*
+/schedule/cmake-*/*
+/schedule/.idea
+/schedule/test/cmake-*/*
 /.vscode
 /output
 /.vs/raptorxx/FileContentIndex

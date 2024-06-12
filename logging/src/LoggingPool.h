@@ -9,6 +9,9 @@
 #pragma warning(disable : 4251)
 #endif
 
+#include "LoggerBridge.h"
+
+
 #include <unordered_map>
 #include "spdlog/logger.h"
 #include <memory>
@@ -21,21 +24,34 @@ enum class Target : int
   FILE
 };
 
-class LOGGER_API LoggingPool
+class LOGGER_API LoggingPool : public LoggerBridge
 {
 public:
   static LoggingPool* getInstance(Target aTarget);
-  [[nodiscard]] static std::shared_ptr<spdlog::logger> getLogger();
 
-  ~LoggingPool();
+  ~LoggingPool() override;
+
   LoggingPool(const LoggingPool&) = delete;
+
   LoggingPool& operator=(const LoggingPool&) = delete;
+
+  void info(const std::string& message) override;
+
+  void warn(const std::string& message) override;
+
+  void error(const std::string& message) override;
+
+  void setLevel(Level level) override;
+
+  [[nodiscard]] Level getLevel() const override;
 
 private:
   LoggingPool();
+
   static std::unique_ptr<LoggingPool> createInstance();
 
   class LoggingPoolImpl;
+
   static std::unique_ptr<LoggingPoolImpl> impl;
 };
 
