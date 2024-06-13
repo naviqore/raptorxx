@@ -41,9 +41,9 @@ void gtfs::GtfsReader::readData() {
       });
   #endif*/
 }
-const DataContainer<gtfs::GtfsData>& gtfs::GtfsReader::getData() const {
+const schedule::DataContainer<gtfs::GtfsData>& gtfs::GtfsReader::getData() const {
   return data;
 }
-DataContainer<gtfs::GtfsData>& gtfs::GtfsReader::getData() {
+schedule::DataContainer<gtfs::GtfsData>& gtfs::GtfsReader::getData() {
   return data;
 }

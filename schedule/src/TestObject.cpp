@@ -5,9 +5,9 @@
 #include "TestObject.h"
 
 #include "DataReader.h"
-#include "GtfsReader.h"
-#include "strategies/GtfsAgencyReader.h"
-#include "strategies/GtfsCalendarReader.h"
+#include "gtfs/GtfsReader.h"
+#include "gtfs/strategies/GtfsAgencyReader.h"
+#include "gtfs/strategies/GtfsCalendarReader.h"
 
 #include <memory>
 #include <LoggingPool.h>

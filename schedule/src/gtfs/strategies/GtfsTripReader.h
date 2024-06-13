@@ -2,26 +2,25 @@
 // Created by MichaelBrunner on 07/06/2024.
 //
 
-#ifndef GTFSROUTERREADER_H
-#define GTFSROUTERREADER_H
+#ifndef GTFSTRIPREADER_H
+#define GTFSTRIPREADER_H
 
-#include "GtfsReader.h"
-
+#include "gtfs/GtfsReader.h"
 
 #include <schedule_export.h>
 #include <string>
 
 namespace gtfs {
 
-  class GTFS_API GtfsRouteReader
+  class GTFS_API GtfsTripReader
   {
     std::string filename;
 
   public:
-    explicit GtfsRouteReader(std::string filename);
+    explicit GtfsTripReader(std::string filename);
     void operator()(GtfsReader& aReader) const;
   };
 
 } // gtfs
 
-#endif //GTFSROUTERREADER_H
+#endif //GTFSTRIPREADER_H

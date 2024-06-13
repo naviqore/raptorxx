@@ -8,7 +8,7 @@
 
 #include <stdexcept>
 #include <fstream>
-#include "src/GtfsReader.h"
+#include "gtfs/GtfsReader.h"
 
 namespace gtfs {
   GtfsTransferReader::GtfsTransferReader(std::string filename)

@@ -4,7 +4,7 @@
 
 #include "GtfsCalendarDateReader.h"
 
-#include "src/GtfsReader.h"
+#include "gtfs/GtfsReader.h"
 #include "src/utils/scopedTimer.h"
 #include "src/utils/utils.h"
 

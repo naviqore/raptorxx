@@ -2,10 +2,10 @@
 // Created by MichaelBrunner on 07/06/2024.
 //
 
-#ifndef GTFSTRANSFERREADER_H
-#define GTFSTRANSFERREADER_H
+#ifndef GTFSROUTERREADER_H
+#define GTFSROUTERREADER_H
 
-#include "GtfsReader.h"
+#include "gtfs/GtfsReader.h"
 
 
 #include <schedule_export.h>
@@ -13,15 +13,15 @@
 
 namespace gtfs {
 
-  class GTFS_API GtfsTransferReader
+  class GTFS_API GtfsRouteReader
   {
     std::string filename;
 
   public:
-    explicit GtfsTransferReader(std::string filename);
+    explicit GtfsRouteReader(std::string filename);
     void operator()(GtfsReader& aReader) const;
   };
 
 } // gtfs
 
-#endif //GTFSTRANSFERREADER_H
+#endif //GTFSROUTERREADER_H

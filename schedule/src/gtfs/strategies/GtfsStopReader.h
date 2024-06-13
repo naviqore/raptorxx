@@ -2,10 +2,10 @@
 // Created by MichaelBrunner on 07/06/2024.
 //
 
-#ifndef GTFSSTOPTIMEREADER_H
-#define GTFSSTOPTIMEREADER_H
+#ifndef GTFSSTOPREADER_H
+#define GTFSSTOPREADER_H
 
-#include "GtfsReader.h"
+#include "gtfs/GtfsReader.h"
 
 
 #include <schedule_export.h>
@@ -13,21 +13,16 @@
 
 namespace gtfs {
 
-  class GTFS_API GtfsStopTimeReader
+  class GTFS_API GtfsStopReader
   {
     std::string filename;
 
   public:
-    explicit GtfsStopTimeReader(std::string filename);
+    explicit GtfsStopReader(std::string filename);
     void operator()(GtfsReader& aReader) const;
   };
 
 } // gtfs
 
-#endif //GTFSSTOPTIMEREADER_H
-
-
-
-
-
+#endif //GTFSSTOPREADER_H
 

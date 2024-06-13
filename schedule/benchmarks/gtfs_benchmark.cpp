@@ -2,9 +2,9 @@
 // Created by MichaelBrunner on 28/05/2024.
 //
 
-#include "GtfsReader.h"
-#include "strategies/GtfsCalendarDateReader.h"
-#include "GtfsData.h"
+#include "gtfs/GtfsReader.h"
+#include "gtfs/strategies/GtfsCalendarDateReader.h"
+#include "gtfs/GtfsData.h"
 #include "model/Agency.h"
 
 #include <benchmark/benchmark.h>
@@ -50,10 +50,10 @@ static void BM_reference(benchmark::State& state) {
 
 static void BM_read_calendar_dates(benchmark::State& state) {
   auto strategy = std::vector<std::function<void(gtfs::GtfsReader&)>>();
-  const std::string basePath = TEST_DATA_DIR_B;
+  const std::string basePath = TEST_DATA_DIR;
   const std::function calendarDateStrategy = gtfs::GtfsCalendarDateReader(basePath + "calendar_dates.txt");
   strategy.push_back(calendarDateStrategy);
-  const std::unique_ptr<DataReader<DataContainer<gtfs::GtfsData>>> reader = std::make_unique<gtfs::GtfsReader>(std::move(strategy));
+  const std::unique_ptr<schedule::DataReader<schedule::DataContainer<gtfs::GtfsData>>> reader = std::make_unique<gtfs::GtfsReader>(std::move(strategy));
   for (auto _ : state)
   {
     reader->readData();

@@ -1,19 +1,22 @@
 
 
 #include "DataReader.h"
-#include "GtfsReader.h"
-#include "GtfsData.h"
+#include "gtfs/GtfsReader.h"
+#include "gtfs/GtfsData.h"
 #include "LoggingPool.h"
-#include "strategies/GtfsAgencyReader.h"
-#include "strategies/GtfsCalendarDateReader.h"
-#include "strategies/GtfsCalendarReader.h"
-#include "strategies/GtfsRouteReader.h"
-#include "strategies/GtfsStopReader.h"
-#include "strategies/GtfsStopTimeReader.h"
-#include "strategies/GtfsTransferReader.h"
-#include "strategies/GtfsTripReader.h"
+#include "gtfs/GtfsData.h"
+#include "gtfs/RelationManager.h"
+#include "gtfs/strategies/GtfsAgencyReader.h"
+#include "gtfs/strategies/GtfsCalendarDateReader.h"
+#include "gtfs/strategies/GtfsCalendarReader.h"
+#include "gtfs/strategies/GtfsRouteReader.h"
+#include "gtfs/strategies/GtfsStopReader.h"
+#include "gtfs/strategies/GtfsStopTimeReader.h"
+#include "gtfs/strategies/GtfsTransferReader.h"
+#include "gtfs/strategies/GtfsTripReader.h"
 #include "utils/utils.h"
 #include "src/model/CalendarDate.h"
+#include "utils/DataContainer.h"
 
 #include <algorithm>
 #include <gtest/gtest.h>
@@ -34,7 +37,7 @@
 class GtfsReaderStrategiesTest : public ::testing::Test
 {
 protected:
-  std::unique_ptr<DataReader<DataContainer<gtfs::GtfsData>>> reader;
+  std::unique_ptr<schedule::DataReader<schedule::DataContainer<gtfs::GtfsData>>> reader;
 
   const std::string basePath = TEST_DATA_DIR;
 
@@ -100,6 +103,24 @@ TEST_F(GtfsReaderStrategiesTest, testAgencyReader2) {
     ASSERT_TRUE(calendarDate.exceptionType == gtfs::CalendarDate::SERVICE_ADDED || calendarDate.exceptionType == gtfs::CalendarDate::SERVICE_REMOVED);
   });
 }
+
+TEST_F(GtfsReaderStrategiesTest, testRelationManager) {
+
+  auto strategy = std::vector<std::function<void(gtfs::GtfsReader&)>>();
+  const std::function stopTimesStrategy = gtfs::GtfsStopTimeReader(lFileNameMap.at(gtfs::utils::GTFS_FILE_TYPE::STOP_TIMES));
+  strategy.push_back(stopTimesStrategy);
+
+  const std::function tripsStrategy = gtfs::GtfsTripReader(lFileNameMap.at(gtfs::utils::GTFS_FILE_TYPE::TRIPS));
+  strategy.push_back(tripsStrategy);
+
+  reader = std::make_unique<gtfs::GtfsReader>(std::move(strategy));
+  reader->readData();
+
+  auto relationManager = gtfs::RelationManager(reader->getData().get());
+  relationManager.createRelations();
+}
+
+
 
 class MyTestSuite : public ::testing::TestWithParam<int>
 {

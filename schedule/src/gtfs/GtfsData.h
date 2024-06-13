@@ -12,7 +12,7 @@
 #include "model/Stop.h"
 #include "model/Transfer.h"
 #include "model/Trip.h"
-#include "model/stopTime.h"
+#include "model/StopTime.h"
 
 
 #include <vector>

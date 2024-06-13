@@ -5,7 +5,7 @@
 #include "GtfsTripReader.h"
 
 #include "src/utils/utils.h"
-#include "src/GtfsReader.h"
+#include "gtfs/GtfsReader.h"
 
 #include <fstream>
 

@@ -5,7 +5,7 @@
 #include "GtfsCalendarReader.h"
 
 #include "LoggingPool.h"
-#include "src/GtfsReader.h"
+#include "gtfs/GtfsReader.h"
 #include "src/utils/utils.h"
 
 #include <fstream>

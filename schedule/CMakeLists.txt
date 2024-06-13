@@ -2,18 +2,20 @@
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
-add_library(${PROJECT_NAME} SHARED)
+add_library(${PROJECT_NAME} SHARED
+        src/gtfs/RelationManager.cpp
+        src/gtfs/RelationManager.h)
 
 target_sources(${PROJECT_NAME} PRIVATE
         src/TestObject.cpp
         src/TestObject.h
         src/DataReader.h
-        src/GtfsReader.h
+        src/gtfs/GtfsReader.h
         src/model/Agency.h
-        src/strategies/GtfsAgencyReader.cpp
-        src/strategies/GtfsAgencyReader.h
+        src/gtfs/strategies/GtfsAgencyReader.cpp
+        src/gtfs/strategies/GtfsAgencyReader.h
         src/utils/utils.h
-        src/GtfsData.h
+        src/gtfs/GtfsData.h
         src/model/Stop.h
         src/model/Route.h
         src/model/Trip.h
@@ -21,23 +23,23 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/model/Calendar.h
         src/model/CalendarDate.h
         src/model/Transfer.h
-        src/strategies/GtfsCalendarReader.cpp
-        src/strategies/GtfsCalendarReader.h
-        src/strategies/GtfsCalendarDateReader.cpp
-        src/strategies/GtfsCalendarDateReader.h
-        src/strategies/GtfsRouteReader.cpp
-        src/strategies/GtfsRouteReader.h
-        src/strategies/GtfsStopReader.cpp
-        src/strategies/GtfsStopReader.h
-        src/strategies/GtfsStopTimeReader.cpp
-        src/strategies/GtfsStopTimeReader.h
-        src/strategies/GtfsTransferReader.cpp
-        src/strategies/GtfsTransferReader.h
-        src/strategies/GtfsTripReader.cpp
-        src/strategies/GtfsTripReader.h
+        src/gtfs/strategies/GtfsCalendarReader.cpp
+        src/gtfs/strategies/GtfsCalendarReader.h
+        src/gtfs/strategies/GtfsCalendarDateReader.cpp
+        src/gtfs/strategies/GtfsCalendarDateReader.h
+        src/gtfs/strategies/GtfsRouteReader.cpp
+        src/gtfs/strategies/GtfsRouteReader.h
+        src/gtfs/strategies/GtfsStopReader.cpp
+        src/gtfs/strategies/GtfsStopReader.h
+        src/gtfs/strategies/GtfsStopTimeReader.cpp
+        src/gtfs/strategies/GtfsStopTimeReader.h
+        src/gtfs/strategies/GtfsTransferReader.cpp
+        src/gtfs/strategies/GtfsTransferReader.h
+        src/gtfs/strategies/GtfsTripReader.cpp
+        src/gtfs/strategies/GtfsTripReader.h
         src/utils/scopedTimer.h
-        src/GtfsReader.cpp
-        src/DataContainer.h
+        src/gtfs/GtfsReader.cpp
+        src/utils/DataContainer.h
 )
 
 
@@ -86,7 +88,7 @@ set(INCLUDE_INSTALL_DIR include)
 install(TARGETS ${PROJECT_NAME} DESTINATION ${LIBRARY_INSTALL_DIR})
 install(FILES
         src/TestObject.h
-        src/GtfsReader.h
+        src/gtfs/GtfsReader.h
         ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_export.h DESTINATION ${INCLUDE_INSTALL_DIR}
 )
 

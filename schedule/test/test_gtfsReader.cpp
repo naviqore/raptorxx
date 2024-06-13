@@ -2,17 +2,17 @@
 // Created by MichaelBrunner on 02/06/2024.
 //
 
-#include "strategies/GtfsCalendarDateReader.h"
-#include "strategies/GtfsRouteReader.h"
-#include "strategies/GtfsStopReader.h"
-#include "strategies/GtfsStopTimeReader.h"
-#include "strategies/GtfsTransferReader.h"
-#include "strategies/GtfsTripReader.h"
+#include "gtfs/strategies/GtfsCalendarDateReader.h"
+#include "gtfs/strategies/GtfsRouteReader.h"
+#include "gtfs/strategies/GtfsStopReader.h"
+#include "gtfs/strategies/GtfsStopTimeReader.h"
+#include "gtfs/strategies/GtfsTransferReader.h"
+#include "gtfs/strategies/GtfsTripReader.h"
 #include "utils/utils.h"
 #include <DataReader.h>
-#include <GtfsReader.h>
-#include <strategies/GtfsAgencyReader.h>
-#include <strategies/GtfsCalendarReader.h>
+#include <gtfs/GtfsReader.h>
+#include <gtfs/strategies/GtfsAgencyReader.h>
+#include <gtfs/strategies/GtfsCalendarReader.h>
 
 #include <memory>
 #include <LoggingPool.h>
@@ -127,7 +127,7 @@ TEST(GTFS, TestFunction) {
 
   std::vector strategies = {agencyStrategy, calendarStrategy, calendarDatesStrategy, routesStrategy, stopStrategy, stopTimeStrategy, transferStrategy, tripStrategy};
 
-  const std::unique_ptr<DataReader<DataContainer<gtfs::GtfsData>>> reader = std::make_unique<gtfs::GtfsReader>(std::move(strategies));
+  const std::unique_ptr<schedule::DataReader<schedule::DataContainer<gtfs::GtfsData>>> reader = std::make_unique<gtfs::GtfsReader>(std::move(strategies));
   reader->readData();
   const auto data = reader->getData();
 

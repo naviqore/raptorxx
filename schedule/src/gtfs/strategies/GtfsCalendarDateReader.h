@@ -5,7 +5,7 @@
 #ifndef GTFSCALENDARDATEREADER_H
 #define GTFSCALENDARDATEREADER_H
 
-#include "GtfsReader.h"
+#include "gtfs/GtfsReader.h"
 
 
 #include <string>

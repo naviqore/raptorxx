@@ -5,7 +5,7 @@
 #ifndef GTFSREADER_H
 #define GTFSREADER_H
 
-#include "DataContainer.h"
+#include "utils/DataContainer.h"
 #include "DataReader.h"
 #include "GtfsData.h"
 
@@ -13,10 +13,9 @@
 
 #include <schedule_export.h>
 
-
 namespace gtfs {
 
-  class GTFS_API GtfsReader final : public DataReader<DataContainer<GtfsData>>
+  class GTFS_API GtfsReader final : public schedule::DataReader<schedule::DataContainer<GtfsData>>
   {
   public:
     template<typename ReaderType>
@@ -26,15 +25,15 @@ namespace gtfs {
 
     void readData() override;
 
-    [[nodiscard]] const DataContainer<GtfsData>& getData() const override;
+    [[nodiscard]] const schedule::DataContainer<GtfsData>& getData() const override;
 
-    DataContainer<GtfsData>& getData() override;
+    schedule::DataContainer<GtfsData>& getData() override;
 
 
   private:
     std::vector<std::function<void(GtfsReader&)>> strategies;
 
-    DataContainer<GtfsData> data;
+    schedule::DataContainer<GtfsData> data;
   };
 
 
