@@ -22,7 +22,7 @@ std::unique_ptr<LoggingPool> LoggingPool::createInstance() {
   return std::unique_ptr<LoggingPool>(new LoggingPool());
 }
 
-LoggingPool* LoggingPool::getInstance(const Target aTarget) {
+LoggerBridge* LoggingPool::getInstance(const Target aTarget) {
   if (!impl->instances.contains(aTarget))
   {
     impl->instances[aTarget] = createInstance();

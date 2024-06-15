@@ -2,9 +2,7 @@
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
-add_library(${PROJECT_NAME} SHARED
-        src/gtfs/RelationManager.cpp
-        src/gtfs/RelationManager.h)
+add_library(${PROJECT_NAME} SHARED)
 
 target_sources(${PROJECT_NAME} PRIVATE
         src/TestObject.cpp
@@ -40,6 +38,9 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/utils/scopedTimer.h
         src/gtfs/GtfsReader.cpp
         src/utils/DataContainer.h
+        src/gtfs/RelationManager.cpp
+        src/gtfs/RelationManager.h
+        src/Types.h
 )
 
 

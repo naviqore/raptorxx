@@ -48,6 +48,23 @@ namespace gtfs::utils {
     TRIPS
   };
 
+  inline std::vector<std::string_view> splitLineAndRemoveQuotes(std::string_view line) {
+    std::vector<std::string_view> result;
+    size_t start = 0;
+    size_t end = line.find(',');
+
+    while (end != std::string_view::npos)
+    {
+      result.push_back(line.substr(start + 1, end - start - 2));
+      start = end + 1;
+      end = line.find(',', start);
+    }
+
+    result.push_back(line.substr(start + 1, line.size() - start - 2));
+    return result;
+  }
+
+
 
 }
 

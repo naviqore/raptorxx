@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <map>
 #include <memory>
 #include <functional>
@@ -85,7 +86,7 @@ TEST_F(GtfsReaderStrategiesTest, testAgencyReader) {
   ASSERT_EQ(data.agencies[0].timezone, "Europe/Berlin");
 }
 
-TEST_F(GtfsReaderStrategiesTest, testAgencyReader2) {
+TEST_F(GtfsReaderStrategiesTest, testCalendarDateReader) {
   auto strategy = std::vector<std::function<void(gtfs::GtfsReader&)>>();
   const std::function calendarDateStrategy = gtfs::GtfsCalendarDateReader(lFileNameMap.at(gtfs::utils::GTFS_FILE_TYPE::CALENDAR_DATES));
   strategy.push_back(calendarDateStrategy);
@@ -102,6 +103,20 @@ TEST_F(GtfsReaderStrategiesTest, testAgencyReader2) {
     ASSERT_TRUE(calendarDate.date.year().ok());
     ASSERT_TRUE(calendarDate.exceptionType == gtfs::CalendarDate::SERVICE_ADDED || calendarDate.exceptionType == gtfs::CalendarDate::SERVICE_REMOVED);
   });
+
+  ASSERT_EQ(data.get().calendarDates[0].serviceId, "TA+00060");
+  // ASSERT_EQ(data.get().calendarDates[0].date, "20231216");
+  ASSERT_EQ(data.get().calendarDates[0].exceptionType, gtfs::CalendarDate::SERVICE_REMOVED);
+}
+
+TEST_F(GtfsReaderStrategiesTest, testStopTimeReader) {
+  auto strategy = std::vector<std::function<void(gtfs::GtfsReader&)>>();
+  const std::function agencyStrategy = gtfs::GtfsStopTimeReader(lFileNameMap.at(gtfs::utils::GTFS_FILE_TYPE::STOP_TIMES));
+  strategy.push_back(agencyStrategy);
+  reader = std::make_unique<gtfs::GtfsReader>(std::move(strategy));
+  reader->readData();
+  const gtfs::GtfsData& data = reader->getData().get();
+  std::cout << "agencies: " << data.stopTimes.size() << std::endl;
 }
 
 TEST_F(GtfsReaderStrategiesTest, testRelationManager) {

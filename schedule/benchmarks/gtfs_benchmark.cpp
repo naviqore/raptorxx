@@ -5,6 +5,7 @@
 #include "gtfs/GtfsReader.h"
 #include "gtfs/strategies/GtfsCalendarDateReader.h"
 #include "gtfs/GtfsData.h"
+#include "gtfs/strategies/GtfsStopTimeReader.h"
 #include "model/Agency.h"
 
 #include <benchmark/benchmark.h>
@@ -51,16 +52,31 @@ static void BM_reference(benchmark::State& state) {
 static void BM_read_calendar_dates(benchmark::State& state) {
   auto strategy = std::vector<std::function<void(gtfs::GtfsReader&)>>();
   const std::string basePath = TEST_DATA_DIR;
-  const std::function calendarDateStrategy = gtfs::GtfsCalendarDateReader(basePath + "calendar_dates.txt");
-  strategy.push_back(calendarDateStrategy);
-  const std::unique_ptr<schedule::DataReader<schedule::DataContainer<gtfs::GtfsData>>> reader = std::make_unique<gtfs::GtfsReader>(std::move(strategy));
+  const std::function readerStrategy = gtfs::GtfsCalendarDateReader(basePath + "calendar_dates.txt");
+  strategy.push_back(readerStrategy);
+  const auto reader = std::make_unique<gtfs::GtfsReader>(std::move(strategy));
   for (auto _ : state)
   {
     reader->readData();
   }
+  std::cout << "Number of calendar dates: " << reader->getData().get().calendarDates.size() << std::endl;
+}
+
+static void BM_read_stop_times(benchmark::State& state) {
+  auto strategy = std::vector<std::function<void(gtfs::GtfsReader&)>>();
+  const std::string basePath = TEST_DATA_DIR;
+  const std::function readerStrategy = gtfs::GtfsStopTimeReader(basePath + "stop_times.txt");
+  strategy.push_back(readerStrategy);
+  const auto reader = std::make_unique<gtfs::GtfsReader>(std::move(strategy));
+  for (auto _ : state)
+  {
+    reader->readData();
+  }
+  std::cout << "Number of stop times: " << reader->getData().get().stopTimes.size() << std::endl;
 }
 
 BENCHMARK(BM_read_calendar_dates);
+BENCHMARK(BM_read_stop_times);
 BENCHMARK(BM_pointer);
 BENCHMARK(BM_reference);
 

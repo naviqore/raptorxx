@@ -5,9 +5,9 @@
 #ifndef LOGGINGPOOL_H
 #define LOGGINGPOOL_H
 
-#ifdef _MSC_VER
+/*#ifdef _MSC_VER
 #pragma warning(disable : 4251)
-#endif
+#endif*/
 
 #include "LoggerBridge.h"
 
@@ -27,7 +27,7 @@ enum class Target : int
 class LOGGER_API LoggingPool : public LoggerBridge
 {
 public:
-  static LoggingPool* getInstance(Target aTarget);
+  static LoggerBridge* getInstance(Target aTarget);
 
   ~LoggingPool() override;
 

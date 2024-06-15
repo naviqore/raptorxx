@@ -8,6 +8,7 @@
 #include "utils/DataContainer.h"
 #include "DataReader.h"
 #include "GtfsData.h"
+#include "Types.h"
 
 #include <functional>
 
@@ -15,7 +16,7 @@
 
 namespace gtfs {
 
-  class GTFS_API GtfsReader final : public schedule::DataReader<schedule::DataContainer<GtfsData>>
+  class GTFS_API GtfsReader : public schedule::DataReader<gtfsDataContainer>
   {
   public:
     template<typename ReaderType>

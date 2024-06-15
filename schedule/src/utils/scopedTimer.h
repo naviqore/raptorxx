@@ -43,7 +43,7 @@ private:
   const ClockType::time_point start_ = {};
 };
 
-auto some_function() {
+inline auto some_function() {
   MEASURE_FUNCTION();
   std::cout << "Do some work..." << '\n';
 }

@@ -6,43 +6,50 @@
 
 #include "gtfs/GtfsReader.h"
 #include "src/utils/utils.h"
+#include "utils/scopedTimer.h"
 
 #include <fstream>
 #include <stdexcept>
 
+
 namespace gtfs {
 
   void GtfsStopTimeReader::operator()(GtfsReader& aReader) const {
-    std::ifstream infile(filename);
+    using namespace std::string_literals;
+    MEASURE_FUNCTION();
+
+    std::ifstream infile(filename, std::ios::in | std::ios::binary);
     if (!infile.is_open())
     {
       throw std::runtime_error("Error opening file: " + std::string(filename));
     }
 
+    constexpr size_t bufferSize = 1 << 22; // ~4MB
+    std::vector<char> buffer(bufferSize);
+    infile.rdbuf()->pubsetbuf(buffer.data(), bufferSize);
+
     std::string line;
     std::getline(infile, line); // Skip header line
 
+    constexpr size_t expectedSizec = 16'891'069; // TODO this is a guess
+    aReader.getData().get().stopTimes.reserve(expectedSizec);
+
     while (std::getline(infile, line))
     {
-      auto fields = utils::splitLine(line);
-      if (constexpr uint8_t expectedNumberOfFields = 7; fields.size() != expectedNumberOfFields)
-      {
+      auto fields = utils::splitLineAndRemoveQuotes(line);
+      if (fields.size() < 7) {
+        // TODO: Handle error
         continue;
       }
 
-      constexpr uint8_t quoteSize = 2; // this is needed to remove the quotes from the fields
-      std::string tripId = fields[0].substr(1, fields[0].size() - quoteSize);
-      std::string arrivalTime = fields[1].substr(1, fields[1].size() - quoteSize);
-      std::string departureTime = fields[2].substr(1, fields[2].size() - quoteSize);
-      std::string stopId = fields[3].substr(1, fields[3].size() - quoteSize);
-      const int stopSequence = std::stoi(fields[4].substr(1, fields[4].size() - quoteSize));
-      //int pickupType = std::stoi(fields[5].substr(1, fields[5].size() - quoteSize));
-      //int dropOffType = std::stoi(fields[6].substr(1, fields[6].size() - quoteSize));
-
-      aReader.getData().get().stopTimes.emplace_back(std::move(tripId), std::move(arrivalTime), std::move(departureTime),
-                                               std::move(stopId), stopSequence);
+      aReader.getData().get().stopTimes.emplace_back(
+          std::string(fields[0]), std::string(fields[1]),
+          std::string(fields[2]), std::string(fields[3]),
+          std::stoi(std::string(fields[4]))
+      );
     }
   }
+
 
   GtfsStopTimeReader::GtfsStopTimeReader(std::string filename)
     : filename(std::move(filename)) {
