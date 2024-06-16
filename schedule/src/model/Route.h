@@ -38,7 +38,7 @@ namespace gtfs {
       {
         throw std::invalid_argument("Mandatory route fields must not be empty");
       }
-      if (routeType < 0 || routeType > 12)
+      if (routeType > 12)
       {
         // TODO Log error - there are some route types that are not defined in the GTFS standard
         // throw std::invalid_argument("Invalid route type");
