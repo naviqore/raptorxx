@@ -75,7 +75,7 @@ static void BM_read_stop_times(benchmark::State& state) {
 
 
 BENCHMARK(BM_read_calendar_dates);
-//BENCHMARK(BM_read_stop_times);
+BENCHMARK(BM_read_stop_times);
 BENCHMARK(BM_pointer);
 BENCHMARK(BM_reference);
 
