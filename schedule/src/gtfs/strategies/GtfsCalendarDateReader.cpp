@@ -10,9 +10,6 @@
 
 #include <algorithm>
 #include <fstream>
-#include <stdexcept>
-#include <exception>
-#include <expected>
 #include <source_location>
 
 
@@ -62,7 +59,7 @@ namespace gtfs {
           // exceptionType = CalendarDate::ExceptionType::SERVICE_REMOVED;
           [[fallthrough]];
         default:
-         continue;
+          continue;
           //TODO lets discuss this - throw std::runtime_error("Error: invalid exception type.");
       }
 
