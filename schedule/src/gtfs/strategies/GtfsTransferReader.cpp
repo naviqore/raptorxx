@@ -9,12 +9,14 @@
 #include <stdexcept>
 #include <fstream>
 #include "gtfs/GtfsReader.h"
+#include "utils/scopedTimer.h"
 
 namespace gtfs {
   GtfsTransferReader::GtfsTransferReader(std::string filename)
     : filename(std::move(filename)) {
   }
   void GtfsTransferReader::operator()(GtfsReader& aReader) const {
+    MEASURE_FUNCTION(std::source_location().file_name());
     std::ifstream infile(filename);
     if (!infile.is_open())
     {
@@ -23,42 +25,21 @@ namespace gtfs {
 
     std::string line;
     std::getline(infile, line); // Skip header line
-
+    std::vector<std::string_view> fields;
+    fields.reserve(4);
     while (std::getline(infile, line))
     {
-      auto fields = utils::splitLine(line);
-      if (constexpr uint8_t expectedNumberOfFields = 4; fields.size() != expectedNumberOfFields)
+      fields = utils::splitLineAndRemoveQuotes(line);
+      if (fields.size() < 4)
       {
+        // TODO: Handle error
         continue;
       }
 
-      constexpr uint8_t quoteSize = 2; // this is needed to remove the quotes from the fields
-      std::string fromStopId = fields[0].substr(1, fields[0].size() - quoteSize);
-      std::string toStopId = fields[1].substr(1, fields[1].size() - quoteSize);
-      // const int transferType = std::stoi(fields[2].substr(1, fields[2].size() - quoteSize));
-
-      Transfer::TransferType transferType;
-
-      switch (fields[2][0])
-      {
-        case '0':
-          transferType = Transfer::TransferType::RECOMMENDED;
-          break;
-        case '1':
-          transferType = Transfer::TransferType::TIMED;
-          break;
-        case '2':
-          transferType = Transfer::TransferType::MINIMUM_TIME;
-          break;
-        case '3':
-          transferType = Transfer::TransferType::NOT_POSSIBLE;
-          break;
-        default:
-          break;
-          //throw std::runtime_error("Error: invalid transfer type.");
-      }
-
-      aReader.getData().get().transfers.emplace_back(std::move(fromStopId), std::move(toStopId), transferType);
+      aReader.getData().get().transfers.emplace_back(std::string(fields[0]),
+                                                     std::string(fields[1]),
+                                                     static_cast<Transfer::TransferType>(std::stoi(std::string(fields[2]))),
+                                                     std::stoi(std::string(fields[3])));
     }
   }
 } // gtfs

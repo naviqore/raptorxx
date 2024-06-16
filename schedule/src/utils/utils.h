@@ -51,19 +51,24 @@ namespace gtfs::utils {
   inline std::vector<std::string_view> splitLineAndRemoveQuotes(std::string_view line) {
     std::vector<std::string_view> result;
     size_t start = 0;
-    size_t end = line.find(',');
+    size_t end = 0;
+    bool inQuotes = false;
 
-    while (end != std::string_view::npos)
-    {
-      result.push_back(line.substr(start + 1, end - start - 2));
-      start = end + 1;
-      end = line.find(',', start);
+    for (size_t i = 0; i < line.size(); ++i) {
+      if (line[i] == '\"') {
+        inQuotes = !inQuotes;
+      }
+      else if (line[i] == ',' && !inQuotes) {
+        end = i;
+        result.push_back(line.substr(start + 1, end - start - 2)); // +1 and -2 to remove quotes
+        start = end + 1;
+      }
     }
 
-    result.push_back(line.substr(start + 1, line.size() - start - 2));
+    result.push_back(line.substr(start + 1, line.size() - start - 2)); // +1 and -2 to remove quotes
+
     return result;
   }
-
 
 
 }

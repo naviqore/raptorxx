@@ -6,6 +6,7 @@
 
 #include "src/utils/utils.h"
 #include "gtfs/GtfsReader.h"
+#include "utils/scopedTimer.h"
 
 #include <fstream>
 
@@ -16,6 +17,7 @@ namespace gtfs {
   }
 
   void GtfsTripReader::operator()(GtfsReader& aReader) const {
+    MEASURE_FUNCTION(std::source_location().file_name());
     std::ifstream infile(filename);
     if (!infile.is_open())
     {
@@ -24,21 +26,19 @@ namespace gtfs {
 
     std::string line;
     std::getline(infile, line); // Skip header line
-
+    std::vector<std::string_view> fields;
+    fields.reserve(7);
     while (std::getline(infile, line))
     {
-      auto fields = utils::splitLine(line);
-      if (constexpr uint8_t expectedNumberOfFields = 7; fields.size() != expectedNumberOfFields)
+      fields = utils::splitLineAndRemoveQuotes(line);
+      if (fields.size() < 7)
       {
+        // TODO: Handle error
         continue;
       }
-
-      constexpr uint8_t quoteSize = 2; // this is needed to remove the quotes from the fields
-      std::string routeId = fields[0].substr(1, fields[0].size() - quoteSize);
-      std::string serviceId = fields[1].substr(1, fields[1].size() - quoteSize);
-      std::string tripId = fields[2].substr(1, fields[2].size() - quoteSize);
-
-      aReader.getData().get().trips.emplace_back(std::move(routeId), std::move(serviceId), std::move(tripId));
+      aReader.getData().get().trips.emplace_back(std::string(fields[0]),
+                                                 std::string(fields[1]),
+                                                 std::string(fields[2]));
     }
   }
 } // gtfs

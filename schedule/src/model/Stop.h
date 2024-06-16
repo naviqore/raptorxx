@@ -19,10 +19,11 @@ namespace gtfs {
   struct Stop
   {
     // TODO consider float instead of double for lat/lon
-    Stop(std::string&& aStopId, std::string&& aStopName, const geometry::Coordinate<double> aStopLat, const geometry::Coordinate<double> aStopLon)
+    Stop(std::string&& aStopId, std::string&& aStopName, const geometry::Coordinate<double> aStopLat, const geometry::Coordinate<double> aStopLon, std::string&& aParentStation)
       : stopId(std::move(aStopId))
       , stopName(std::move(aStopName))
-      , stopPoint(aStopLat, aStopLon) {
+      , stopPoint(aStopLat, aStopLon)
+      , parentStation(std::move(aParentStation)) {
       if (stopId.empty()
           || stopName.empty())
       {
@@ -32,6 +33,7 @@ namespace gtfs {
     std::string stopId;
     std::string stopName;
     geometry::CoordinateComponent<geometry::Coordinate<double>> stopPoint;
+    std::string parentStation;
   };
 
 } // gtfs

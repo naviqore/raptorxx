@@ -22,10 +22,11 @@ namespace gtfs {
       NOT_POSSIBLE
     };
 
-    Transfer(std::string&& aFromStopId, std::string&& aToStopId, TransferType const aTransferType)
+    Transfer(std::string&& aFromStopId, std::string&& aToStopId, TransferType const aTransferType, const int minTransferTime)
       : fromStopId(std::move(aFromStopId))
       , toStopId(std::move(aToStopId))
-      , transferType(aTransferType) {
+      , transferType(aTransferType)
+      , minTransferTime(minTransferTime) {
       if (fromStopId.empty()
           || toStopId.empty())
       {
@@ -35,6 +36,7 @@ namespace gtfs {
     std::string fromStopId;
     std::string toStopId;
     TransferType transferType;
+    int minTransferTime = 120;
   };
 
 } // gtfs

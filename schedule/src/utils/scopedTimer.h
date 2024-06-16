@@ -12,10 +12,10 @@
 #define USE_TIMER 1
 
 #if USE_TIMER
-#define MEASURE_FUNCTION()                                                     \
-ScopedTimer timer { std::source_location().function_name() }
+#define MEASURE_FUNCTION(msg)                                                     \
+ScopedTimer timer { msg }
 #else
-#define MEASURE_FUNCTION()
+#define MEASURE_FUNCTION(msg)
 #endif
 
 class ScopedTimer {
@@ -32,9 +32,9 @@ public:
 
   ~ScopedTimer() {
     using namespace std::chrono;
-    auto stop = ClockType::now();
-    auto duration = (stop - start_);
-    auto ms = duration_cast<milliseconds>(duration).count();
+    const auto stop = ClockType::now();
+    const auto duration = (stop - start_);
+    const auto ms = duration_cast<milliseconds>(duration).count();
     std::cout << ms << " ms " << function_ << '\n';
   }
 
@@ -44,7 +44,7 @@ private:
 };
 
 inline auto some_function() {
-  MEASURE_FUNCTION();
+  MEASURE_FUNCTION(std::source_location().file_name());
   std::cout << "Do some work..." << '\n';
 }
 

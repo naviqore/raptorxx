@@ -5,6 +5,9 @@
 #ifndef STOP_TIME_H
 #define STOP_TIME_H
 
+#include "utils/ServiceDayTime.h"
+
+
 #include <string>
 #include <stdexcept>
 
@@ -13,21 +16,18 @@ namespace gtfs {
   {
     StopTime(std::string&& aTripId, std::string&& aArrivalTime, std::string&& aDepartureTime, std::string&& aStopId, int const aStopSequence)
       : tripId(std::move(aTripId))
-      , arrivalTime(std::move(aArrivalTime))
-      , departureTime(std::move(aDepartureTime))
+      , arrivalTime(utils::ServiceDayTime::fromString(std::move(aArrivalTime)))
+      , departureTime(utils::ServiceDayTime::fromString(std::move(aDepartureTime)))
       , stopId(std::move(aStopId))
       , stopSequence(aStopSequence) {
-      if (tripId.empty()
-          || arrivalTime.empty()
-          || departureTime.empty()
-          || stopId.empty())
+      if (tripId.empty())
       {
         throw std::invalid_argument("Mandatory stop time fields must not be empty");
       }
     }
     std::string tripId;
-    std::string arrivalTime;
-    std::string departureTime;
+    utils::ServiceDayTime arrivalTime;
+    utils::ServiceDayTime departureTime;
     std::string stopId;
     int stopSequence;
   };

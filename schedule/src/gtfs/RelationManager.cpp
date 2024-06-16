@@ -9,6 +9,7 @@
 
 
 namespace gtfs {
+
   RelationManager::RelationManager(const GtfsData& data)
     : data(data) {
   }
@@ -34,6 +35,19 @@ namespace gtfs {
 
   const std::vector<std::string>& RelationManager::getStopsForRoute(const std::string& routeId) const {
     return routesStops.at(routeId);
+  }
+
+  /// @brief Attention span lives on the stack, so the data it points to must be valid for the duration of its lifetime
+  /// Span does not own the data it points to, so it is not responsible for its lifetime management.
+  /// @param routeId
+  /// @return span of StopTime objects
+  std::span<const StopTime> RelationManager::getStopTimesForRouteSpan(const std::string& routeId) const {
+    const auto& stopTimes = stopTimeStops.at(routeId);
+    return {stopTimes.data(), stopTimes.size()};
+  }
+
+  const GtfsData& RelationManager::getData() const {
+    return data;
   }
 
   void RelationManager::collectStopTimesForTrips() {

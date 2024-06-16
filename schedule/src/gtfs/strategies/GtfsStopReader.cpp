@@ -2,20 +2,19 @@
 // Created by MichaelBrunner on 07/06/2024.
 //
 
-// GtfsStopReader.cpp
-#include "GtfsStopReader.h"
 
+#include "GtfsStopReader.h"
 #include "LoggingPool.h"
 #include "gtfs/GtfsReader.h"
 #include "src/utils/utils.h"
+#include "utils/scopedTimer.h"
 
 #include <fstream>
-#include <map>
-#include <source_location>
 
 namespace gtfs {
 
   void GtfsStopReader::operator()(GtfsReader& aReader) const {
+    MEASURE_FUNCTION(std::source_location().file_name());
     std::ifstream infile(filename);
     if (!infile.is_open())
     {
@@ -24,23 +23,21 @@ namespace gtfs {
 
     std::string line;
     std::getline(infile, line); // Skip header line
-
+    std::vector<std::string_view> fields;
+    fields.reserve(6);
     while (std::getline(infile, line))
     {
-      auto fields = utils::splitLine(line);
-      if (constexpr uint8_t expectedNumberOfFields = 7; fields.size() != expectedNumberOfFields)
+
+      fields = utils::splitLineAndRemoveQuotes(line);
+      if (fields.size() < 6)
       {
-        // TODO: Handle error
         continue;
       }
 
-      constexpr uint8_t quoteSize = 2; // this is needed to remove the quotes from the fields
-      std::string stopId = fields[0].substr(1, fields[0].size() - quoteSize);
-      std::string stopName = fields[1].substr(1, fields[1].size() - quoteSize);
-      const double stopLat = std::stod(fields[2].substr(1, fields[2].size() - quoteSize));
-      const double stopLon = std::stod(fields[3].substr(1, fields[3].size() - quoteSize));
-
-      aReader.getData().get().stops.emplace_back(std::move(stopId), std::move(stopName), geometry::Coordinate<double>(stopLat), geometry::Coordinate<double>(stopLon));
+      aReader.getData().get().stops.emplace_back(std::string(fields[0]),
+        std::string(fields[1]),
+        geometry::Coordinate<double>(std::stod(std::string(fields[2]))),
+        geometry::Coordinate<double>(std::stod(std::string(fields[3]))), std::string(fields[5]));
     }
   }
 

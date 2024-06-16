@@ -7,15 +7,15 @@
 #include "LoggingPool.h"
 #include "gtfs/GtfsReader.h"
 #include "src/utils/utils.h"
+#include "utils/scopedTimer.h"
 
 #include <fstream>
-#include <map>
 #include <source_location>
 
 namespace gtfs {
 
   void GtfsCalendarReader::operator()(GtfsReader& aReader) const {
-
+    MEASURE_FUNCTION(std::source_location().file_name());
     std::ifstream infile(filename);
     if (!infile.is_open())
     {
@@ -25,26 +25,29 @@ namespace gtfs {
     LoggingPool::getInstance(Target::CONSOLE)->info(fmt::format("Reading file: {}", filename));
     std::string line;
     std::getline(infile, line); // Skip header line
-
+    std::vector<std::string_view> fields;
+    fields.reserve(10);
     while (std::getline(infile, line))
     {
-      auto fields = utils::splitLine(line);
-      if (constexpr uint8_t expectedNumberOfFields = 10; fields.size() != expectedNumberOfFields)
+      fields = utils::splitLineAndRemoveQuotes(line);
+      if (fields.size() < 10)
       {
-        LoggingPool::getInstance(Target::CONSOLE)
-          ->error(fmt::format("Invalid calendar filename: {} line: {} GTFS data {}", std::source_location::current().file_name(), std::source_location::current().line(), line));
+        // TODO: Handle error
+        LoggingPool::getInstance(Target::CONSOLE)->error(fmt::format("Invalid calendar filename: {} line: {} GTFS data {}", std::source_location::current().file_name(), std::source_location::current().line(), line));
         continue;
       }
-      constexpr uint8_t quoteSize = 2; // this is needed to remove the quotes from the fields
-      std::string serviceId = fields[0].substr(1, fields[0].size() - quoteSize);
+
       Calendar::WeekdayServiceHashMap weekdayService
-        = {{std::chrono::Monday, std::stoi(fields[1].substr(1, fields[1].size() - quoteSize))},    {std::chrono::Tuesday, std::stoi(fields[2].substr(1, fields[2].size() - quoteSize))},
-           {std::chrono::Wednesday, std::stoi(fields[3].substr(1, fields[3].size() - quoteSize))}, {std::chrono::Thursday, std::stoi(fields[4].substr(1, fields[4].size() - quoteSize))},
-           {std::chrono::Friday, std::stoi(fields[5].substr(1, fields[5].size() - quoteSize))},    {std::chrono::Saturday, std::stoi(fields[6].substr(1, fields[6].size() - quoteSize))},
-           {std::chrono::Sunday, std::stoi(fields[7].substr(1, fields[7].size() - quoteSize))}};
-      std::string startDate = fields[8].substr(1, fields[8].size() - quoteSize);
-      std::string endDate = fields[9].substr(1, fields[9].size() - quoteSize);
-      aReader.getData().get().calendars.emplace_back(std::move(serviceId), std::move(weekdayService), std::move(startDate), std::move(endDate));
+        = {{std::chrono::Monday, std::stoi(std::string(fields[1]))},
+           {std::chrono::Tuesday, std::stoi(std::string(fields[2]))},
+           {std::chrono::Wednesday, std::stoi(std::string(fields[3]))},
+           {std::chrono::Thursday, std::stoi(std::string(fields[4]))},
+           {std::chrono::Friday, std::stoi(std::string(fields[5]))},
+           {std::chrono::Saturday, std::stoi(std::string(fields[6]))},
+           {std::chrono::Sunday, std::stoi(std::string(fields[7]))}};
+
+      aReader.getData().get().calendars.emplace_back(std::string(fields[0]), std::move(weekdayService),
+                                                     std::string(fields[8]), std::string(fields[9]));
     }
   }
 

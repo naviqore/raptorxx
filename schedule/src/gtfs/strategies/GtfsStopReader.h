@@ -6,8 +6,6 @@
 #define GTFSSTOPREADER_H
 
 #include "gtfs/GtfsReader.h"
-
-
 #include <schedule_export.h>
 #include <string>
 

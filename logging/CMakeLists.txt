@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.28)
 
 project("logging")
 
+set(SPDLOG_BUILD_SHARED OFF)
+
 add_library(${PROJECT_NAME} SHARED
         src/LoggingPool.cpp
         src/LoggingPool.h

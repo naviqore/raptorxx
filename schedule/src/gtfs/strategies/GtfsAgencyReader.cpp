@@ -7,6 +7,7 @@
 #include "LoggingPool.h"
 #include "gtfs/GtfsReader.h"
 #include "src/utils/utils.h"
+#include "utils/scopedTimer.h"
 
 
 #include <stdexcept>
@@ -19,6 +20,7 @@
 namespace gtfs {
 
   void GtfsAgencyReader::operator()(GtfsReader& aReader) const {
+    MEASURE_FUNCTION(std::source_location().file_name());
     std::ifstream infile(filename);
     if (!infile.is_open())
     {

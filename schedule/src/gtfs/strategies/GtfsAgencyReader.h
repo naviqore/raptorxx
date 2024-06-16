@@ -7,9 +7,6 @@
 
 
 #include "GtfsCalendarDateReader.h"
-#include "gtfs/GtfsData.h"
-
-
 #include <schedule_export.h>
 #include <string>
 

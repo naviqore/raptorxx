@@ -9,14 +9,12 @@
 #include "DataReader.h"
 #include "GtfsData.h"
 #include "Types.h"
-
 #include <functional>
-
 #include <schedule_export.h>
 
 namespace gtfs {
 
-  class GTFS_API GtfsReader : public schedule::DataReader<gtfsDataContainer>
+  class GTFS_API GtfsReader final : public schedule::DataReader<gtfsDataContainer>
   {
   public:
     template<typename ReaderType>

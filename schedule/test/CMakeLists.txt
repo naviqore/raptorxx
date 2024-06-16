@@ -8,7 +8,6 @@ add_executable(${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME} PRIVATE
         test_gtfsReader.cpp
-        test_exploreGTest.cpp
         test_gtfs.cpp
         test_main.cpp
         )

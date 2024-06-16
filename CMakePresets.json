@@ -1,0 +1,40 @@
+{
+  "version": 2,
+  "configurePresets": [
+    {
+      "name": "x64-Debug",
+      "hidden": false,
+      "generator": "Ninja",
+      "description": "Use this preset for x64 Debug builds",
+      "binaryDir": "${sourceDir}/out/build/x64-Debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_TOOLCHAIN_FILE": "C:/Users/MichaelBrunner/.vcpkg-clion/vcpkg-raptorxx/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "YES"
+      }
+    },
+    {
+      "name": "x64-Release",
+      "hidden": false,
+      "generator": "Ninja",
+      "description": "Use this preset for x64 Release builds",
+      "binaryDir": "${sourceDir}/out/build/x64-Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_TOOLCHAIN_FILE": "C:/Users/MichaelBrunner/.vcpkg-clion/vcpkg-raptorxx/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "YES"
+      }
+    }
+    //{
+    //  "name": "x64-windows-static",
+    //  "hidden": true,
+    //  "generator": "Ninja",
+    //  "description": "Use this preset for x64 Windows static builds",
+    //  "binaryDir": "${sourceDir}/out/build/${presetName}",
+    //  "cacheVariables": {
+    //    "VCPKG_TARGET_TRIPLET": "x64-windows-static",
+    //    "CMAKE_TOOLCHAIN_FILE": "<path-to-your-vcpkg-installation>/scripts/buildsystems/vcpkg.cmake"
+    //  }
+    //}
+  ]
+}

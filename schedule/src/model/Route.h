@@ -34,21 +34,20 @@ namespace gtfs {
       , routeShortName(std::move(aRouteShortName))
       , routeLongName(std::move(aRouteLongName))
       , routeType(aRouteType) {
-      if (routeId.empty()
-          || routeShortName.empty()
-          || routeLongName.empty())
+      if (routeId.empty()) // || routeShortName.empty()  || routeLongName.empty()
       {
         throw std::invalid_argument("Mandatory route fields must not be empty");
       }
       if (routeType < 0 || routeType > 12)
       {
-        throw std::invalid_argument("Invalid route type");
+        // TODO Log error - there are some route types that are not defined in the GTFS standard
+        // throw std::invalid_argument("Invalid route type");
       }
     }
     std::string routeId;
     std::string routeShortName;
     std::string routeLongName;
-    int routeType;
+    RouteType routeType;
     // std::string agency_id;
   };
 

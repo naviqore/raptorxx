@@ -15,6 +15,7 @@
 #include "model/Stop.h"
 #include "model/Route.h"
 #include <schedule_export.h>
+#include <span>
 
 namespace gtfs {
 
@@ -33,13 +34,17 @@ namespace gtfs {
 
     [[nodiscard]] const std::vector<std::string>& getStopsForRoute(const std::string& routeId) const;
 
+    [[nodiscard]] std::span<const StopTime> getStopTimesForRouteSpan(const std::string& routeId) const;
+
+    [[nodiscard]] const GtfsData& getData() const;
+
   private:
     const GtfsData& data;
 
-    std::map<std::string, std::vector<StopTime>> stopTimeTrips;
-    std::map<std::string, std::vector<StopTime>> stopTimeStops;
-    std::map<std::string, std::vector<Trip>> tripsRoutes;
-    std::map<std::string, std::vector<std::string>> routesStops;
+    std::unordered_map<std::string, std::vector<StopTime>> stopTimeTrips;
+    std::unordered_map<std::string, std::vector<StopTime>> stopTimeStops;
+    std::unordered_map<std::string, std::vector<Trip>> tripsRoutes;
+    std::unordered_map<std::string, std::vector<std::string>> routesStops;
 
     void collectStopTimesForTrips();
 
