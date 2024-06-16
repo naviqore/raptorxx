@@ -17,7 +17,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/model/Stop.h
         src/model/Route.h
         src/model/Trip.h
-        src/model/stopTime.h
+        src/model/StopTime.h
         src/model/Calendar.h
         src/model/CalendarDate.h
         src/model/Transfer.h
