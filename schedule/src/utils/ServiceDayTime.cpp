@@ -37,7 +37,7 @@ namespace gtfs::utils {
     return totalSeconds >= other.totalSeconds;
   }
   ServiceDayTime::operator bool() const {
-    return totalSeconds < 0;
+    return totalSeconds != 0;
   }
 
   ServiceDayTime ServiceDayTime::fromString(std::string_view timeString) {
