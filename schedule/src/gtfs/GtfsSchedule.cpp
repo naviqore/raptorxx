@@ -18,6 +18,10 @@ namespace gtfs {
                   });*/
 
     // TODO in next Jira ticket
+    std::ignore = stopId;
+    std::ignore = aDateTime;
+    std::ignore = limit;
+
     return {};
   }
 } // gtfs
