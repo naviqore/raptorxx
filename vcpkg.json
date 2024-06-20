@@ -1,0 +1,15 @@
+{
+  "name" : "raptorxx",
+  "version-string" : "0.0.2",
+  "dependencies" : [ {
+    "name" : "vcpkg-cmake-config"
+  }, {
+    "name" : "vcpkg-cmake"
+  }, {
+    "name" : "gtest"
+  }, {
+    "name" : "spdlog"
+  }, {
+    "name" : "benchmark"
+  } ]
+}
