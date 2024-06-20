@@ -10,19 +10,19 @@
 
 
 template<typename T>
-concept CoordinateComponentConcept = requires(T a) {
+concept CoordinateItemConcept = requires(T a) {
   { a.getValue() } -> std::convertible_to<double>;
 };
 
 template<typename T>
-concept PointConcept = requires(T a) {
+concept CoordinateComponentConcept = requires(T a) {
   { a.getFirstCoordinate() } -> std::convertible_to<double>;
   { a.getSecondCoordinate() } -> std::convertible_to<double>;
 };
 
 namespace geometry {
 
-  template<CoordinateComponentConcept T>
+  template<CoordinateItemConcept T>
   class CoordinateComponent
   {
     T firstCoordinate;
@@ -68,12 +68,12 @@ namespace geometry {
 
     CoordinateComponent operator*(const double scalar) {
       return CoordinateComponent(getFirstCoordinate() * scalar,
-                   getSecondCoordinate() * scalar);
+                                 getSecondCoordinate() * scalar);
     }
 
     CoordinateComponent operator/(const double scalar) {
       return CoordinateComponent(getFirstCoordinate() / scalar,
-                   getSecondCoordinate() / scalar);
+                                 getSecondCoordinate() / scalar);
     }
 
     double distanceTo(const CoordinateComponent& other) {
@@ -93,6 +93,27 @@ namespace geometry {
       return *this / distanceTo(CoordinateComponent(0, 0));
     }
   };
+
+  template<CoordinateItemConcept T>
+  struct CoordinateComponentHash
+  {
+    size_t operator()(const CoordinateComponent<T>& k) const {
+      constexpr std::hash<double> hash;
+      return hash(k.getFirstCoordinate()) ^ hash(k.getSecondCoordinate());
+    }
+  };
+
+
+  template<CoordinateItemConcept T>
+  struct CoordinateComponentEqual
+  {
+    bool operator()(const CoordinateComponent<T>& p1, const CoordinateComponent<T>& p2) const {
+      return std::make_tuple(p1.getFirstCoordinate(), p1.getSecondCoordinate())
+             == std::make_tuple(p2.getFirstCoordinate(), p2.getSecondCoordinate());
+    }
+  };
+
+
 
 } // geometry
 

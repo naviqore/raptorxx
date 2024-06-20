@@ -3,7 +3,7 @@ project("test"
 )
 
 if (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    message(WARNING "Tests should be built in Debug mode")
+message(STATUS "Tests should be built in Debug mode")
 endif ()
 
 enable_testing()

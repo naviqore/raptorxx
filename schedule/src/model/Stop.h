@@ -5,8 +5,8 @@
 #ifndef STOP_H
 #define STOP_H
 
-#include <Coordinate.h>
-#include <CoordinateComponent.h>
+#include <spatial/Coordinate.h>
+#include <spatial/CoordinateComponent.h>
 
 
 #include <string>
