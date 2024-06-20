@@ -2,6 +2,10 @@ project("test"
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
+if (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    message(WARNING "Tests should be built in Debug mode")
+endif ()
+
 enable_testing()
 
 add_executable(${PROJECT_NAME})
@@ -10,7 +14,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         test_gtfsReader.cpp
         test_gtfs.cpp
         test_main.cpp
-        )
+)
 
 find_package(GTest CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)

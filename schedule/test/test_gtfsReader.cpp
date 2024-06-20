@@ -138,9 +138,7 @@ TEST(GTFS, TestStrategyReader) {
   reader->readData();
   const auto data = reader->getData();
 
-  printAgency(data.get().agencies);
-  printCalendar(data.get().calendars);
-  printCalendarDates(data.get().calendarDates);
-
-  EXPECT_EQ(1, 1);
+  EXPECT_FALSE(data.get().agencies.empty() || data.get().calendars.empty()
+              || data.get().calendarDates.empty() || data.get().routes.empty() || data.get().stops.empty()
+              || data.get().stopTimes.empty() || data.get().transfers.empty() || data.get().trips.empty());
 }

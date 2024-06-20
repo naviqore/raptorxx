@@ -1,6 +1,6 @@
 {
   "name" : "raptorxx",
-  "version-string" : "1.0.0",
+  "version-string" : "0.0.2",
   "dependencies" : [ {
     "name" : "vcpkg-cmake-config"
   }, {
