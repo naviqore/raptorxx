@@ -10,8 +10,8 @@
 #include <memory>
 #include <concepts>
 #include <functional>
-#include "../CoordinateComponent.h"
-#include "../../utils/utils.h"
+#include <CoordinateComponent.h>
+#include <utils.h>
 
 #include <stdexcept>
 
@@ -123,7 +123,7 @@ namespace geometry::kd_tree {
     void rangeSearch(const std::shared_ptr<Node>& node, const T& point, const double range, const int depth, std::vector<T>& results) {
       if (nullptr == node)
       {
-        throw std::invalid_argument("Node is null");
+        return;
       }
 
       if (const double distance = utils::haversineDistance(node->point, point);
@@ -133,7 +133,7 @@ namespace geometry::kd_tree {
       }
 
       int axis = axisFunc(depth, kDimensions);
-      const double difference = point.getDimensionValue(axis) - node->point.getDimensionValue(axis);
+      const double difference = utils::getCoordinateComponent(point, axis) - utils::getCoordinateComponent(node->point, axis);
 
       if (difference <= range)
       {

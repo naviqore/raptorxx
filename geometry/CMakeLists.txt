@@ -9,5 +9,7 @@ target_sources(${PROJECT_NAME} INTERFACE
         src/utils/utils.h
         src/utils/usings.h)
 
-# specify the include directory for the library and the users of the library
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/src/spatial)
+target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/src/spatial/index)
+target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/src/utils)

@@ -5,9 +5,9 @@
 #ifndef USINGS_H
 #define USINGS_H
 
-#include "../spatial/index/K2DTree.h"
-#include "../spatial/CoordinateComponent.h"
-#include "../spatial/Coordinate.h"
+#include <K2DTree.h>
+#include <CoordinateComponent.h>
+#include <Coordinate.h>
 
 namespace geometry::kd_tree {
   using spatialCoordinate = Coordinate<double>;

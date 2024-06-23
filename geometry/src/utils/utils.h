@@ -5,9 +5,14 @@
 #pragma once
 
 #include <cmath>
-#include "spatial/CoordinateComponent.h"
 #include <stdexcept>
 #include <numbers>
+#include <spatial/CoordinateComponent.h>
+
+constexpr long double operator"" _km(const long double value) {
+  return value;
+}
+
 
 namespace geometry::utils {
 
@@ -31,7 +36,7 @@ namespace geometry::utils {
   }
 
   double haversineDistance(const CoordinateComponentConcept auto& aFirstPoint, const CoordinateComponentConcept auto& aSecondPoint) {
-    constexpr double kEarthRadiusKilometers = 6'371.0;
+    constexpr double kEarthRadiusKilometers = 6'371.00_km;
     auto toRadians = [](const double degrees) { return degrees * std::numbers::pi / 180.0; };
 
     const double lat1 = toRadians(aFirstPoint.getFirstCoordinate());
@@ -46,6 +51,26 @@ namespace geometry::utils {
 
     return kEarthRadiusKilometers * c;
   }
+
+  template<CoordinateItemConcept T>
+  struct CoordinateComponentHash
+  {
+    size_t operator()(const CoordinateComponent<T>& k) const {
+      constexpr std::hash<double> hash;
+      return hash(k.getFirstCoordinate()) ^ hash(k.getSecondCoordinate());
+    }
+  };
+
+
+  template<CoordinateItemConcept T>
+  struct CoordinateComponentEqual
+  {
+    bool operator()(const CoordinateComponent<T>& p1, const CoordinateComponent<T>& p2) const {
+      return std::make_tuple(p1.getFirstCoordinate(), p1.getSecondCoordinate())
+             == std::make_tuple(p2.getFirstCoordinate(), p2.getSecondCoordinate());
+    }
+  };
+
 
 
 }

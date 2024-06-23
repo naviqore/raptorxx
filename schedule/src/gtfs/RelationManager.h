@@ -41,6 +41,7 @@ namespace gtfs {
   private:
     const GtfsData& data;
 
+    // TODO reserve size for maps
     std::unordered_map<std::string, std::vector<StopTime>> stopTimeTrips;
     std::unordered_map<std::string, std::vector<StopTime>> stopTimeStops;
     std::unordered_map<std::string, std::vector<Trip>> tripsRoutes;

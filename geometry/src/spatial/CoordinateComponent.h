@@ -94,27 +94,6 @@ namespace geometry {
     }
   };
 
-  template<CoordinateItemConcept T>
-  struct CoordinateComponentHash
-  {
-    size_t operator()(const CoordinateComponent<T>& k) const {
-      constexpr std::hash<double> hash;
-      return hash(k.getFirstCoordinate()) ^ hash(k.getSecondCoordinate());
-    }
-  };
-
-
-  template<CoordinateItemConcept T>
-  struct CoordinateComponentEqual
-  {
-    bool operator()(const CoordinateComponent<T>& p1, const CoordinateComponent<T>& p2) const {
-      return std::make_tuple(p1.getFirstCoordinate(), p1.getSecondCoordinate())
-             == std::make_tuple(p2.getFirstCoordinate(), p2.getSecondCoordinate());
-    }
-  };
-
-
-
 } // geometry
 
 #endif //BASEPOINT_H
