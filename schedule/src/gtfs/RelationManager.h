@@ -17,7 +17,7 @@
 #include <schedule_export.h>
 #include <span>
 
-namespace gtfs {
+namespace schedule::gtfs {
 
   class GTFS_API RelationManager
   {

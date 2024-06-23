@@ -28,7 +28,7 @@ namespace gtfs {
     while (std::getline(infile, line))
     {
 
-      fields = utils::splitLineAndRemoveQuotes(line);
+      fields = schedule::gtfs::utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 6)
       {
         continue;

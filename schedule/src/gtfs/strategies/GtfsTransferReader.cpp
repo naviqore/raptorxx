@@ -29,7 +29,7 @@ namespace gtfs {
     fields.reserve(4);
     while (std::getline(infile, line))
     {
-      fields = utils::splitLineAndRemoveQuotes(line);
+      fields = schedule::gtfs::utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 4)
       {
         // TODO: Handle error
@@ -38,7 +38,7 @@ namespace gtfs {
 
       aReader.getData().get().transfers.emplace_back(std::string(fields[0]),
                                                      std::string(fields[1]),
-                                                     static_cast<Transfer::TransferType>(std::stoi(std::string(fields[2]))),
+                                                     static_cast<schedule::gtfs::Transfer::TransferType>(std::stoi(std::string(fields[2]))),
                                                      std::stoi(std::string(fields[3])));
     }
   }

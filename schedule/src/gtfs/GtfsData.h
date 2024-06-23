@@ -18,7 +18,7 @@
 #include <vector>
 #include <schedule_export.h>
 
-namespace gtfs {
+namespace schedule::gtfs {
 
   struct GTFS_API GtfsData
   {

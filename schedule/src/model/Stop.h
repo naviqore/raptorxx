@@ -15,7 +15,7 @@
 // https://gtfs.org/schedule/reference/#stopstxt
 // Required
 
-namespace gtfs {
+namespace schedule::gtfs {
   struct Stop
   {
     // TODO consider float instead of double for lat/lon

@@ -12,7 +12,7 @@
 // https://gtfs.org/schedule/reference/#routestxt
 // Required
 
-namespace gtfs {
+namespace schedule::gtfs {
   struct Route
   {
     enum RouteType : uint8_t

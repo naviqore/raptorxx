@@ -10,7 +10,7 @@
 #include <cstdint>
 
 // https://gtfs.org/schedule/reference/#transferstxt
-namespace gtfs {
+namespace schedule::gtfs {
   struct Transfer
   {
 

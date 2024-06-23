@@ -5,8 +5,6 @@
 add_library(${PROJECT_NAME} SHARED)
 
 target_sources(${PROJECT_NAME} PRIVATE
-        src/TestObject.cpp
-        src/TestObject.h
         src/DataReader.h
         src/gtfs/GtfsReader.h
         src/model/Agency.h
