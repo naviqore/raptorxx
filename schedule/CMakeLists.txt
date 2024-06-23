@@ -43,6 +43,8 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/gtfs/GtfsSchedule.h
         src/utils/ServiceDayTime.cpp
         src/utils/ServiceDayTime.h
+        src/gtfs/GtfsReaderStrategyFactory.cpp
+        src/gtfs/GtfsReaderStrategyFactory.h
 )
 
 
