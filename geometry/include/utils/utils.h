@@ -7,7 +7,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <numbers>
-#include <spatial/CoordinateComponent.h>
+#include <../../include/spatial/CoordinateComponent.h>
 
 constexpr long double operator"" _km(const long double value) {
   return value;

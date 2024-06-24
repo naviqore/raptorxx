@@ -117,6 +117,10 @@ namespace geometry::kd_tree {
       std::shared_ptr<Node> best = nullptr;
       double bestDist = std::numeric_limits<double>::infinity(); // start with INFINITY
       nearest(root, point, 0, best, bestDist);
+      if (nullptr == best)
+      {
+        throw std::runtime_error("No nearest point found");
+      }
       return best->point;
     }
 
