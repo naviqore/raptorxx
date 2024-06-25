@@ -102,12 +102,12 @@ TEST_F(GtfsReaderStrategiesTest, testCalendarDateReader) {
     ASSERT_TRUE(calendarDate.exceptionType == schedule::gtfs::CalendarDate::SERVICE_ADDED || calendarDate.exceptionType == schedule::gtfs::CalendarDate::SERVICE_REMOVED);
   });
 
-  std::string date_str = "20231225";
-  int year = std::stoi(date_str.substr(0, 4));
-  int month = std::stoi(date_str.substr(4, 2));
-  int day = std::stoi(date_str.substr(6, 2));
+  const std::string date_str = "20231225";
+  const int year = std::stoi(date_str.substr(0, 4));
+  const int month = std::stoi(date_str.substr(4, 2));
+  const int day = std::stoi(date_str.substr(6, 2));
 
-  std::chrono::year_month_day date = std::chrono::year{year} / month / day;
+  const std::chrono::year_month_day date = std::chrono::year{year} / month / day;
 
   ASSERT_EQ(data.get().calendarDates[0].serviceId, "TA+00060");
   ASSERT_EQ(data.get().calendarDates[0].date, date);

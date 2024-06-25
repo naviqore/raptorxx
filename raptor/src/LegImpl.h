@@ -24,6 +24,8 @@ namespace raptor {
   public:
     explicit LegImpl(std::string routeId, std::string tripId, std::string fromStopId, std::string toStopId, int departureTime, int arrivalTime, Type type);
 
+    ~LegImpl() override = default;
+
     [[nodiscard]] std::string const& getRouteId() const override;
 
     [[nodiscard]] std::string const& getTripId() const override;

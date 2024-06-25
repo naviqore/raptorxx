@@ -13,7 +13,7 @@ namespace raptor {
 
   class Raptor
   {
-    constexpr auto INFINITY_VALUE = std::numeric_limits<int>::max();
+    static constexpr auto INFINITY_VALUE = std::numeric_limits<int>::max();
     schedule::gtfs::RelationManager relationManager;
 
   public:

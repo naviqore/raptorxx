@@ -18,7 +18,7 @@ namespace raptor {
       ROUTE
     };
 
-    virtual ~Leg() = 0;
+    virtual ~Leg() = default;
 
     [[nodiscard]] virtual std::string const& getRouteId() const = 0;
 
