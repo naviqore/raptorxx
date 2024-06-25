@@ -8,6 +8,6 @@
 #include "gtfs/GtfsData.h"
 #include "utils/DataContainer.h"
 
-using gtfsDataContainer = schedule::DataContainer<gtfs::GtfsData>;
+using gtfsDataContainer = schedule::DataContainer<schedule::gtfs::GtfsData>;
 
 #endif //TYPES_H

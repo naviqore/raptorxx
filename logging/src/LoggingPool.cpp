@@ -3,6 +3,7 @@
 //
 
 #include "LoggingPool.h"
+#include <unordered_map>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
 
@@ -40,6 +41,7 @@ LoggerBridge* LoggingPool::getInstance(const Target aTarget) {
 }
 
 LoggingPool::~LoggingPool() = default;
+
 void LoggingPool::info(const std::string& message) {
   impl->current->info(message);
 }

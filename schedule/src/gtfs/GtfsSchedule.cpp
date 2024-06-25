@@ -8,10 +8,10 @@
 
 namespace gtfs {
 
-  GtfsSchedule::GtfsSchedule(const GtfsData& data)
+  GtfsSchedule::GtfsSchedule(const schedule::gtfs::GtfsData& data)
     : relationManager(data) {}
 
-  std::span<const StopTime> GtfsSchedule::getNextDepartures(std::string const& stopId, std::chrono::system_clock::time_point const& aDateTime, int limit) {
+  std::span<const schedule::gtfs::StopTime> GtfsSchedule::getNextDepartures(std::string const& stopId, std::chrono::system_clock::time_point const& aDateTime, int limit) {
     /*auto data = relationManager.getData().stopTimes
                 | std::views::filter([stopId, aDateTime](const StopTime& stopTime) {
                     return stopTime.departureTime

@@ -26,7 +26,7 @@ namespace gtfs {
     fields.reserve(6);
     while (std::getline(infile, line))
     {
-      fields = utils::splitLineAndRemoveQuotes(line);
+      fields = schedule::gtfs::utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 6)
       {
         // TODO: Handle error
@@ -36,7 +36,7 @@ namespace gtfs {
       aReader.getData().get().routes.emplace_back(std::string(fields[0]),
                                                   std::string(fields[2]),
                                                   std::string(fields[3]),
-                                                  static_cast<Route::RouteType>(std::stoi(std::string(fields[5]))));
+                                                  static_cast<schedule::gtfs::Route::RouteType>(std::stoi(std::string(fields[5]))));
     }
   }
 

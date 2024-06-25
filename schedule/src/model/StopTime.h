@@ -11,7 +11,7 @@
 #include <string>
 #include <stdexcept>
 
-namespace gtfs {
+namespace schedule::gtfs {
   struct StopTime
   {
     StopTime(std::string&& aTripId, std::string&& aArrivalTime, std::string&& aDepartureTime, std::string&& aStopId, int const aStopSequence)

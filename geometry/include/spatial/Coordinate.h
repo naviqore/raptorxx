@@ -5,6 +5,9 @@
 #ifndef COORDINATE_H
 #define COORDINATE_H
 
+#include <type_traits>
+#include <concepts>
+
 namespace geometry {
 
   template<typename T>
@@ -12,6 +15,7 @@ namespace geometry {
   class Coordinate
   {
     T value;
+
   public:
     explicit Coordinate(const T value)
       : value(value) {}

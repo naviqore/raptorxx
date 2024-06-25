@@ -10,19 +10,19 @@
 
 
 template<typename T>
-concept CoordinateComponentConcept = requires(T a) {
+concept CoordinateItemConcept = requires(T a) {
   { a.getValue() } -> std::convertible_to<double>;
 };
 
 template<typename T>
-concept PointConcept = requires(T a) {
+concept CoordinateComponentConcept = requires(T a) {
   { a.getFirstCoordinate() } -> std::convertible_to<double>;
   { a.getSecondCoordinate() } -> std::convertible_to<double>;
 };
 
 namespace geometry {
 
-  template<CoordinateComponentConcept T>
+  template<CoordinateItemConcept T>
   class CoordinateComponent
   {
     T firstCoordinate;
@@ -68,12 +68,12 @@ namespace geometry {
 
     CoordinateComponent operator*(const double scalar) {
       return CoordinateComponent(getFirstCoordinate() * scalar,
-                   getSecondCoordinate() * scalar);
+                                 getSecondCoordinate() * scalar);
     }
 
     CoordinateComponent operator/(const double scalar) {
       return CoordinateComponent(getFirstCoordinate() / scalar,
-                   getSecondCoordinate() / scalar);
+                                 getSecondCoordinate() / scalar);
     }
 
     double distanceTo(const CoordinateComponent& other) {

@@ -8,7 +8,7 @@
 #include <ranges>
 
 
-namespace gtfs {
+namespace schedule::gtfs {
 
   RelationManager::RelationManager(const GtfsData& data)
     : data(data) {

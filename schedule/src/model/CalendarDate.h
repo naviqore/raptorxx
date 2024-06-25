@@ -14,7 +14,7 @@
 
 // https://gtfs.org/schedule/reference/#calendar_datestxt
 
-namespace gtfs {
+namespace schedule::gtfs {
   struct CalendarDate
   {
 
