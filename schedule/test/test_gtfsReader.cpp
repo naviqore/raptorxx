@@ -67,7 +67,7 @@ namespace fmt {
   };
 }
 
-void printCalendar(const std::vector<gtfs::Calendar>& calendars) {
+void printCalendar(const std::vector<schedule::gtfs::Calendar>& calendars) {
   std::array<std::string, 7> weekday_names = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
   std::ranges::for_each(calendars, [&](const auto& calendar) {
     LoggingPool::getInstance(Target::CONSOLE)->info(fmt::format("Service ID: {}", calendar.serviceId));
@@ -83,12 +83,12 @@ void printCalendar(const std::vector<gtfs::Calendar>& calendars) {
   });
 }
 
-void printAgency(const std::vector<gtfs::Agency>& agencies) {
+void printAgency(const std::vector<schedule::gtfs::Agency>& agencies) {
   std::ranges::for_each(
     agencies, [](const auto& agency) { LoggingPool::getInstance(Target::CONSOLE)->info(fmt::format("Agency: {} {} {}", agency.agencyId, agency.name, agency.timezone)); });
 }
 
-void printCalendarDates(const std::vector<gtfs::CalendarDate>& calendarDates) {
+void printCalendarDates(const std::vector<schedule::gtfs::CalendarDate>& calendarDates) {
   std::ranges::for_each(calendarDates, [](const auto& calendarDate) {
     LoggingPool::getInstance(Target::CONSOLE)->info(fmt::format("Service ID: {} Date: {}-{}-{} Exception Type: {}", calendarDate.serviceId, calendarDate.date.year(), calendarDate.date.month(), calendarDate.date.day(), static_cast<int>(calendarDate.exceptionType)));
   });
@@ -109,32 +109,32 @@ TEST(GTFS, TestStrategyReader) {
   const auto TripFile = basePath + "trips.txt";
 
   // register GTFS file names
-  const std::map<gtfs::utils::GTFS_FILE_TYPE, std::string> lFileNameMap = {
-    {gtfs::utils::GTFS_FILE_TYPE::AGENCY, agencyFile},
-    {gtfs::utils::GTFS_FILE_TYPE::CALENDAR, calendarFile},
-    {gtfs::utils::GTFS_FILE_TYPE::CALENDAR_DATES, calendarDatesFile},
-    {gtfs::utils::GTFS_FILE_TYPE::ROUTES, routesFile},
-    {gtfs::utils::GTFS_FILE_TYPE::STOP, stopFile},
-    {gtfs::utils::GTFS_FILE_TYPE::STOP_TIMES, stopTimeFile},
-    {gtfs::utils::GTFS_FILE_TYPE::TRANSFERS, TransferFile},
-    {gtfs::utils::GTFS_FILE_TYPE::TRIPS, TripFile}};
+  const std::map<schedule::gtfs::utils::GTFS_FILE_TYPE, std::string> lFileNameMap = {
+    {schedule::gtfs::utils::GTFS_FILE_TYPE::AGENCY, agencyFile},
+    {schedule::gtfs::utils::GTFS_FILE_TYPE::CALENDAR, calendarFile},
+    {schedule::gtfs::utils::GTFS_FILE_TYPE::CALENDAR_DATES, calendarDatesFile},
+    {schedule::gtfs::utils::GTFS_FILE_TYPE::ROUTES, routesFile},
+    {schedule::gtfs::utils::GTFS_FILE_TYPE::STOP, stopFile},
+    {schedule::gtfs::utils::GTFS_FILE_TYPE::STOP_TIMES, stopTimeFile},
+    {schedule::gtfs::utils::GTFS_FILE_TYPE::TRANSFERS, TransferFile},
+    {schedule::gtfs::utils::GTFS_FILE_TYPE::TRIPS, TripFile}};
 
   LoggingPool::getInstance(Target::CONSOLE)->setLevel(LoggerBridge::ERROR);
 
 
   // create strategy callable objects
-  const std::function<void(gtfs::GtfsReader&)> agencyStrategy = gtfs::GtfsAgencyReader(lFileNameMap.at(gtfs::utils::GTFS_FILE_TYPE::AGENCY));
-  const std::function<void(gtfs::GtfsReader&)> calendarStrategy = gtfs::GtfsCalendarReader(lFileNameMap.at(gtfs::utils::GTFS_FILE_TYPE::CALENDAR));
-  const std::function<void(gtfs::GtfsReader&)> calendarDatesStrategy = gtfs::GtfsCalendarDateReader(lFileNameMap.at(gtfs::utils::GTFS_FILE_TYPE::CALENDAR_DATES));
-  const std::function<void(gtfs::GtfsReader&)> routesStrategy = gtfs::GtfsRouteReader(lFileNameMap.at(gtfs::utils::GTFS_FILE_TYPE::ROUTES));
-  const std::function<void(gtfs::GtfsReader&)> stopStrategy = gtfs::GtfsStopReader(lFileNameMap.at(gtfs::utils::GTFS_FILE_TYPE::STOP));
-  const std::function<void(gtfs::GtfsReader&)> stopTimeStrategy = gtfs::GtfsStopTimeReader(lFileNameMap.at(gtfs::utils::GTFS_FILE_TYPE::STOP_TIMES));
-  const std::function<void(gtfs::GtfsReader&)> transferStrategy = gtfs::GtfsTransferReader(lFileNameMap.at(gtfs::utils::GTFS_FILE_TYPE::TRANSFERS));
-  const std::function<void(gtfs::GtfsReader&)> tripStrategy = gtfs::GtfsTripReader(lFileNameMap.at(gtfs::utils::GTFS_FILE_TYPE::TRIPS));
+  const std::function<void(gtfs::GtfsReader&)> agencyStrategy = gtfs::GtfsAgencyReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::AGENCY));
+  const std::function<void(gtfs::GtfsReader&)> calendarStrategy = gtfs::GtfsCalendarReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::CALENDAR));
+  const std::function<void(gtfs::GtfsReader&)> calendarDatesStrategy = gtfs::GtfsCalendarDateReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::CALENDAR_DATES));
+  const std::function<void(gtfs::GtfsReader&)> routesStrategy = gtfs::GtfsRouteReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::ROUTES));
+  const std::function<void(gtfs::GtfsReader&)> stopStrategy = gtfs::GtfsStopReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::STOP));
+  const std::function<void(gtfs::GtfsReader&)> stopTimeStrategy = gtfs::GtfsStopTimeReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::STOP_TIMES));
+  const std::function<void(gtfs::GtfsReader&)> transferStrategy = gtfs::GtfsTransferReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::TRANSFERS));
+  const std::function<void(gtfs::GtfsReader&)> tripStrategy = gtfs::GtfsTripReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::TRIPS));
 
   std::vector strategies = {agencyStrategy, calendarStrategy, calendarDatesStrategy, routesStrategy, stopStrategy, stopTimeStrategy, transferStrategy, tripStrategy};
 
-  const std::unique_ptr<schedule::DataReader<schedule::DataContainer<gtfs::GtfsData>>> reader = std::make_unique<gtfs::GtfsReader>(std::move(strategies));
+  const std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> reader = std::make_unique<gtfs::GtfsReader>(std::move(strategies));
   reader->readData();
   const auto data = reader->getData();
 

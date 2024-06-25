@@ -2,8 +2,6 @@ project("raptor"
         DESCRIPTION "C++ implementation of raptor algorithm"
 )
 
-include_directories(${CMAKE_SOURCE_DIR}/common/logging/include)
-
 add_library(${PROJECT_NAME}
         src/main.cpp
         src/Raptor.cpp
@@ -14,6 +12,7 @@ add_library(${PROJECT_NAME}
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
+        ${CMAKE_SOURCE_DIR}/logging/include
         ${CMAKE_SOURCE_DIR}/logging
         ${CMAKE_SOURCE_DIR}/schedule/src
 )

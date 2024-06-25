@@ -40,6 +40,7 @@ LoggerBridge* LoggingPool::getInstance(const Target aTarget) {
 }
 
 LoggingPool::~LoggingPool() = default;
+
 void LoggingPool::info(const std::string& message) {
   impl->current->info(message);
 }

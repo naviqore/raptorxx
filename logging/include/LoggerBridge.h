@@ -6,8 +6,9 @@
 #define LOGGERBRIDGE_H
 
 #include <string>
+#include <logging_export.h>
 
-class LoggerBridge
+class LOGGER_API LoggerBridge
 {
 public:
   enum Level
