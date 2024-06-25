@@ -8,7 +8,7 @@
 #include <string>
 #include <stdexcept>
 
-namespace gtfs {
+namespace schedule::gtfs {
   struct Trip
   {
     Trip(std::string&& aRouteId, std::string&& aServiceId, std::string&& aTripId)

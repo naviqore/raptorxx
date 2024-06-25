@@ -30,7 +30,7 @@ namespace gtfs {
     fields.reserve(7);
     while (std::getline(infile, line))
     {
-      fields = utils::splitLineAndRemoveQuotes(line);
+      fields = schedule::gtfs::utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 7)
       {
         // TODO: Handle error

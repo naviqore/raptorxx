@@ -5,8 +5,6 @@
 add_library(${PROJECT_NAME} SHARED)
 
 target_sources(${PROJECT_NAME} PRIVATE
-        src/TestObject.cpp
-        src/TestObject.h
         src/DataReader.h
         src/gtfs/GtfsReader.h
         src/model/Agency.h
@@ -45,6 +43,8 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/gtfs/GtfsSchedule.h
         src/utils/ServiceDayTime.cpp
         src/utils/ServiceDayTime.h
+        src/gtfs/GtfsReaderStrategyFactory.cpp
+        src/gtfs/GtfsReaderStrategyFactory.h
 )
 
 
@@ -52,7 +52,7 @@ message("CU_LIST_DIR UO: ${CMAKE_CURRENT_LIST_DIR}")
 
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging/src)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/geometry/src)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/geometry/include)
 target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

@@ -4,7 +4,8 @@
 
 #include <gtest/gtest.h>
 #include "LoggingPool.h"
-#include "utils/usings.h"
+#include "utils.h"
+#include "usings.h"
 
 #include <ranges>
 #include <unordered_map>
@@ -16,7 +17,7 @@ TEST(geomety, TestK2dTree) {
   const auto secondCoordinate = geometry::kd_tree::spatialCoordinate(2.0);
   const auto coordiante = geometry::kd_tree::coordinateComponent(firstCoordinate, secondCoordinate);
 
-  EXPECT_THROW(kdTree.nearest(coordiante), std::invalid_argument);
+  EXPECT_THROW(kdTree.nearest(coordiante), std::runtime_error);
 }
 
 

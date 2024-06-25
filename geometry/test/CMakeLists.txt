@@ -28,7 +28,7 @@ add_test(NAME ${BINARY} COMMAND ${BINARY})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging/src)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/geometry/src)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/geometry/include)
 
 
 

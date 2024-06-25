@@ -10,7 +10,7 @@
 #include <cstring>
 #include <stdexcept>
 
-namespace gtfs {
+namespace schedule::gtfs {
   struct Agency
   {
     Agency(std::string&& aAgencyId, std::string&& aName, std::string&& aTimezone)

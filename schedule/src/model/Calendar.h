@@ -19,7 +19,7 @@ inline auto weekdayHash = [](const std::chrono::weekday& wd) {
   return static_cast<size_t>(wd.c_encoding());
 };
 
-namespace gtfs {
+namespace schedule::gtfs {
   struct Calendar
   {
     using WeekdayServiceHashMap = std::unordered_map<std::chrono::weekday, int, decltype(weekdayHash), std::equal_to<>>;
