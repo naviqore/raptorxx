@@ -48,24 +48,41 @@ namespace schedule::gtfs::utils {
     TRIPS
   };
 
-  inline std::vector<std::string_view> splitLineAndRemoveQuotes(std::string_view line) {
+  inline std::vector<std::string_view> splitLineAndRemoveQuotes(const std::string_view line) {
     std::vector<std::string_view> result;
     size_t start = 0;
     size_t end = 0;
     bool inQuotes = false;
 
-    for (size_t i = 0; i < line.size(); ++i) {
-      if (line[i] == '\"') {
+    for (size_t i = 0; i < line.size(); ++i)
+    {
+      if (line[i] == '\"')
+      {
         inQuotes = !inQuotes;
       }
-      else if (line[i] == ',' && !inQuotes) {
+      else if (line[i] == ',' && !inQuotes)
+      {
         end = i;
-        result.push_back(line.substr(start + 1, end - start - 2)); // +1 and -2 to remove quotes
+        if (start < end)
+        {
+          result.push_back(line.substr(start, end - start)); // Do not remove quotes
+        }
+        else
+        {
+          result.emplace_back(""); // push empty string when field is empty
+        }
         start = end + 1;
       }
     }
 
-    result.push_back(line.substr(start + 1, line.size() - start - 2)); // +1 and -2 to remove quotes
+    if (start < line.size())
+    {
+      result.push_back(line.substr(start, line.size() - start)); // Do not remove quotes
+    }
+    else
+    {
+      result.emplace_back(""); // push empty string when last field is empty
+    }
 
     return result;
   }

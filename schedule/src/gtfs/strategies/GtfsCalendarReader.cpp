@@ -11,6 +11,7 @@
 
 #include <fstream>
 #include <source_location>
+#include <format>
 
 namespace gtfs {
 
@@ -22,7 +23,7 @@ namespace gtfs {
       // TODO log error
       throw std::runtime_error("Error opening file: " + std::string(filename));
     }
-    LoggingPool::getInstance(Target::CONSOLE)->info(fmt::format("Reading file: {}", filename));
+    LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
     std::string line;
     std::getline(infile, line); // Skip header line
     std::vector<std::string_view> fields;
@@ -33,7 +34,7 @@ namespace gtfs {
       if (fields.size() < 10)
       {
         // TODO: Handle error
-        LoggingPool::getInstance(Target::CONSOLE)->error(fmt::format("Invalid calendar filename: {} line: {} GTFS data {}", std::source_location::current().file_name(), std::source_location::current().line(), line));
+        LoggingPool::getInstance(Target::CONSOLE)->error(std::format("Invalid calendar filename: {} line: {} GTFS data {}", std::source_location::current().file_name(), std::source_location::current().line(), line));
         continue;
       }
 

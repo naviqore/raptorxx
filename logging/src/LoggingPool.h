@@ -11,7 +11,6 @@
 
 #include "LoggerBridge.h"
 
-#include "spdlog/logger.h"
 #include <memory>
 #include <logging_export.h>
 

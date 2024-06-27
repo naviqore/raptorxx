@@ -13,7 +13,7 @@
 #include "gtfs/strategies/GtfsTransferReader.h"
 #include "gtfs/strategies/GtfsTripReader.h"
 #include "utils/utils.h"
-#include "src/model/CalendarDate.h"
+#include "model/CalendarDate.h"
 #include "utils/DataContainer.h"
 
 #include <algorithm>

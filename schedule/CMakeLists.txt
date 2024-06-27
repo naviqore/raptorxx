@@ -7,18 +7,18 @@ add_library(${PROJECT_NAME} SHARED)
 target_sources(${PROJECT_NAME} PRIVATE
         src/DataReader.h
         src/gtfs/GtfsReader.h
-        src/model/Agency.h
+        include/model/Agency.h
         src/gtfs/strategies/GtfsAgencyReader.cpp
         src/gtfs/strategies/GtfsAgencyReader.h
         src/utils/utils.h
         src/gtfs/GtfsData.h
-        src/model/Stop.h
-        src/model/Route.h
-        src/model/Trip.h
-        src/model/StopTime.h
-        src/model/Calendar.h
-        src/model/CalendarDate.h
-        src/model/Transfer.h
+        include/model/Stop.h
+        include/model/Route.h
+        include/model/Trip.h
+        include/model/StopTime.h
+        include/model/Calendar.h
+        include/model/CalendarDate.h
+        include/model/Transfer.h
         src/gtfs/strategies/GtfsCalendarReader.cpp
         src/gtfs/strategies/GtfsCalendarReader.h
         src/gtfs/strategies/GtfsCalendarDateReader.cpp
@@ -70,6 +70,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 target_compile_definitions(${PROJECT_NAME} PRIVATE GTFS_DLL_EXPORTS)
 target_include_directories(${PROJECT_NAME} PUBLIC
         ${CMAKE_SOURCE_DIR}/schedule/src # specify path to include files during build
+        ${CMAKE_SOURCE_DIR}/schedule/include
 )
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -83,10 +84,8 @@ generate_export_header(${PROJECT_NAME}
         STATIC_DEFINE ${PROJECT_NAME}_BUILT_AS_STATIC
 )
 
-set(LIBRARY_INSTALL_DIR lib)
 set(INCLUDE_INSTALL_DIR include)
 
-install(TARGETS ${PROJECT_NAME} DESTINATION ${LIBRARY_INSTALL_DIR})
 install(FILES
         src/TestObject.h
         src/gtfs/GtfsReader.h

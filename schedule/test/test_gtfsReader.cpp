@@ -20,6 +20,7 @@
 #include <array>
 #include <chrono>
 #include <iostream>
+#include <fmt/core.h>
 
 #include <gtest/gtest.h>
 

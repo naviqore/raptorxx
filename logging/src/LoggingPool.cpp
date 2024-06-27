@@ -2,6 +2,7 @@
 // Created by MichaelBrunner on 27/05/2024.
 //
 
+#include "spdlog/logger.h"
 #include "LoggingPool.h"
 #include <unordered_map>
 #include <spdlog/sinks/stdout_color_sinks.h>
