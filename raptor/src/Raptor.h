@@ -27,6 +27,8 @@ namespace raptor {
     explicit Raptor(std::unique_ptr<strategy::IRaptorAlgorithmStrategy>&& strategy);
 
     [[nodiscard]] std::shared_ptr<IConnection> getConnections(utils::ConnectionRequest const& request) const override;
+
+    void testFunction() override;
   };
 
 } // raptor

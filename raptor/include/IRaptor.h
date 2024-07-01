@@ -19,6 +19,8 @@ namespace raptor {
     virtual ~IRaptor() = default;
 
     [[nodiscard]] virtual std::shared_ptr<IConnection> getConnections(utils::ConnectionRequest const& request) const = 0;
+
+    virtual void testFunction() = 0;
   };
 }
 

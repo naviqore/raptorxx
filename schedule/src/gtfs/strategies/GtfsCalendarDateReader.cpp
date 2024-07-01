@@ -4,6 +4,7 @@
 
 #include "GtfsCalendarDateReader.h"
 
+#include "LoggingPool.h"
 #include "gtfs/GtfsReader.h"
 #include "src/utils/scopedTimer.h"
 #include "src/utils/utils.h"
@@ -27,7 +28,7 @@ namespace gtfs {
       // throw std::runtime_error("Error opening file: " + std::string(filename));
       return;
     }
-
+    LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
     constexpr size_t bufferSize = 1 << 20; // 1 MB buffer size
     std::vector<char> buffer(bufferSize);
     infile.rdbuf()->pubsetbuf(buffer.data(), bufferSize);

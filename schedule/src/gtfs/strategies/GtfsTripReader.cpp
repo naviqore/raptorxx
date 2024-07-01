@@ -4,6 +4,7 @@
 
 #include "GtfsTripReader.h"
 
+#include "LoggingPool.h"
 #include "src/utils/utils.h"
 #include "gtfs/GtfsReader.h"
 #include "utils/scopedTimer.h"
@@ -23,7 +24,7 @@ namespace gtfs {
     {
       throw std::runtime_error("Error opening file: " + std::string(filename));
     }
-
+    LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
     std::string line;
     std::getline(infile, line); // Skip header line
     std::vector<std::string_view> fields;

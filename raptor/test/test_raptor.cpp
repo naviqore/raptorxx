@@ -90,18 +90,10 @@ TEST_F(RaptorTest, InitialTest) {
   auto stopIdSource = relationManager.getStopIdFromName("Zürich, Bahnhof Affoltern");
   auto stopIdTarget = relationManager.getStopIdFromName("Erlenbach ZH, Bahnhof");
 
-  // raptor::utils::ConnectionRequest request(stopIdSource, stopIdTarget, 1000);
 
   const std::unique_ptr<raptor::strategy::factory::IRaptorAlgorithmFactory> factory = std::make_unique<raptor::strategy::factory::RaptorAlgorithmFactory>();
   auto strategy = factory->create(raptor::strategy::factory::IRaptorAlgorithmFactory::RAPTOR, std::move(relationManager));
-
-  try
-  {
-    std::unique_ptr<raptor::IRaptor> raptor = std::make_unique<raptor::Raptor>(std::move(strategy));
-    //  auto connections = raptor->getConnections(request);
-  } catch (const std::invalid_argument& e)
-  {
-    std::cout << e.what() << std::endl;
-  }
-
+  std::unique_ptr<raptor::IRaptor> raptor = std::make_unique<raptor::Raptor>(std::move(strategy));
+  ASSERT_TRUE(raptor);
+  // auto connections = raptor->getConnections(request);
 }

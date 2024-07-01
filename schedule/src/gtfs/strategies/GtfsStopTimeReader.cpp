@@ -4,6 +4,7 @@
 
 #include "GtfsStopTimeReader.h"
 
+#include "LoggingPool.h"
 #include "gtfs/GtfsReader.h"
 #include "src/utils/utils.h"
 #include "utils/scopedTimer.h"
@@ -23,7 +24,7 @@ namespace gtfs {
     {
       throw std::runtime_error("Error opening file: " + std::string(filename));
     }
-
+    LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
     constexpr size_t bufferSize = 1 << 22; // ~4MB
     std::vector<char> buffer(bufferSize);
     infile.rdbuf()->pubsetbuf(buffer.data(), bufferSize);

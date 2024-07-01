@@ -21,7 +21,7 @@ namespace raptor::strategy::factory {
 
   private:
     std::map<AlgorithmType, std::function<std::unique_ptr<IRaptorAlgorithmStrategy>(schedule::gtfs::RelationManager&& relationManager)>> strategies{
-      {AlgorithmType::RAPTOR, [](schedule::gtfs::RelationManager&& relationManager) { return std::make_unique<RaptorStrategy>(std::move(relationManager)); }}};
+      {RAPTOR, [](schedule::gtfs::RelationManager&& relationManager) { return std::make_unique<RaptorStrategy>(std::move(relationManager)); }}};
   };
 
 } // factory

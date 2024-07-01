@@ -27,7 +27,7 @@ namespace gtfs {
       // TODO log error
       throw std::runtime_error("Error opening file: " + std::string(filename));
     }
-
+    LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
     std::string line;
     std::getline(infile, line); // Skip header line
     std::vector<std::string_view> fields;
