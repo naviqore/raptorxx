@@ -63,6 +63,50 @@ namespace schedule::gtfs::utils {
       else if (line[i] == ',' && !inQuotes)
       {
         end = i;
+        std::string_view field = line.substr(start, end - start);
+
+        // Remove quotes at the beginning and end of the field
+        if (field.front() == '\"' && field.back() == '\"')
+        {
+          field.remove_prefix(1);
+          field.remove_suffix(1);
+        }
+
+        result.push_back(field);
+        start = end + 1;
+      }
+    }
+
+    // Add the last field
+    if (start < line.size())
+    {
+      std::string_view field = line.substr(start);
+      if (field.front() == '\"' && field.back() == '\"')
+      {
+        field.remove_prefix(1);
+        field.remove_suffix(1);
+      }
+      result.push_back(field);
+    }
+
+    return result;
+  }
+
+  /*inline std::vector<std::string_view> splitLineAndRemoveQuotes(const std::string_view line) {
+    std::vector<std::string_view> result;
+    size_t start = 0;
+    size_t end = 0;
+    bool inQuotes = false;
+
+    for (size_t i = 0; i < line.size(); ++i)
+    {
+      if (line[i] == '\"')
+      {
+        inQuotes = !inQuotes;
+      }
+      else if (line[i] == ',' && !inQuotes)
+      {
+        end = i;
         if (start < end)
         {
           result.push_back(line.substr(start, end - start)); // Do not remove quotes
@@ -85,7 +129,7 @@ namespace schedule::gtfs::utils {
     }
 
     return result;
-  }
+  }*/
 
 
 }

@@ -4,7 +4,7 @@
 
 /////// PSEUDO IMPLEMENTATION OF RAPTOR ALGORITHM ///////
 
-/*
+
 #include <vector>
 #include <limits>
 #include <optional>
@@ -242,4 +242,4 @@ std::vector<Label> RAPTOR(const Stop& source, const Stop& target, int departure_
   // ... (omitted for brevity)
   return journey;
 }
-*/
+

@@ -23,20 +23,28 @@ namespace gtfs {
     std::string line;
     std::getline(infile, line); // Skip header line
     std::vector<std::string_view> fields;
-    fields.reserve(6);
+    fields.reserve(7);
     while (std::getline(infile, line))
     {
       fields = schedule::gtfs::utils::splitLineAndRemoveQuotes(line);
-      if (fields.size() < 6)
+      if (fields.size() < 7)
       {
         // TODO: Handle error
         continue;
       }
 
+#ifdef OPEN_DATA_ZURICH
+      aReader.getData().get().routes.emplace_back(std::string(fields[0]),
+                                                  std::string(fields[2]),
+                                                  std::string(fields[3]),
+                                                  static_cast<schedule::gtfs::Route::RouteType>(std::stoi(std::string(fields[4]))));
+#else
+
       aReader.getData().get().routes.emplace_back(std::string(fields[0]),
                                                   std::string(fields[2]),
                                                   std::string(fields[3]),
                                                   static_cast<schedule::gtfs::Route::RouteType>(std::stoi(std::string(fields[5]))));
+#endif
     }
   }
 

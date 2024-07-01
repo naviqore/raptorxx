@@ -13,7 +13,11 @@ namespace raptor::strategy {
 
   class RaptorStrategy final : public IRaptorAlgorithmStrategy
   {
+    schedule::gtfs::RelationManager relationManager;
+
   public:
+    explicit RaptorStrategy(schedule::gtfs::RelationManager&& relationManager);
+
     std::shared_ptr<IConnection> execute(const utils::ConnectionRequest& request) override;
   };
 

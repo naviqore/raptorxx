@@ -6,7 +6,7 @@
 #define RAPTORALGORITHMFACTORY_H
 
 #include "IRaptorAlgorithmFactory.h"
-#include "RaptorStrategy.h"
+#include "strategies/RaptorStrategy.h"
 
 #include <functional>
 #include <map>
@@ -17,11 +17,11 @@ namespace raptor::strategy::factory {
   class RAPTOR_API RaptorAlgorithmFactory final : public IRaptorAlgorithmFactory
   {
   public:
-    std::unique_ptr<IRaptorAlgorithmStrategy> create(AlgorithmType type) override;
+    std::unique_ptr<IRaptorAlgorithmStrategy> create(AlgorithmType type, schedule::gtfs::RelationManager&& relationManager) override;
 
   private:
-    std::map<AlgorithmType, std::function<std::unique_ptr<IRaptorAlgorithmStrategy>()>> strategies{
-      {AlgorithmType::RAPTOR, []() { return std::make_unique<RaptorStrategy>(); }}};
+    std::map<AlgorithmType, std::function<std::unique_ptr<IRaptorAlgorithmStrategy>(schedule::gtfs::RelationManager&& relationManager)>> strategies{
+      {AlgorithmType::RAPTOR, [](schedule::gtfs::RelationManager&& relationManager) { return std::make_unique<RaptorStrategy>(std::move(relationManager)); }}};
   };
 
 } // factory

@@ -5,6 +5,9 @@
 #ifndef IRAPTORALGORITHMFACTORY_H
 #define IRAPTORALGORITHMFACTORY_H
 
+#include "gtfs/RelationManager.h"
+
+
 #include <memory>
 #include <raptor_export.h>
 
@@ -24,7 +27,7 @@ namespace raptor::strategy::factory {
 
     virtual ~IRaptorAlgorithmFactory() = default;
 
-    virtual std::unique_ptr<IRaptorAlgorithmStrategy> create(AlgorithmType type) = 0;
+    virtual std::unique_ptr<IRaptorAlgorithmStrategy> create(AlgorithmType type, schedule::gtfs::RelationManager&& relationManager) = 0;
   };
 }
 

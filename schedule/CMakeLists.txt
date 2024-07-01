@@ -95,3 +95,7 @@ install(FILES
 message(BINARY_DIR: ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${CMAKE_BINARY_DIR}/${PROJECT_NAME}/test)
+
+if(USE_ZURICH_GTFS)
+    add_compile_definitions(-DOPEN_DATA_ZURICH)
+endif()

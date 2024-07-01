@@ -37,7 +37,6 @@ namespace gtfs {
         LoggingPool::getInstance(Target::CONSOLE)->error(std::format("Invalid calendar filename: {} line: {} GTFS data {}", std::source_location::current().file_name(), std::source_location::current().line(), line));
         continue;
       }
-
       schedule::gtfs::Calendar::WeekdayServiceHashMap weekdayService
         = {{std::chrono::Monday, std::stoi(std::string(fields[1]))},
            {std::chrono::Tuesday, std::stoi(std::string(fields[2]))},

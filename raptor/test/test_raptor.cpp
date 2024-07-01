@@ -19,18 +19,15 @@
 #include <gtfs/GtfsReader.h>
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
-TEST(RaptorAlgorithm, InitialTest) {
-  const std::unique_ptr<raptor::strategy::factory::IRaptorAlgorithmFactory> factory = std::make_unique<raptor::strategy::factory::RaptorAlgorithmFactory>();
-  auto strategy = factory->create(raptor::strategy::factory::IRaptorAlgorithmFactory::AlgorithmType::RAPTOR);
-  //auto raptor = raptor::Raptor(std::move(strategy));
-  // raptor.getConnections();
-}
+
 
 class RaptorTest : public ::testing::Test
 {
 protected:
   std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> reader;
+  // raptor::utils::ConnectionRequest request;
 
   const std::string basePath = TEST_DATA_DIR_FULL_GTFS;
 
@@ -56,6 +53,12 @@ protected:
       {schedule::gtfs::utils::GTFS_FILE_TYPE::STOP_TIMES, stopTimeFile},
       {schedule::gtfs::utils::GTFS_FILE_TYPE::TRANSFERS, TransferFile},
       {schedule::gtfs::utils::GTFS_FILE_TYPE::TRIPS, TripFile}};
+
+    // request.departureStop = schedule::gtfs::Stop{"Stop1", "Mels", geometry::Coordinate{0.0},
+    //                                              geometry::Coordinate{0.0}, "Par"};
+    // request.departureTime = 1000;
+    // request.arrivalStop = schedule::gtfs::Stop{"Stop2", "Sargans", geometry::Coordinate{0.0},
+    //                                            geometry::Coordinate{0.0}, "Par"};
   }
 
   void TearDown() override {
@@ -63,6 +66,7 @@ protected:
     reader.reset(nullptr);
   }
 };
+
 
 TEST_F(RaptorTest, InitialTest) {
 
@@ -76,26 +80,28 @@ TEST_F(RaptorTest, InitialTest) {
   const std::function<void(gtfs::GtfsReader&)> transferStrategy = gtfs::GtfsTransferReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::TRANSFERS));
   const std::function<void(gtfs::GtfsReader&)> tripStrategy = gtfs::GtfsTripReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::TRIPS));
 
-  std::vector strategies = {agencyStrategy, calendarStrategy, calendarDatesStrategy, routesStrategy,stopStrategy, /* stopTimeStrategy, transferStrategy, tripStrategy*/}; //
+  std::vector strategies = {agencyStrategy, calendarStrategy, calendarDatesStrategy, routesStrategy, stopStrategy, stopTimeStrategy, transferStrategy, tripStrategy}; //
 
   const std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> reader = std::make_unique<gtfs::GtfsReader>(std::move(strategies));
   reader->readData();
   const auto data = reader->getData();
   auto relationManager = schedule::gtfs::RelationManager(data.get());
 
+  auto stopIdSource = relationManager.getStopIdFromName("Zürich, Bahnhof Affoltern");
+  auto stopIdTarget = relationManager.getStopIdFromName("Erlenbach ZH, Bahnhof");
+
+  // raptor::utils::ConnectionRequest request(stopIdSource, stopIdTarget, 1000);
+
   const std::unique_ptr<raptor::strategy::factory::IRaptorAlgorithmFactory> factory = std::make_unique<raptor::strategy::factory::RaptorAlgorithmFactory>();
-  auto strategy = factory->create(raptor::strategy::factory::IRaptorAlgorithmFactory::RAPTOR);
+  auto strategy = factory->create(raptor::strategy::factory::IRaptorAlgorithmFactory::RAPTOR, std::move(relationManager));
 
   try
   {
-    auto raptor = raptor::Raptor(std::move(strategy), std::move(relationManager));
+    std::unique_ptr<raptor::IRaptor> raptor = std::make_unique<raptor::Raptor>(std::move(strategy));
+    //  auto connections = raptor->getConnections(request);
   } catch (const std::invalid_argument& e)
   {
     std::cout << e.what() << std::endl;
   }
 
-  // raptor::utils::ConnectionRequest request;
-  // request.departureStop = schedule::gtfs::Stop();
-  //
-  // raptor.getConnections();
 }

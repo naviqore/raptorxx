@@ -28,6 +28,11 @@ namespace schedule::gtfs {
   const std::vector<StopTime>& RelationManager::getStopTimesForStop(const std::string& stopId) const {
     return stopTimeStops.at(stopId);
   }
+  const std::string& RelationManager::getStopIdFromName(const std::string& stopName) const {
+    return std::ranges::find_if(data.stops, [&stopName](const auto& stop) {
+      return stop.stopName == stopName;
+    })->stopId;
+  }
 
   const std::vector<Trip>& RelationManager::getTripsForRoute(const std::string& routeId) const {
     return tripsRoutes.at(routeId);

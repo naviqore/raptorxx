@@ -33,23 +33,22 @@ namespace gtfs {
 
     constexpr size_t expectedSizec = 16'891'069; // TODO this is a guess
     aReader.getData().get().stopTimes.reserve(expectedSizec);
+    std::vector<std::string_view> fields;
+    fields.reserve(7);
 
     while (std::getline(infile, line))
     {
-      auto fields = schedule::gtfs::utils::splitLineAndRemoveQuotes(line);
-      if (fields.size() < 7) {
+      fields = schedule::gtfs::utils::splitLineAndRemoveQuotes(line);
+      if (fields.size() < 9) // 9 because of ZURICH gtfs {
         // TODO: Handle error
         continue;
-      }
-
-      aReader.getData().get().stopTimes.emplace_back(
-          std::string(fields[0]), std::string(fields[1]),
-          std::string(fields[2]), std::string(fields[3]),
-          std::stoi(std::string(fields[4]))
-      );
     }
+  std::cout << "field nr 4 " << std::string(fields[4]) << std::endl;
+    aReader.getData().get().stopTimes.emplace_back(
+      std::string(fields[0]), std::string(fields[1]),
+      std::string(fields[2]), std::string(fields[3]),
+      std::stoi(std::string(fields[4])));
   }
-
 
   GtfsStopTimeReader::GtfsStopTimeReader(std::string filename)
     : filename(std::move(filename)) {

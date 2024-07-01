@@ -7,8 +7,8 @@
 
 namespace raptor::strategy::factory {
 
-  std::unique_ptr<IRaptorAlgorithmStrategy> RaptorAlgorithmFactory::create(AlgorithmType type) {
-    return strategies[type]();
+  std::unique_ptr<IRaptorAlgorithmStrategy> RaptorAlgorithmFactory::create(const AlgorithmType type, schedule::gtfs::RelationManager&& relationManager) {
+    return strategies[type](std::move(relationManager));
   }
 } // factory
   // strategy

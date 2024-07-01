@@ -30,6 +30,8 @@ namespace schedule::gtfs {
 
     [[nodiscard]] const std::vector<StopTime>& getStopTimesForStop(const std::string& stopId) const;
 
+    [[nodiscard]] const std::string& getStopIdFromName(const std::string& stopName) const;
+
     [[nodiscard]] const std::vector<Trip>& getTripsForRoute(const std::string& routeId) const;
 
     [[nodiscard]] const std::vector<std::string>& getStopsForRoute(const std::string& routeId) const;

@@ -43,6 +43,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/output/bin/releas
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/output/lib/release)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/output/lib/release)
 
+set(USE_ZURICH_GTFS ON)
+
 add_subdirectory(interfaces)
 add_subdirectory(logging)
 add_subdirectory(geometry)

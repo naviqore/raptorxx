@@ -34,8 +34,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/raptor/in
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/schedule/src)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/schedule/include)
 
-add_definitions(-DTEST_DATA_DIR="${CMAKE_SOURCE_DIR}/schedule/test/test-data/")
-add_definitions(-DTEST_DATA_DIR_FULL_GTFS="C:/Users/MichaelBrunner/Downloads/gtfs_fp2024_2024-05-27/") #
+if(USE_ZURICH_GTFS)
+    add_definitions(-DTEST_DATA_DIR_FULL_GTFS="C:/Users/MichaelBrunner/Downloads/2024_google_transit/")
+else ()
+    add_definitions(-DTEST_DATA_DIR="${CMAKE_SOURCE_DIR}/schedule/test/test-data/")
+    add_definitions(-DTEST_DATA_DIR_FULL_GTFS="C:/Users/MichaelBrunner/Downloads/gtfs_fp2024_2024-05-27/")
+endif()
 
 
 

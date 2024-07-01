@@ -5,6 +5,9 @@
 #ifndef RAPTOR_H
 #define RAPTOR_H
 
+#include "IRaptor.h"
+
+
 #include <IConnection.h>
 #include <gtfs/RelationManager.h>
 #include <IRaptorAlgorithmStrategy.h>
@@ -16,15 +19,14 @@ namespace raptor {
     struct ConnectionRequest;
   }
 
-  class RAPTOR_API Raptor
+  class RAPTOR_API Raptor final : public IRaptor
   {
     std::unique_ptr<strategy::IRaptorAlgorithmStrategy> strategy;
-    schedule::gtfs::RelationManager relationManager;
 
   public:
-    explicit Raptor(std::unique_ptr<strategy::IRaptorAlgorithmStrategy>&& strategy, schedule::gtfs::RelationManager&& relationManager);
+    explicit Raptor(std::unique_ptr<strategy::IRaptorAlgorithmStrategy>&& strategy);
 
-    [[nodiscard]] std::shared_ptr<IConnection> getConnections(utils::ConnectionRequest const& request) const;
+    [[nodiscard]] std::shared_ptr<IConnection> getConnections(utils::ConnectionRequest const& request) const override;
   };
 
 } // raptor
