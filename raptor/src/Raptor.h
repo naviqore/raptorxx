@@ -4,12 +4,8 @@
 
 #ifndef RAPTOR_H
 #define RAPTOR_H
-#include "IConnection.h"
 
-
-#include <utility>
-
-#include <gtfs/GtfsData.h>
+#include <IConnection.h>
 #include <gtfs/RelationManager.h>
 #include <IRaptorAlgorithmStrategy.h>
 #include <memory>
@@ -28,7 +24,7 @@ namespace raptor {
   public:
     explicit Raptor(std::unique_ptr<strategy::IRaptorAlgorithmStrategy>&& strategy, schedule::gtfs::RelationManager&& relationManager);
 
-    void getConnections(utils::ConnectionRequest const& request) const;
+    [[nodiscard]] std::shared_ptr<IConnection> getConnections(utils::ConnectionRequest const& request) const;
   };
 
 } // raptor

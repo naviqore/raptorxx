@@ -19,8 +19,10 @@ namespace raptor {
     }
   }
 
-  void Raptor::getConnections(utils::ConnectionRequest const& request) const {
+  std::shared_ptr<IConnection> Raptor::getConnections(utils::ConnectionRequest const& request) const {
     strategy->execute(request);
+
+    return nullptr;
   }
 
 
