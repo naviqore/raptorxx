@@ -10,6 +10,7 @@
 #include "utils/scopedTimer.h"
 
 #include <fstream>
+#include <map>
 
 namespace gtfs {
   void GtfsRouteReader::operator()(GtfsReader& aReader) const {
@@ -21,30 +22,25 @@ namespace gtfs {
     }
     LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
     std::string line;
-    std::getline(infile, line); // Skip header line
+    std::getline(infile, line); // Get Header line
+    // get indices of header columns
+    std::map<std::string, size_t> headerMap = schedule::gtfs::utils::getGtfsColumnIndices(line);
+
     std::vector<std::string_view> fields;
     fields.reserve(7);
     while (std::getline(infile, line))
     {
       fields = schedule::gtfs::utils::splitLineAndRemoveQuotes(line);
-      if (fields.size() < 7)
+      if (fields.size() < 6)
       {
         // TODO: Handle error
         continue;
       }
 
-#ifdef OPEN_DATA_ZURICH
-      aReader.getData().get().routes.emplace_back(std::string(fields[0]),
-                                                  std::string(fields[2]),
-                                                  std::string(fields[3]),
-                                                  static_cast<schedule::gtfs::Route::RouteType>(std::stoi(std::string(fields[4]))));
-#else
-
-      aReader.getData().get().routes.emplace_back(std::string(fields[0]),
-                                                  std::string(fields[2]),
-                                                  std::string(fields[3]),
-                                                  static_cast<schedule::gtfs::Route::RouteType>(std::stoi(std::string(fields[5]))));
-#endif
+      aReader.getData().get().routes.emplace_back(std::string(fields[headerMap["route_id"]]),
+                                                  std::string(fields[headerMap["route_short_name"]]),
+                                                  std::string(fields[headerMap["route_long_name"]]),
+                                                  static_cast<schedule::gtfs::Route::RouteType>(std::stoi(std::string(fields[headerMap["route_type"]]))));
     }
   }
 

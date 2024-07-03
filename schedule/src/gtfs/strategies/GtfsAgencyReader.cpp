@@ -30,6 +30,7 @@ namespace gtfs {
     LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
     std::string line;
     std::getline(infile, line); // Skip header line
+    std::map<std::string, size_t> headerMap = schedule::gtfs::utils::getGtfsColumnIndices(line);
     std::vector<std::string_view> fields;
     fields.reserve(4);
     while (std::getline(infile, line))
@@ -40,8 +41,10 @@ namespace gtfs {
         // TODO: Handle error
         continue;
       }
-      aReader.getData().get().agencies.emplace_back(std::string(fields[0]), std::string(fields[1]),
-                                                    std::string(fields[3]));
+      aReader.getData().get().agencies.emplace_back(
+        std::string(fields[headerMap["agency_id"]]),
+        std::string(fields[headerMap["agency_name"]]),
+        std::string(fields[headerMap["agency_timezone"]]));
     }
   }
 

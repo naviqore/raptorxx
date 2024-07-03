@@ -10,6 +10,7 @@
 #include <vector>
 #include <sstream>
 #include <iomanip> // std::get_time
+#include <map>
 
 namespace schedule::gtfs::utils {
   constexpr int YEAR_OFFSET = 1900;
@@ -92,45 +93,15 @@ namespace schedule::gtfs::utils {
     return result;
   }
 
-  /*inline std::vector<std::string_view> splitLineAndRemoveQuotes(const std::string_view line) {
-    std::vector<std::string_view> result;
-    size_t start = 0;
-    size_t end = 0;
-    bool inQuotes = false;
-
-    for (size_t i = 0; i < line.size(); ++i)
+  inline auto getGtfsColumnIndices(const std::string_view line) {
+    std::map<std::string, size_t> headerMap;
+    const std::vector<std::string_view> fieldsHeader = splitLineAndRemoveQuotes(line);
+    for (size_t i = 0; i < fieldsHeader.size(); ++i)
     {
-      if (line[i] == '\"')
-      {
-        inQuotes = !inQuotes;
-      }
-      else if (line[i] == ',' && !inQuotes)
-      {
-        end = i;
-        if (start < end)
-        {
-          result.push_back(line.substr(start, end - start)); // Do not remove quotes
-        }
-        else
-        {
-          result.emplace_back(""); // push empty string when field is empty
-        }
-        start = end + 1;
-      }
+      headerMap[std::string(fieldsHeader[i])] = i;
     }
-
-    if (start < line.size())
-    {
-      result.push_back(line.substr(start, line.size() - start)); // Do not remove quotes
-    }
-    else
-    {
-      result.emplace_back(""); // push empty string when last field is empty
-    }
-
-    return result;
-  }*/
-
+    return headerMap;
+  }
 
 }
 

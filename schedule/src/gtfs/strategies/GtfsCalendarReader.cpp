@@ -26,6 +26,7 @@ namespace gtfs {
     LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
     std::string line;
     std::getline(infile, line); // Skip header line
+    std::map<std::string, size_t> headerMap = schedule::gtfs::utils::getGtfsColumnIndices(line);
     std::vector<std::string_view> fields;
     fields.reserve(10);
     while (std::getline(infile, line))
@@ -38,16 +39,17 @@ namespace gtfs {
         continue;
       }
       schedule::gtfs::Calendar::WeekdayServiceHashMap weekdayService
-        = {{std::chrono::Monday, std::stoi(std::string(fields[1]))},
-           {std::chrono::Tuesday, std::stoi(std::string(fields[2]))},
-           {std::chrono::Wednesday, std::stoi(std::string(fields[3]))},
-           {std::chrono::Thursday, std::stoi(std::string(fields[4]))},
-           {std::chrono::Friday, std::stoi(std::string(fields[5]))},
-           {std::chrono::Saturday, std::stoi(std::string(fields[6]))},
-           {std::chrono::Sunday, std::stoi(std::string(fields[7]))}};
+        = {{std::chrono::Monday, std::stoi(std::string(fields[headerMap["monday"]]))},
+           {std::chrono::Tuesday, std::stoi(std::string(fields[headerMap["tuesday"]]))},
+           {std::chrono::Wednesday, std::stoi(std::string(fields[headerMap["wednesday"]]))},
+           {std::chrono::Thursday, std::stoi(std::string(fields[headerMap["thursday"]]))},
+           {std::chrono::Friday, std::stoi(std::string(fields[headerMap["friday"]]))},
+           {std::chrono::Saturday, std::stoi(std::string(fields[headerMap["saturday"]]))},
+           {std::chrono::Sunday, std::stoi(std::string(fields[headerMap["sunday"]]))}};
 
-      aReader.getData().get().calendars.emplace_back(std::string(fields[0]), std::move(weekdayService),
-                                                     std::string(fields[8]), std::string(fields[9]));
+      aReader.getData().get().calendars.emplace_back(std::string(fields[headerMap["service_id"]]), std::move(weekdayService),
+                                                     std::string(fields[headerMap["start_date"]]),
+                                                     std::string(fields[headerMap["end_date"]]));
     }
   }
 

@@ -35,6 +35,7 @@ namespace gtfs {
 
     std::string line;
     std::getline(infile, line); // Skip header line
+    std::map<std::string, size_t> headerMap = schedule::gtfs::utils::getGtfsColumnIndices(line);
 
     // Reserve memory for vector
     constexpr size_t expectedSize = 5'600'000;
@@ -51,7 +52,7 @@ namespace gtfs {
       }
 
       schedule::gtfs::CalendarDate::ExceptionType exceptionType;
-      switch (fields[2][0])
+      switch (fields[headerMap["exception_type"]][0])
       {
         case '1':
           exceptionType = schedule::gtfs::CalendarDate::ExceptionType::SERVICE_ADDED;
@@ -65,7 +66,7 @@ namespace gtfs {
       }
 
       aReader.getData().get().calendarDates.emplace_back(
-        std::string(fields[0]), std::string(fields[1]), exceptionType);
+        std::string(fields[headerMap["service_id"]]), std::string(fields[headerMap["date"]]), exceptionType);
     }
   }
 } // gtfs

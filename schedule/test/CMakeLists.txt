@@ -40,13 +40,15 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/geometry/
 
 message(STATUS "CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}/schedule/test/test-data/")
 
-
-if(USE_ZURICH_GTFS)
-    message(WARNING "Using Zurich GTFS data - test won't work with this data")
-endif()
-
 add_definitions(-DTEST_DATA_DIR="${CMAKE_SOURCE_DIR}/schedule/test/test-data/")
-add_definitions(-DTEST_DATA_DIR_FULL_GTFS="C:/Users/MichaelBrunner/Downloads/gtfs_fp2024_2024-05-27/")
+
+#if(USE_ZURICH_GTFS)
+#    add_definitions(-DTEST_DATA_DIR="C:/Users/MichaelBrunner/Downloads/2024_google_transit/")
+#else ()
+#    # add_definitions(-DTEST_DATA_DIR="${CMAKE_SOURCE_DIR}/schedule/test/test-data/")
+#    add_definitions(-DTEST_DATA_DIR="C:/Users/MichaelBrunner/Downloads/gtfs_fp2024_2024-05-27/")
+#endif()
+
 
 
 

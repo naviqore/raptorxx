@@ -31,6 +31,7 @@ namespace gtfs {
 
     std::string line;
     std::getline(infile, line); // Skip header line
+    std::map<std::string, size_t> headerMap = schedule::gtfs::utils::getGtfsColumnIndices(line);
 
     constexpr size_t expectedSizec = 16'891'069; // TODO this is a guess
     aReader.getData().get().stopTimes.reserve(expectedSizec);
@@ -40,15 +41,18 @@ namespace gtfs {
     while (std::getline(infile, line))
     {
       fields = schedule::gtfs::utils::splitLineAndRemoveQuotes(line);
-      if (fields.size() < 9) // 9 because of ZURICH gtfs {
+      if (fields.size() < 7)
+      {
         // TODO: Handle error
         continue;
+      }
+      aReader.getData().get().stopTimes.emplace_back(
+        std::string(fields[headerMap["trip_id"]]),
+        std::string(fields[headerMap["arrival_time"]]),
+        std::string(fields[headerMap["departure_time"]]),
+        std::string(fields[headerMap["stop_id"]]),
+        std::stoi(std::string(fields[headerMap["stop_sequence"]])));
     }
-  std::cout << "field nr 4 " << std::string(fields[4]) << std::endl;
-    aReader.getData().get().stopTimes.emplace_back(
-      std::string(fields[0]), std::string(fields[1]),
-      std::string(fields[2]), std::string(fields[3]),
-      std::stoi(std::string(fields[4])));
   }
 
   GtfsStopTimeReader::GtfsStopTimeReader(std::string filename)
