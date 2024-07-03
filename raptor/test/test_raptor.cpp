@@ -29,7 +29,7 @@ protected:
   std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> reader;
   // raptor::utils::ConnectionRequest request;
 
-  const std::string basePath = TEST_DATA_DIR_FULL_GTFS;
+  const std::string basePath = TEST_DATA_DIR;
 
   std::map<schedule::gtfs::utils::GTFS_FILE_TYPE, std::string> lFileNameMap;
 
@@ -95,5 +95,8 @@ TEST_F(RaptorTest, InitialTest) {
   auto strategy = factory->create(raptor::strategy::factory::IRaptorAlgorithmFactory::RAPTOR, std::move(relationManager));
   std::unique_ptr<raptor::IRaptor> raptor = std::make_unique<raptor::Raptor>(std::move(strategy));
   ASSERT_TRUE(raptor);
-  // auto connections = raptor->getConnections(request);
+
+  const auto connectionRequest = raptor::utils::ConnectionRequest{stopIdSource, stopIdTarget, 1000};
+
+  auto connections = raptor->getConnections(connectionRequest);
 }

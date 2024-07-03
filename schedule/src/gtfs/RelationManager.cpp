@@ -12,13 +12,14 @@ namespace schedule::gtfs {
 
   RelationManager::RelationManager(const GtfsData& data)
     : data(data) {
+    createRelations();
   }
 
   void RelationManager::createRelations() {
     collectStopTimesForTrips();
     collectStopTimesForStops();
     collectTripsForRoutes();
-    collectRoutesForStops();
+    // collectRoutesForStops();
   }
 
   const std::vector<StopTime>& RelationManager::getStopTimesForTrip(const std::string& tripId) const {
@@ -30,8 +31,9 @@ namespace schedule::gtfs {
   }
   const std::string& RelationManager::getStopIdFromName(const std::string& stopName) const {
     return std::ranges::find_if(data.stops, [&stopName](const auto& stop) {
-      return stop.stopName == stopName;
-    })->stopId;
+             return stop.stopName == stopName;
+           })
+      ->stopId;
   }
 
   const std::vector<Trip>& RelationManager::getTripsForRoute(const std::string& routeId) const {
@@ -88,4 +90,5 @@ namespace schedule::gtfs {
       }
     });
   }
+
 } // gtfs

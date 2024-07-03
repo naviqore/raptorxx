@@ -8,6 +8,8 @@
 #include <utility>
 #include "raptorTypes.h"
 
+#include <algorithm>
+
 namespace raptor::strategy {
 
   RaptorStrategy::RaptorStrategy(schedule::gtfs::RelationManager&& relationManager)
@@ -15,7 +17,7 @@ namespace raptor::strategy {
   }
   std::shared_ptr<IConnection> RaptorStrategy::execute(const utils::ConnectionRequest& request) {
 
-    LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Agency: {} {} {}", request.departureStop.stopName, request.departureTime, request.arrivalStop.stopName));
+    // LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Agency: {} {} {}", request.departureStop.stopName, request.departureTime, request.arrivalStop.stopName));
 
     std::vector<int> arrivalTimes;
     std::vector<int> bestTimes;
@@ -27,12 +29,19 @@ namespace raptor::strategy {
     };
 
     std::vector<bool> visited;
+    const auto stopTimes = relationManager.getStopTimesForStop(request.departureStopId);
+    // const auto sourceStops = relationManager.getStopsForRoute(request.departureStopId);
+    // const auto targetStops = relationManager.getStopsForRoute(request.arrivalStopId);
+
+    // for (const auto& stop : sourceStops)
+    // {
+    //   auto stopTImes = relationManager.getStopTimesForStop(stop);
+    // }
 
     /*arrivalTimes.assign(relationManager.getStopsForRoute(request.arrivalStop.stopId).size(), utils::INFINITY_VALUE);
     bestTimes.assign(relationManager.getStopsForRoute(request.arrivalStop.stopId).size(), utils::INFINITY_VALUE);
 
-    const auto sourceStops = relationManager.getStopsForRoute(request.arrivalStop.stopId);
-    const auto targetStops = relationManager.getStopsForRoute(request.departureStop.stopId);*/
+   */
 
     // arrivalTimes[request.arrivalStop.stopId] = request.departureTime;
 

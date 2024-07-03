@@ -13,9 +13,11 @@ namespace raptor::utils {
 
   struct ConnectionRequest
   {
-    schedule::gtfs::Stop departureStop;
+    // schedule::gtfs::Stop departureStop;
+    std::string departureStopId{};
+    std::string arrivalStopId{};
     int departureTime{};
-    schedule::gtfs::Stop arrivalStop;
+    // schedule::gtfs::Stop arrivalStop;
   };
 }
 

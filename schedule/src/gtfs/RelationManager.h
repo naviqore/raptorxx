@@ -44,6 +44,7 @@ namespace schedule::gtfs {
     const GtfsData& data;
 
     // TODO reserve size for maps
+    // using stopTimeId = std::string;
     std::unordered_map<std::string, std::vector<StopTime>> stopTimeTrips;
     std::unordered_map<std::string, std::vector<StopTime>> stopTimeStops;
     std::unordered_map<std::string, std::vector<Trip>> tripsRoutes;
@@ -56,6 +57,7 @@ namespace schedule::gtfs {
     void collectTripsForRoutes();
 
     void collectRoutesForStops();
+
   };
 
 } // gtfs
