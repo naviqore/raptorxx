@@ -19,47 +19,42 @@
 
 namespace schedule::gtfs {
 
-  class GTFS_API RelationManager
+  class SCHEDULE_API RelationManager
   {
   public:
     explicit RelationManager(const GtfsData& data);
 
     void createRelations();
 
-    [[nodiscard]] const std::vector<StopTime>& getStopTimesForTrip(const std::string& tripId) const;
-
-    [[nodiscard]] const std::vector<StopTime>& getStopTimesForStop(const std::string& stopId) const;
-
-    [[nodiscard]] const std::string& getStopIdFromName(const std::string& stopName) const;
-
-    [[nodiscard]] const std::vector<Trip>& getTripsForRoute(const std::string& routeId) const;
-
-    [[nodiscard]] const std::vector<std::string>& getStopsForRoute(const std::string& routeId) const;
-
-    [[nodiscard]] std::span<const StopTime> getStopTimesForRouteSpan(const std::string& routeId) const;
-
     [[nodiscard]] const GtfsData& getData() const;
+
+    [[nodiscard]] const std::string& getStopNameFromStopId(std::string const& aStopId) const;
+
+    [[nodiscard]] const std::string& getStopIdFromStopName(std::string const& aStopName) const;
 
   private:
     const GtfsData& data;
 
-    // TODO reserve size for maps
-    // using stopTimeId = std::string;
-    std::unordered_map<std::string, std::vector<StopTime>> stopTimeTrips;
-    std::unordered_map<std::string, std::vector<StopTime>> stopTimeStops;
-    std::unordered_map<std::string, std::vector<Trip>> tripsRoutes;
-    std::unordered_map<std::string, std::vector<std::string>> routesStops;
-
-    void collectStopTimesForTrips();
-
-    void collectStopTimesForStops();
-
-    void collectTripsForRoutes();
-
-    void collectRoutesForStops();
-
+    // // TODO reserve size for maps
+    // // using stopTimeId = std::string;
+    // using stopId = std::string;
+    // using tripId = std::string;
+    // using routeId = std::string;
+    // using serviceId = std::string;
+    //
+    // // via Stop - stop_id we can get the StopTime
+    // std::unordered_map<stopId, std::vector<StopTime>> stopTimeForStop;
+    // // Transfer has two stop items from - to
+    // std::unordered_map<stopId, std::vector<Transfer>> transfersForStop;
+    // // via stopTime - trip_id we can get the Trip
+    // std::unordered_map<tripId, std::vector<Trip>> tripsForRoute;
+    // // via Trip - route_id we can get the Route
+    // std::unordered_map<routeId, std::vector<Route>> routesForStop;
+    // // via Trip - service_id we can get the calendar
+    // std::unordered_map<serviceId, Calendar> calendarForTrip;
+    // // via Calendar - service_id we can get the CalendarDates
+    // std::unordered_map<serviceId, CalendarDate> calendarDatesForCalendar;
   };
-
 } // gtfs
 
 #endif //RELATIONMANAGER_H

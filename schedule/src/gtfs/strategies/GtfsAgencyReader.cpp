@@ -17,7 +17,7 @@
 #include <string>
 #include <utility>
 
-namespace gtfs {
+namespace schedule::gtfs {
 
   void GtfsAgencyReader::operator()(GtfsReader& aReader) const {
     MEASURE_FUNCTION(std::source_location().file_name());
@@ -30,21 +30,21 @@ namespace gtfs {
     LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
     std::string line;
     std::getline(infile, line); // Skip header line
-    std::map<std::string, size_t> headerMap = schedule::gtfs::utils::getGtfsColumnIndices(line);
+    std::map<std::string, size_t> headerMap = utils::getGtfsColumnIndices(line);
     std::vector<std::string_view> fields;
     fields.reserve(4);
     while (std::getline(infile, line))
     {
-      fields = schedule::gtfs::utils::splitLineAndRemoveQuotes(line);
+      fields = utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 4)
       {
         // TODO: Handle error
         continue;
       }
-      aReader.getData().get().agencies.emplace_back(
-        std::string(fields[headerMap["agency_id"]]),
-        std::string(fields[headerMap["agency_name"]]),
-        std::string(fields[headerMap["agency_timezone"]]));
+      aReader.getData().get().agencies.emplace(std::string(fields[headerMap["agency_name"]]),
+                                               Agency{std::string(fields[headerMap["agency_id"]]),
+                                                      std::string(fields[headerMap["agency_name"]]),
+                                                      std::string(fields[headerMap["agency_timezone"]])});
     }
   }
 

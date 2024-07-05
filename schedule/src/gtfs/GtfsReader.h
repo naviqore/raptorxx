@@ -12,9 +12,9 @@
 #include <functional>
 #include <schedule_export.h>
 
-namespace gtfs {
+namespace schedule::gtfs {
 
-  class GTFS_API GtfsReader final : public schedule::DataReader<gtfsDataContainer>
+  class SCHEDULE_API GtfsReader final : public DataReader<gtfsDataContainer>
   {
   public:
     template<typename ReaderType>
@@ -24,15 +24,15 @@ namespace gtfs {
 
     void readData() override;
 
-    [[nodiscard]] const schedule::DataContainer<schedule::gtfs::GtfsData>& getData() const override;
+    [[nodiscard]] const DataContainer<GtfsData>& getData() const override;
 
-    schedule::DataContainer<schedule::gtfs::GtfsData>& getData() override;
+    DataContainer<GtfsData>& getData() override;
 
 
   private:
     std::vector<std::function<void(GtfsReader&)>> strategies;
 
-    schedule::DataContainer<schedule::gtfs::GtfsData> data;
+    DataContainer<GtfsData> data;
   };
 
 

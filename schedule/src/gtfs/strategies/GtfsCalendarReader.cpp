@@ -13,7 +13,7 @@
 #include <source_location>
 #include <format>
 
-namespace gtfs {
+namespace schedule::gtfs {
 
   void GtfsCalendarReader::operator()(GtfsReader& aReader) const {
     MEASURE_FUNCTION(std::source_location().file_name());
@@ -26,19 +26,19 @@ namespace gtfs {
     LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
     std::string line;
     std::getline(infile, line); // Skip header line
-    std::map<std::string, size_t> headerMap = schedule::gtfs::utils::getGtfsColumnIndices(line);
+    std::map<std::string, size_t> headerMap = utils::getGtfsColumnIndices(line);
     std::vector<std::string_view> fields;
     fields.reserve(10);
     while (std::getline(infile, line))
     {
-      fields = schedule::gtfs::utils::splitLineAndRemoveQuotes(line);
+      fields = utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 10)
       {
         // TODO: Handle error
         LoggingPool::getInstance(Target::CONSOLE)->error(std::format("Invalid calendar filename: {} line: {} GTFS data {}", std::source_location::current().file_name(), std::source_location::current().line(), line));
         continue;
       }
-      schedule::gtfs::Calendar::WeekdayServiceHashMap weekdayService
+      Calendar::WeekdayServiceHashMap weekdayService
         = {{std::chrono::Monday, std::stoi(std::string(fields[headerMap["monday"]]))},
            {std::chrono::Tuesday, std::stoi(std::string(fields[headerMap["tuesday"]]))},
            {std::chrono::Wednesday, std::stoi(std::string(fields[headerMap["wednesday"]]))},
@@ -47,9 +47,10 @@ namespace gtfs {
            {std::chrono::Saturday, std::stoi(std::string(fields[headerMap["saturday"]]))},
            {std::chrono::Sunday, std::stoi(std::string(fields[headerMap["sunday"]]))}};
 
-      aReader.getData().get().calendars.emplace_back(std::string(fields[headerMap["service_id"]]), std::move(weekdayService),
-                                                     std::string(fields[headerMap["start_date"]]),
-                                                     std::string(fields[headerMap["end_date"]]));
+      aReader.getData().get().calendars.emplace(std::string(fields[headerMap["service_id"]]), Calendar(std::string(fields[headerMap["service_id"]]),
+                                                                                                       std::move(weekdayService),
+                                                                                                       std::string(fields[headerMap["start_date"]]),
+                                                                                                       std::string(fields[headerMap["end_date"]])));
     }
   }
 

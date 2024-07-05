@@ -15,7 +15,7 @@
 namespace schedule::gtfs {
   struct Route
   {
-    enum RouteType : uint8_t
+    enum RouteType : uint16_t
     {
       Tram = 0,
       Subway = 1,
@@ -49,6 +49,14 @@ namespace schedule::gtfs {
     std::string routeLongName;
     RouteType routeType;
     // std::string agency_id;
+  };
+
+  inline auto routeHash = [](const Route& route) {
+    return std::hash<std::string>{}(route.routeId);
+  };
+
+  inline auto routeEqual = [](const Route& lhs, const Route& rhs) {
+    return lhs.routeId == rhs.routeId;
   };
 
 } // gtfs

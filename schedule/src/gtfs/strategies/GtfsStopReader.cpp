@@ -11,7 +11,7 @@
 
 #include <fstream>
 
-namespace gtfs {
+namespace schedule::gtfs {
 
   void GtfsStopReader::operator()(GtfsReader& aReader) const {
     MEASURE_FUNCTION(std::source_location().file_name());
@@ -23,25 +23,27 @@ namespace gtfs {
     LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
     std::string line;
     std::getline(infile, line); // Skip header line
-    std::map<std::string, size_t> headerMap = schedule::gtfs::utils::getGtfsColumnIndices(line);
+    std::map<std::string, size_t> headerMap = utils::getGtfsColumnIndices(line);
 
     std::vector<std::string_view> fields;
     fields.reserve(6);
     while (std::getline(infile, line))
     {
 
-      fields = schedule::gtfs::utils::splitLineAndRemoveQuotes(line);
+      fields = utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 6) // due to different file format of the open data zurich dataset
       {
         continue;
       }
 
-
-      aReader.getData().get().stops.emplace_back(std::string(fields[headerMap["stop_id"]]),
-                                                 std::string(fields[headerMap["stop_name"]]),
-                                                 geometry::Coordinate<double>(std::stod(std::string(fields[headerMap["stop_lat"]]))),
-                                                 geometry::Coordinate<double>(std::stod(std::string(fields[headerMap["stop_lon"]]))),
-                                                 std::string(fields[headerMap["parent_station"]]));
+      aReader.getData().get().stops.emplace(
+        std::string(fields[headerMap["stop_id"]]),
+        Stop{
+          std::string(fields[headerMap["stop_id"]]),
+          std::string(fields[headerMap["stop_name"]]),
+          geometry::Coordinate<double>(std::stod(std::string(fields[headerMap["stop_lat"]]))),
+          geometry::Coordinate<double>(std::stod(std::string(fields[headerMap["stop_lon"]]))),
+          std::string(fields[headerMap["parent_station"]])});
     }
   }
 

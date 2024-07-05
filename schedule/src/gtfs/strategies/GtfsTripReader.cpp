@@ -11,7 +11,7 @@
 
 #include <fstream>
 
-namespace gtfs {
+namespace schedule::gtfs {
 
   GtfsTripReader::GtfsTripReader(std::string filename)
     : filename(std::move(filename)) {
@@ -27,21 +27,22 @@ namespace gtfs {
     LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
     std::string line;
     std::getline(infile, line); // Skip header line
-    std::map<std::string, size_t> headerMap = schedule::gtfs::utils::getGtfsColumnIndices(line);
+    std::map<std::string, size_t> headerMap = utils::getGtfsColumnIndices(line);
 
     std::vector<std::string_view> fields;
     fields.reserve(7);
     while (std::getline(infile, line))
     {
-      fields = schedule::gtfs::utils::splitLineAndRemoveQuotes(line);
+      fields = utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 7)
       {
         // TODO: Handle error
         continue;
       }
-      aReader.getData().get().trips.emplace_back(std::string(fields[headerMap["route_id"]]),
-                                                 std::string(fields[headerMap["service_id"]]),
-                                                 std::string(fields[headerMap["trip_id"]]));
+      aReader.getData().get().trips[std::string(fields[headerMap["route_id"]])].emplace_back(
+        std::string(fields[headerMap["route_id"]]),
+        std::string(fields[headerMap["service_id"]]),
+        std::string(fields[headerMap["trip_id"]]));
     }
   }
 } // gtfs

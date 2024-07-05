@@ -10,9 +10,9 @@
 #include <schedule_export.h>
 #include <string>
 
-namespace gtfs {
+namespace schedule::gtfs {
 
-  class GTFS_API GtfsAgencyReader
+  class SCHEDULE_API GtfsAgencyReader
   {
     std::string filename;
 

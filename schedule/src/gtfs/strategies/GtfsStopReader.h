@@ -9,9 +9,9 @@
 #include <schedule_export.h>
 #include <string>
 
-namespace gtfs {
+namespace schedule::gtfs {
 
-  class GTFS_API GtfsStopReader
+  class SCHEDULE_API GtfsStopReader
   {
     std::string filename;
 

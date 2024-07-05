@@ -36,6 +36,14 @@ namespace schedule::gtfs {
     std::string parentStation;
   };
 
+  inline auto stopHash = [](const Stop& stop) {
+    return std::hash<std::string>{}(stop.stopId);
+  };
+
+  inline auto stopEqual = [](const Stop& lhs, const Stop& rhs) {
+    return lhs.stopId == rhs.stopId;
+  };
+
 } // gtfs
 
 #endif //STOP_H

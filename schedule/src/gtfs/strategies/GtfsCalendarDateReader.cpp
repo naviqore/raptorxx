@@ -14,7 +14,7 @@
 #include <source_location>
 
 
-namespace gtfs {
+namespace schedule::gtfs {
 
   GtfsCalendarDateReader::GtfsCalendarDateReader(std::string filename)
     : filename(std::move(filename)) {
@@ -35,27 +35,27 @@ namespace gtfs {
 
     std::string line;
     std::getline(infile, line); // Skip header line
-    std::map<std::string, size_t> headerMap = schedule::gtfs::utils::getGtfsColumnIndices(line);
+    std::map<std::string, size_t> headerMap = utils::getGtfsColumnIndices(line);
 
     // Reserve memory for vector
-    constexpr size_t expectedSize = 5'600'000;
-    aReader.getData().get().calendarDates.reserve(expectedSize);
+    //constexpr size_t expectedSize = 5'600'000;
+    // aReader.getData().get().calendarDates.reserve(expectedSize);
     std::vector<std::string_view> fields;
     fields.reserve(3);
     while (std::getline(infile, line))
     {
-      fields = schedule::gtfs::utils::splitLineAndRemoveQuotes(line);
+      fields = utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 3)
       {
         // TODO: Handle error
         continue;
       }
 
-      schedule::gtfs::CalendarDate::ExceptionType exceptionType;
+      CalendarDate::ExceptionType exceptionType;
       switch (fields[headerMap["exception_type"]][0])
       {
         case '1':
-          exceptionType = schedule::gtfs::CalendarDate::ExceptionType::SERVICE_ADDED;
+          exceptionType = CalendarDate::ExceptionType::SERVICE_ADDED;
           break;
         case '2':
           // exceptionType = CalendarDate::ExceptionType::SERVICE_REMOVED;
@@ -65,8 +65,9 @@ namespace gtfs {
           //TODO lets discuss this - throw std::runtime_error("Error: invalid exception type.");
       }
 
-      aReader.getData().get().calendarDates.emplace_back(
-        std::string(fields[headerMap["service_id"]]), std::string(fields[headerMap["date"]]), exceptionType);
+      aReader.getData().get().calendarDates[std::string(fields[headerMap["service_id"]])].emplace_back(
+        std::string(fields[headerMap["service_id"]]),
+        std::string(fields[headerMap["date"]]), exceptionType);
     }
   }
 } // gtfs

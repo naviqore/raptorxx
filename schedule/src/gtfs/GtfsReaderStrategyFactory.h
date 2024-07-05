@@ -4,31 +4,44 @@
 
 #ifndef GTFSREADERSTRATEGYFACTORY_H
 #define GTFSREADERSTRATEGYFACTORY_H
-#include "GtfsReader.h"
 
+#include "GtfsReader.h"
 
 #include <functional>
 #include <string>
 #include <unordered_map>
-
+#include <schedule_export.h>
 
 namespace schedule::gtfs {
 
-  class GtfsReaderStrategyFactory
+  class SCHEDULE_API GtfsReaderStrategyFactory
   {
+    std::string fileDirectory;
+
   public:
     enum Type
     {
-      AGENCY
+      AGENCY,
+      CALENDAR,
+      CALENDAR_DATE,
+      ROUTE,
+      STOP,
+      STOP_TIME,
+      TRANSFER,
+      TRIP
     };
-    GtfsReaderStrategyFactory();
+    explicit GtfsReaderStrategyFactory(std::string&& aGtfsFileDirectory);
 
-    std::function<void(::gtfs::GtfsReader&)>& getStrategy(Type aType);
+    std::function<void(GtfsReader&)>& getStrategy(Type aType);
 
   private:
-    std::unordered_map<Type, std::function<void(::gtfs::GtfsReader&)>> strategies;
+    std::map<utils::GTFS_FILE_TYPE, std::string> lFileNameMap;
+
+    std::unordered_map<Type, std::function<void(GtfsReader&)>> strategies;
 
     void init();
+
+    void setUpFileNameMap();
   };
 
 } // gtfs

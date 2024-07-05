@@ -30,6 +30,14 @@ namespace schedule::gtfs {
     std::string timezone;
   };
 
+  inline auto agencyHash = [](const Agency& agency) {
+    return std::hash<std::string>{}(agency.name);
+  };
+
+  inline auto agencyEqual = [](const Agency& lhs, const Agency& rhs) {
+    return lhs.name == rhs.name;
+  };
+
 } // gtfs
 
 #endif //AGENCY_H

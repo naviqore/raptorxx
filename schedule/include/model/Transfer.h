@@ -39,6 +39,16 @@ namespace schedule::gtfs {
     int minTransferTime = 120;
   };
 
+  inline auto transferHash = [](const Transfer& transfer) {
+    const auto h1 = std::hash<std::string>{}(transfer.fromStopId);
+    const auto h2 = std::hash<std::string>{}(transfer.toStopId);
+    return h1 ^ (h2 << 1);
+  };
+
+  inline auto transferEqual = [](const Transfer& lhs, const Transfer& rhs) {
+    return lhs.fromStopId == rhs.fromStopId && lhs.toStopId == rhs.toStopId;
+  };
+
 } // gtfs
 
 #endif //TRANSFER_H

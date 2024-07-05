@@ -21,7 +21,7 @@ TEST(geomety, TestK2dTree) {
 }
 
 
-class TestK2dTree : public ::testing::Test
+class TestK2dTree : public testing::Test
 {
   using hasher = geometry::utils::CoordinateComponentHash<geometry::kd_tree::spatialCoordinate>;
   using equalizer = geometry::utils::CoordinateComponentEqual<geometry::kd_tree::spatialCoordinate>;

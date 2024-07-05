@@ -23,7 +23,7 @@
 
 
 
-class RaptorTest : public ::testing::Test
+class RaptorTest : public testing::Test
 {
 protected:
   std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> reader;
@@ -71,24 +71,24 @@ protected:
 TEST_F(RaptorTest, InitialTest) {
 
 
-  const std::function<void(gtfs::GtfsReader&)> agencyStrategy = gtfs::GtfsAgencyReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::AGENCY));
-  const std::function<void(gtfs::GtfsReader&)> calendarStrategy = gtfs::GtfsCalendarReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::CALENDAR));
-  const std::function<void(gtfs::GtfsReader&)> calendarDatesStrategy = gtfs::GtfsCalendarDateReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::CALENDAR_DATES));
-  const std::function<void(gtfs::GtfsReader&)> routesStrategy = gtfs::GtfsRouteReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::ROUTES));
-  const std::function<void(gtfs::GtfsReader&)> stopStrategy = gtfs::GtfsStopReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::STOP));
-  const std::function<void(gtfs::GtfsReader&)> stopTimeStrategy = gtfs::GtfsStopTimeReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::STOP_TIMES));
-  const std::function<void(gtfs::GtfsReader&)> transferStrategy = gtfs::GtfsTransferReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::TRANSFERS));
-  const std::function<void(gtfs::GtfsReader&)> tripStrategy = gtfs::GtfsTripReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::TRIPS));
+  const std::function<void(schedule::gtfs::GtfsReader&)> agencyStrategy = schedule::gtfs::GtfsAgencyReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::AGENCY));
+  const std::function<void(schedule::gtfs::GtfsReader&)> calendarStrategy = schedule::gtfs::GtfsCalendarReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::CALENDAR));
+  const std::function<void(schedule::gtfs::GtfsReader&)> calendarDatesStrategy = schedule::gtfs::GtfsCalendarDateReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::CALENDAR_DATES));
+  const std::function<void(schedule::gtfs::GtfsReader&)> routesStrategy = schedule::gtfs::GtfsRouteReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::ROUTES));
+  const std::function<void(schedule::gtfs::GtfsReader&)> stopStrategy = schedule::gtfs::GtfsStopReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::STOP));
+  const std::function<void(schedule::gtfs::GtfsReader&)> stopTimeStrategy = schedule::gtfs::GtfsStopTimeReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::STOP_TIMES));
+  const std::function<void(schedule::gtfs::GtfsReader&)> transferStrategy = schedule::gtfs::GtfsTransferReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::TRANSFERS));
+  const std::function<void(schedule::gtfs::GtfsReader&)> tripStrategy = schedule::gtfs::GtfsTripReader(lFileNameMap.at(schedule::gtfs::utils::GTFS_FILE_TYPE::TRIPS));
 
   std::vector strategies = {agencyStrategy, calendarStrategy, calendarDatesStrategy, routesStrategy, stopStrategy, stopTimeStrategy, transferStrategy, tripStrategy}; //
 
-  const std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> reader = std::make_unique<gtfs::GtfsReader>(std::move(strategies));
+  const std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategies));
   reader->readData();
   const auto data = reader->getData();
   auto relationManager = schedule::gtfs::RelationManager(data.get());
 
-  auto stopIdSource = relationManager.getStopIdFromName("Zürich, Bahnhof Affoltern");
-  auto stopIdTarget = relationManager.getStopIdFromName("Erlenbach ZH, Bahnhof");
+  auto stopIdSource = relationManager.getStopIdFromStopName("Zürich, Bahnhof Affoltern");
+  auto stopIdTarget = relationManager.getStopIdFromStopName("Erlenbach ZH, Bahnhof");
 
 
   const std::unique_ptr<raptor::strategy::factory::IRaptorAlgorithmFactory> factory = std::make_unique<raptor::strategy::factory::RaptorAlgorithmFactory>();

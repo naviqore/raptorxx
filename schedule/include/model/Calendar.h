@@ -41,7 +41,15 @@ namespace schedule::gtfs {
     std::chrono::year_month_day startDate;
     std::chrono::year_month_day endDate;
   };
-  
+
+  inline auto calendarHash = [](const Calendar& calendar) {
+    return std::hash<std::string>{}(calendar.serviceId);
+  };
+
+  inline auto calendarEqual = [](const Calendar& lhs, const Calendar& rhs) {
+    return lhs.serviceId == rhs.serviceId;
+  };
+
 }
 
 #endif //CALENDAR_H

@@ -11,9 +11,9 @@
 #include <schedule_export.h>
 #include <string>
 
-namespace gtfs {
+namespace schedule::gtfs {
 
-  class GTFS_API GtfsTransferReader
+  class SCHEDULE_API GtfsTransferReader
   {
     std::string filename;
 

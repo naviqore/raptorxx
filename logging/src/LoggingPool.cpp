@@ -56,5 +56,5 @@ void LoggingPool::setLevel(Level level) {
   impl->current->set_level(static_cast<spdlog::level::level_enum>(level));
 }
 LoggerBridge::Level LoggingPool::getLevel() const {
-  return static_cast<LoggerBridge::Level>(impl->current->level());
+  return static_cast<Level>(impl->current->level());
 }

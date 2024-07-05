@@ -27,6 +27,16 @@ namespace schedule::gtfs {
     std::string tripId;
   };
 
+  inline auto tripHash = [](const Trip& trip) {
+    const auto h1 = std::hash<std::string>{}(trip.tripId);
+    const auto h2 = std::hash<std::string>{}(trip.routeId);
+    return h1 ^ (h2 << 1);
+  };
+
+  inline auto tripEqual = [](const Trip& lhs, const Trip& rhs) {
+    return lhs.tripId == rhs.tripId && lhs.routeId == rhs.routeId;
+  };
+
 } // gtfs
 
 #endif //TRIP_H

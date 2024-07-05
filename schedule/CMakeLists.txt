@@ -79,7 +79,7 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 include(GenerateExportHeader)
 generate_export_header(${PROJECT_NAME}
         BASE_NAME ${PROJECT_NAME}
-        EXPORT_MACRO_NAME GTFS_API
+        EXPORT_MACRO_NAME SCHEDULE_API
         EXPORT_FILE_NAME ${PROJECT_NAME}_export.h
         STATIC_DEFINE ${PROJECT_NAME}_BUILT_AS_STATIC
 )
@@ -87,8 +87,6 @@ generate_export_header(${PROJECT_NAME}
 set(INCLUDE_INSTALL_DIR include)
 
 install(FILES
-        src/TestObject.h
-        src/gtfs/GtfsReader.h
         ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_export.h DESTINATION ${INCLUDE_INSTALL_DIR}
 )
 

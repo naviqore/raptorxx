@@ -39,6 +39,14 @@ namespace schedule::gtfs {
     ExceptionType exceptionType;
   };
 
+  inline auto calendarDateHash = [](const Calendar& calendarDate) {
+    return std::hash<std::string>{}(calendarDate.serviceId);
+  };
+
+  inline auto calendarDateEqual = [](const Calendar& lhs, const Calendar& rhs) {
+    return lhs.serviceId == rhs.serviceId;
+  };
+
 } // gtfs
 
 #endif //CALENDAR_DATE_H

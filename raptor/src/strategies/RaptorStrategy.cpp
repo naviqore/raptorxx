@@ -29,7 +29,7 @@ namespace raptor::strategy {
     };
 
     std::vector<bool> visited;
-    const auto stopTimes = relationManager.getStopTimesForStop(request.departureStopId);
+    // const auto stopTimes = relationManager.getStopTimesForStop(request.departureStopId);
     // const auto sourceStops = relationManager.getStopsForRoute(request.departureStopId);
     // const auto targetStops = relationManager.getStopsForRoute(request.arrivalStopId);
 

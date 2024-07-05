@@ -11,9 +11,9 @@
 
 
 
-namespace gtfs {
+namespace schedule::gtfs {
 
-  class GTFS_API GtfsCalendarReader
+  class SCHEDULE_API GtfsCalendarReader
   {
     std::string filename;
 
