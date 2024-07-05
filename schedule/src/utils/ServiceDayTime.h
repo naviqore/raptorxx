@@ -8,7 +8,7 @@
 #include <string>
 #include <schedule_export.h>
 
-namespace gtfs::utils {
+namespace schedule::gtfs::utils {
 
   /// @brief std::chrono is way too slow for this purpose, so we use our own implementation
   class GTFS_API ServiceDayTime
@@ -99,8 +99,8 @@ namespace gtfs::utils {
 } // utils
 // gtfs
 
-inline gtfs::utils::ServiceDayTime::Second operator"" _sec(unsigned long long seconds) {
-  return gtfs::utils::ServiceDayTime::Second(static_cast<unsigned int>(seconds));
+inline schedule::gtfs::utils::ServiceDayTime::Second operator"" _sec(unsigned long long seconds) {
+  return schedule::gtfs::utils::ServiceDayTime::Second(static_cast<unsigned int>(seconds));
 }
 
 #endif //SERVICEDAYTIME_H

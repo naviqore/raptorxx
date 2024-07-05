@@ -29,7 +29,7 @@ namespace gtfs {
     fields.reserve(10);
     while (std::getline(infile, line))
     {
-      fields = utils::splitLineAndRemoveQuotes(line);
+      fields = schedule::gtfs::utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 10)
       {
         // TODO: Handle error
@@ -37,7 +37,7 @@ namespace gtfs {
         continue;
       }
 
-      Calendar::WeekdayServiceHashMap weekdayService
+      schedule::gtfs::Calendar::WeekdayServiceHashMap weekdayService
         = {{std::chrono::Monday, std::stoi(std::string(fields[1]))},
            {std::chrono::Tuesday, std::stoi(std::string(fields[2]))},
            {std::chrono::Wednesday, std::stoi(std::string(fields[3]))},

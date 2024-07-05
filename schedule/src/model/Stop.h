@@ -5,8 +5,8 @@
 #ifndef STOP_H
 #define STOP_H
 
-#include <Coordinate.h>
-#include <CoordinateComponent.h>
+#include <spatial/Coordinate.h>
+#include <spatial/CoordinateComponent.h>
 
 
 #include <string>
@@ -15,7 +15,7 @@
 // https://gtfs.org/schedule/reference/#stopstxt
 // Required
 
-namespace gtfs {
+namespace schedule::gtfs {
   struct Stop
   {
     // TODO consider float instead of double for lat/lon

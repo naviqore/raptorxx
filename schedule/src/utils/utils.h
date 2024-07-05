@@ -11,7 +11,7 @@
 #include <sstream>
 #include <iomanip> // std::get_time
 
-namespace gtfs::utils {
+namespace schedule::gtfs::utils {
   constexpr int YEAR_OFFSET = 1900;
 
   constexpr int MONTH_OFFSET = 1;

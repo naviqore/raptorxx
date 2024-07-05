@@ -7,7 +7,7 @@ set(SPDLOG_BUILD_SHARED OFF)
 add_library(${PROJECT_NAME} SHARED
         src/LoggingPool.cpp
         src/LoggingPool.h
-        src/LoggerBridge.h
+        include/LoggerBridge.h
 )
 
 find_package(spdlog CONFIG REQUIRED)
@@ -28,6 +28,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
+target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 set(LIBRARY_INSTALL_DIR lib)
 set(INCLUDE_INSTALL_DIR include)

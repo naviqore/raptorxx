@@ -6,7 +6,7 @@
 #include <stdexcept>
 
 
-namespace gtfs::utils {
+namespace schedule::gtfs::utils {
   ServiceDayTime::ServiceDayTime(const Second seconds)
     : totalSeconds(seconds) {
   }

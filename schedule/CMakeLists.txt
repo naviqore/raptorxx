@@ -5,8 +5,6 @@
 add_library(${PROJECT_NAME} SHARED)
 
 target_sources(${PROJECT_NAME} PRIVATE
-        src/TestObject.cpp
-        src/TestObject.h
         src/DataReader.h
         src/gtfs/GtfsReader.h
         src/model/Agency.h
@@ -45,6 +43,8 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/gtfs/GtfsSchedule.h
         src/utils/ServiceDayTime.cpp
         src/utils/ServiceDayTime.h
+        src/gtfs/GtfsReaderStrategyFactory.cpp
+        src/gtfs/GtfsReaderStrategyFactory.h
 )
 
 
@@ -52,23 +52,24 @@ message("CU_LIST_DIR UO: ${CMAKE_CURRENT_LIST_DIR}")
 
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging/src)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/geometry/src)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/geometry/include)
+target_include_directories(${PROJECT_NAME} PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)
+
 
 find_package(spdlog CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         logging
-        # geometry
+        geometry
         spdlog::spdlog
 )
 
-#target_link_libraries(${PROJECT_NAME} PRIVATE CommonInterfaces)
-#target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/CommonInterfaces/include)
-
 target_compile_definitions(${PROJECT_NAME} PRIVATE GTFS_DLL_EXPORTS)
 target_include_directories(${PROJECT_NAME} PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/schedule/src>
-        $<INSTALL_INTERFACE:include>
+        ${CMAKE_SOURCE_DIR}/schedule/src # specify path to include files during build
 )
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -80,11 +81,6 @@ generate_export_header(${PROJECT_NAME}
         EXPORT_MACRO_NAME GTFS_API
         EXPORT_FILE_NAME ${PROJECT_NAME}_export.h
         STATIC_DEFINE ${PROJECT_NAME}_BUILT_AS_STATIC
-)
-
-target_include_directories(${PROJECT_NAME} PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
 
 set(LIBRARY_INSTALL_DIR lib)

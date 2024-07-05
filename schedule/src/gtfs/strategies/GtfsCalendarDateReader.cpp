@@ -42,18 +42,18 @@ namespace gtfs {
     fields.reserve(3);
     while (std::getline(infile, line))
     {
-      fields = utils::splitLineAndRemoveQuotes(line);
+      fields = schedule::gtfs::utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 3)
       {
         // TODO: Handle error
         continue;
       }
 
-      CalendarDate::ExceptionType exceptionType;
+      schedule::gtfs::CalendarDate::ExceptionType exceptionType;
       switch (fields[2][0])
       {
         case '1':
-          exceptionType = CalendarDate::ExceptionType::SERVICE_ADDED;
+          exceptionType = schedule::gtfs::CalendarDate::ExceptionType::SERVICE_ADDED;
           break;
         case '2':
           // exceptionType = CalendarDate::ExceptionType::SERVICE_REMOVED;
