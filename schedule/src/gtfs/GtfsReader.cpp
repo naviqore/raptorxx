@@ -32,22 +32,18 @@ void schedule::gtfs::GtfsReader::readData() {
     strategy(*this);
   });
 
-  // std::vector<std::future<void>> futures;
-  // for (const auto& strategy : strategies)
-  // {
-  //   futures.emplace_back(std::async(std::launch::async, [this, &strategy]() {
-  //     strategy(*this);
-  //   }));
-  // }
-
-  // std::ranges::for_each(futures, [](auto& future) {
-  //   future.get();
-  // });
-
 #endif
 #else
-  std::for_each(strategies.begin(), strategies.end(), [this](const auto& strategy) {
-    strategy(*this);
+  std::vector<std::future<void>> futures;
+  for (const auto& strategy : strategies)
+  {
+    futures.emplace_back(std::async(std::launch::async, [this, &strategy]() {
+      strategy(*this);
+    }));
+  }
+
+  std::ranges::for_each(futures, [](auto& future) {
+    future.get();
   });
 #endif
 }

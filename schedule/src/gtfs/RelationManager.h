@@ -6,6 +6,7 @@
 #define RELATIONMANAGER_H
 
 #include "GtfsData.h"
+#include "LoggingPool.h"
 
 
 #include <map>
@@ -14,15 +15,20 @@
 #include "model/Trip.h"
 #include "model/Stop.h"
 #include "model/Route.h"
+
+#include <iostream>
 #include <schedule_export.h>
 #include <span>
+#include <ranges>
 
 namespace schedule::gtfs {
 
   class SCHEDULE_API RelationManager
   {
+    GtfsData data;
+
   public:
-    explicit RelationManager(const GtfsData& data);
+    explicit RelationManager(GtfsData&& data);
 
     void createRelations();
 
@@ -32,9 +38,23 @@ namespace schedule::gtfs {
 
     [[nodiscard]] const std::string& getStopIdFromStopName(std::string const& aStopName) const;
 
-  private:
-    const GtfsData& data;
+    [[nodiscard]] std::vector<std::string> getStopIdsFromStopName(std::string const& aStopName) const;
 
+    [[nodiscard]] const StopTime& getStopTimeFromStopId(std::string const& aStopId) const;
+
+    [[nodiscard]] std::vector<Stop> getAllStopsOnTrip(std::string const& aTripId) const;
+
+    [[nodiscard]] const std::vector<StopTime>& getStopTimesFromStopId(std::string const& aStopId) const;
+
+    [[nodiscard]] std::vector<Route> getRouteFromTripId(std::string const& aTripId) const;
+
+    [[nodiscard]] std::vector<StopTime> getStopTimesFromStopIdStartingFromSpecificTime(std::string const& aStopId, unsigned int secondsGreaterThan) const;
+
+    [[nodiscard]] bool isServiceActiveOnDay(std::string const& aServiceId, std::chrono::weekday aDay) const;
+
+    [[nodiscard]] const std::vector<Trip>& getTripsFromStopTimeTripId(std::string const& aTripId) const;
+
+  private:
     // // TODO reserve size for maps
     // // using stopTimeId = std::string;
     // using stopId = std::string;

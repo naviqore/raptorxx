@@ -19,6 +19,7 @@ public:
   };
   virtual ~LoggerBridge() = default;
   virtual void info(const std::string& message) = 0;
+  // TODO add debug level
   virtual void warn(const std::string& message) = 0;
   virtual void error(const std::string& message) = 0;
   virtual void setLevel(Level level) = 0;

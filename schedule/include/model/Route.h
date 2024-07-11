@@ -5,13 +5,21 @@
 #ifndef ROUTE_H
 #define ROUTE_H
 
+#include "Stop.h"
+
+
 #include <string>
 #include <stdexcept>
 #include <cstdint>
+#include <set>
+#include <unordered_set>
 
 // https://gtfs.org/schedule/reference/#routestxt
 // Required
 
+namespace schedule::gtfs {
+  struct Trip;
+}
 namespace schedule::gtfs {
   struct Route
   {
@@ -49,6 +57,8 @@ namespace schedule::gtfs {
     std::string routeLongName;
     RouteType routeType;
     // std::string agency_id;
+    std::vector<Trip> trips{};
+    std::unordered_set<Stop, decltype(stopHash), decltype(stopEqual)> stops{};
   };
 
   inline auto routeHash = [](const Route& route) {

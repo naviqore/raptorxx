@@ -23,15 +23,15 @@ namespace schedule::gtfs {
 
   struct SCHEDULE_API GtfsData
   {
-    std::unordered_map<std::string, Agency /*, decltype(agencyHash), decltype(agencyEqual)*/> agencies = {};
-    std::unordered_map<std::string, Calendar /*, decltype(calendarHash), decltype(calendarEqual)*/> calendars;
-    std::unordered_map<std::string, std::vector<CalendarDate> /*, decltype(calendarDateHash), decltype(calendarDateEqual)*/> calendarDates;
-    std::unordered_map<std::string, Route /*, decltype(routeHash), decltype(routeEqual)*/> routes;
-    std::unordered_map<std::string, Stop /*, decltype(stopHash), decltype(stopEqual)*/> stops;
-    std::unordered_map<std::string, StopTime /*, decltype(stopTimeHash), decltype(stopTimeEqual)*/> stopTimes;
-    std::unordered_map<std::string, std::vector<Transfer> /*, decltype(transferHash), decltype(transferEqual)*/> transferFrom;
-    std::unordered_map<std::string, std::vector<Transfer> /*, decltype(transferHash), decltype(transferEqual)*/> transferTo;
-    std::unordered_map<std::string, std::vector<Trip> /*, decltype(tripHash), decltype(tripEqual)*/> trips;
+    std::unordered_map<std::string, Agency> agencies;
+    std::unordered_map<std::string, Calendar> calendars;
+    std::unordered_map<std::string, std::vector<CalendarDate>> calendarDates;
+    std::unordered_map<std::string, Route> routes;
+    std::unordered_map<std::string, Stop> stops;
+    std::unordered_map<std::string, std::vector<StopTime>> stopTimes;
+    std::unordered_map<std::string, std::vector<Transfer>> transferFrom;
+    std::unordered_map<std::string, std::vector<Transfer>> transferTo;
+    std::unordered_map<std::string, std::vector<Trip>> trips;
   };
 
 } // gtfs

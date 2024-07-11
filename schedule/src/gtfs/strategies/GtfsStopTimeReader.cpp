@@ -14,7 +14,6 @@
 
 
 namespace schedule::gtfs {
-
   void GtfsStopTimeReader::operator()(GtfsReader& aReader) const {
     using namespace std::string_literals;
     MEASURE_FUNCTION(std::source_location().file_name());
@@ -41,18 +40,17 @@ namespace schedule::gtfs {
     while (std::getline(infile, line))
     {
       fields = utils::splitLineAndRemoveQuotes(line);
-      if (fields.size() < 7)
+      if (fields.size() < 5)
       {
         // TODO: Handle error
         continue;
       }
-      aReader.getData().get().stopTimes.emplace(
+      aReader.getData().get().stopTimes[std::string(fields[headerMap["stop_id"]])].emplace_back(
+        std::string(fields[headerMap["trip_id"]]),
+        std::string(fields[headerMap["arrival_time"]]),
+        std::string(fields[headerMap["departure_time"]]),
         std::string(fields[headerMap["stop_id"]]),
-        StopTime{std::string(fields[headerMap["trip_id"]]),
-                 std::string(fields[headerMap["arrival_time"]]),
-                 std::string(fields[headerMap["departure_time"]]),
-                 std::string(fields[headerMap["stop_id"]]),
-                 std::stoi(std::string(fields[headerMap["stop_sequence"]]))});
+        std::stoi(std::string(fields[headerMap["stop_sequence"]])));
     }
   }
 

@@ -141,12 +141,12 @@ TEST_F(GtfsReaderStrategiesTest, testStopTimeReader) {
   const schedule::gtfs::GtfsData& data = reader->getData().get();
   const auto stopTimes = data.stopTimes.at("8503054:0:1");
 
-  ASSERT_TRUE(stopTimes.stopId.empty() == false);
-  ASSERT_EQ(stopTimes.tripId, "1.TA.91-10-A-j24-1.1.H");
-  ASSERT_EQ(stopTimes.arrivalTime, schedule::gtfs::utils::ServiceDayTime(18, 27, 0));
-  ASSERT_EQ(stopTimes.departureTime, schedule::gtfs::utils::ServiceDayTime(18, 27, 0));
-  ASSERT_EQ(stopTimes.stopId, "8503054:0:1");
-  ASSERT_EQ(stopTimes.stopSequence, 1);
+  ASSERT_TRUE(stopTimes[0].stopId.empty() == false);
+  ASSERT_EQ(stopTimes[0].tripId, "1.TA.91-10-A-j24-1.1.H");
+  ASSERT_EQ(stopTimes[0].arrivalTime, schedule::gtfs::utils::ServiceDayTime(18, 27, 0));
+  ASSERT_EQ(stopTimes[0].departureTime, schedule::gtfs::utils::ServiceDayTime(18, 27, 0));
+  ASSERT_EQ(stopTimes[0].stopId, "8503054:0:1");
+  ASSERT_EQ(stopTimes[0].stopSequence, 1);
 }
 
 TEST_F(GtfsReaderStrategiesTest, testTransferReader) {
@@ -203,6 +203,6 @@ TEST_F(GtfsReaderStrategiesTest, testRelationManager) {
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
 
-  auto relationManager = schedule::gtfs::RelationManager(reader->getData().get());
+  auto relationManager = schedule::gtfs::RelationManager(std::move(reader->getData().get()));
   relationManager.createRelations();
 }

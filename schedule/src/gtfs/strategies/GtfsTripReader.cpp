@@ -34,12 +34,12 @@ namespace schedule::gtfs {
     while (std::getline(infile, line))
     {
       fields = utils::splitLineAndRemoveQuotes(line);
-      if (fields.size() < 7)
+      if (fields.size() < 6)
       {
         // TODO: Handle error
         continue;
       }
-      aReader.getData().get().trips[std::string(fields[headerMap["route_id"]])].emplace_back(
+      aReader.getData().get().trips[std::string(fields[headerMap["trip_id"]])].emplace_back(
         std::string(fields[headerMap["route_id"]]),
         std::string(fields[headerMap["service_id"]]),
         std::string(fields[headerMap["trip_id"]]));

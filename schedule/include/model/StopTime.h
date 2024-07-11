@@ -25,11 +25,11 @@ namespace schedule::gtfs {
         throw std::invalid_argument("Mandatory stop time fields must not be empty");
       }
     }
-    std::string tripId;
-    utils::ServiceDayTime arrivalTime;
-    utils::ServiceDayTime departureTime;
-    std::string stopId;
-    int stopSequence;
+    std::string tripId{};
+    utils::ServiceDayTime arrivalTime = utils::ServiceDayTime::fromSeconds(utils::ServiceDayTime::Second(0));
+    utils::ServiceDayTime departureTime = utils::ServiceDayTime::fromSeconds(utils::ServiceDayTime::Second(0));
+    std::string stopId{};
+    int stopSequence{};
   };
   // TODO create hash with tripId and stopSequence
 
@@ -42,6 +42,10 @@ namespace schedule::gtfs {
 
   inline auto stopTimeEqual = [](StopTime const& lhs, StopTime const& rhs) noexcept {
     return lhs.stopId == rhs.stopId; // && lhs.tripId == rhs.tripId;
+  };
+
+  inline auto stopTimeLessByStopSequence = [](StopTime const& lhs, StopTime const& rhs) noexcept {
+    return lhs.stopSequence < rhs.stopSequence;
   };
 
 } // gtfs

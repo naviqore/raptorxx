@@ -39,8 +39,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/gtfs/RelationManager.cpp
         src/gtfs/RelationManager.h
         src/Types.h
-        src/gtfs/GtfsSchedule.cpp
-        src/gtfs/GtfsSchedule.h
         src/utils/ServiceDayTime.cpp
         src/utils/ServiceDayTime.h
         src/gtfs/GtfsReaderStrategyFactory.cpp
