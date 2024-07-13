@@ -23,7 +23,7 @@ namespace schedule::gtfs {
     {
       throw std::runtime_error("Error opening file: " + std::string(filename));
     }
-    LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
+    LoggingPool::getInstance().getLogger(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
     constexpr size_t bufferSize = 1 << 22; // ~4MB
     std::vector<char> buffer(bufferSize);
     infile.rdbuf()->pubsetbuf(buffer.data(), bufferSize);

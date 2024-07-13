@@ -88,7 +88,7 @@ TEST_F(GtfsReaderStrategiesTest, testCalendarDateReader) {
     ASSERT_TRUE(calendarDate.exceptionType == schedule::gtfs::CalendarDate::SERVICE_ADDED || calendarDate.exceptionType == schedule::gtfs::CalendarDate::SERVICE_REMOVED);
   });
 
-  const std::string date_str = "20231225";
+  const std::string date_str = "20231216";
   const int year = std::stoi(date_str.substr(0, 4));
   const int month = std::stoi(date_str.substr(4, 2));
   const int day = std::stoi(date_str.substr(6, 2));
@@ -97,7 +97,7 @@ TEST_F(GtfsReaderStrategiesTest, testCalendarDateReader) {
 
   ASSERT_EQ(calendarDate[0].serviceId, "TA+00060");
   ASSERT_EQ(calendarDate[0].date, date);
-  ASSERT_TRUE(calendarDate[0].exceptionType == schedule::gtfs::CalendarDate::SERVICE_ADDED);
+  ASSERT_TRUE(calendarDate[0].exceptionType == schedule::gtfs::CalendarDate::SERVICE_REMOVED);
 }
 
 TEST_F(GtfsReaderStrategiesTest, testCalendarReader) {

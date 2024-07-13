@@ -32,7 +32,7 @@ protected:
 
   void SetUp() override {
     // arrange
-    LoggingPool::getInstance(Target::CONSOLE)->setLevel(LoggerBridge::ERROR);
+    LoggingPool::getInstance().getLogger(Target::CONSOLE)->setLevel(LoggerBridge::ERROR);
     stations[geometry::kd_tree::coordinateComponent(geometry::kd_tree::spatialCoordinate(47.4230127859742), geometry::kd_tree::spatialCoordinate(9.369479194531577))] = "St. Gallen Train Station";
     stations[geometry::kd_tree::coordinateComponent(geometry::kd_tree::spatialCoordinate(47.41190313108875), geometry::kd_tree::spatialCoordinate(9.25303543394843))] = "Gossau Train Station";
     stations[geometry::kd_tree::coordinateComponent(geometry::kd_tree::spatialCoordinate(47.41549705750434), geometry::kd_tree::spatialCoordinate(9.18936624689178))] = "Flawil Train Station";
@@ -55,10 +55,10 @@ TEST_F(TestK2dTree, TestK2dTreeStGallenToWinterthur) {
   const auto findNeaerestFromKreuzbleiche = geometry::kd_tree::coordinateComponent(geometry::kd_tree::spatialCoordinate(47.419620275547636), geometry::kd_tree::spatialCoordinate(9.359281921519944));
 
   const auto nearestRickenbach = kdTree->nearest(findNearestFromRickenbach);
-  LoggingPool::getInstance(Target::CONSOLE)->info(fmt::format("Nearest to Rickenbach is: {}", stations[nearestRickenbach]));
+  LoggingPool::getInstance().getLogger(Target::CONSOLE)->info(std::format("Nearest to Rickenbach is: {}", stations[nearestRickenbach]));
 
   const auto neaerestKreuzbleiche = kdTree->nearest(findNeaerestFromKreuzbleiche);
-  LoggingPool::getInstance(Target::CONSOLE)->info(fmt::format("Nearest to Kreuzbleiche is: {}", stations[neaerestKreuzbleiche]));
+  LoggingPool::getInstance().getLogger(Target::CONSOLE)->info(std::format("Nearest to Kreuzbleiche is: {}", stations[neaerestKreuzbleiche]));
 
   // assert
   ASSERT_TRUE(stations[nearestRickenbach] == "Wintherthur Train Station");
@@ -75,7 +75,7 @@ TEST_F(TestK2dTree, TestK2dTreeRangeSearch) {
   // assert
   for (auto it = nearestRickenbach.begin(); it != nearestRickenbach.end(); ++it)
   {
-    LoggingPool::getInstance(Target::CONSOLE)->info(fmt::format("Nearest to Kreuzbleiche is: {}", stations[*it]));
+    LoggingPool::getInstance().getLogger(Target::CONSOLE)->info(std::format("Nearest to Kreuzbleiche is: {}", stations[*it]));
     switch (std::distance(nearestRickenbach.begin(), it))
     {
       case 0:

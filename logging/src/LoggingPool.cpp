@@ -1,60 +1,31 @@
-//
-// Created by MichaelBrunner on 27/05/2024.
-//
 
-#include "spdlog/logger.h"
+
 #include "LoggingPool.h"
-#include <unordered_map>
+#include "LoggerBridgeImpl.h"
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/async.h>
 
-// PIMPL idiom - https://en.cppreference.com/w/cpp/language/pimpl
-class LoggingPool::LoggingPoolImpl
-{
-public:
-  std::unordered_map<Target, std::unique_ptr<LoggingPool>> instances;
-  std::shared_ptr<spdlog::logger> current;
-};
-
-std::unique_ptr<LoggingPool::LoggingPoolImpl> LoggingPool::impl = std::make_unique<LoggingPoolImpl>();
-
-LoggingPool::LoggingPool() = default;
-
-std::unique_ptr<LoggingPool> LoggingPool::createInstance() {
-  return std::unique_ptr<LoggingPool>(new LoggingPool());
+LoggingPool& LoggingPool::getInstance() {
+  static LoggingPool instance;
+  return instance;
 }
 
-LoggerBridge* LoggingPool::getInstance(const Target aTarget) {
-  if (!impl->instances.contains(aTarget))
+std::shared_ptr<LoggerBridge> LoggingPool::getLogger(Target target) {
+  std::lock_guard<std::mutex> lock(mutex);
+  if (!loggers.contains(target))
   {
-    impl->instances[aTarget] = createInstance();
-    switch (aTarget)
+    std::shared_ptr<spdlog::logger> spdLogger;
+    switch (target)
     {
       case Target::CONSOLE:
-        impl->instances[aTarget]->impl->current = spdlog::stdout_color_mt("console");
+        spdLogger = spdlog::create_async<spdlog::sinks::stdout_color_sink_mt>("console");
         break;
       case Target::FILE:
-        impl->instances[aTarget]->impl->current = spdlog::basic_logger_mt("file", "logs/file.log");
+        spdLogger = spdlog::basic_logger_mt<spdlog::async_factory>("file", "logs/file.log");
         break;
     }
+    loggers[target] = std::make_shared<LoggerBridgeImpl>(spdLogger);
   }
-  return impl->instances[aTarget].get();
-}
-
-LoggingPool::~LoggingPool() = default;
-
-void LoggingPool::info(const std::string& message) {
-  impl->current->info(message);
-}
-void LoggingPool::warn(const std::string& message) {
-  impl->current->warn(message);
-}
-void LoggingPool::error(const std::string& message) {
-  impl->current->error(message);
-}
-void LoggingPool::setLevel(Level level) {
-  impl->current->set_level(static_cast<spdlog::level::level_enum>(level));
-}
-LoggerBridge::Level LoggingPool::getLevel() const {
-  return static_cast<Level>(impl->current->level());
+  return loggers[target];
 }

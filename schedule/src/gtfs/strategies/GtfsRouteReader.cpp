@@ -20,7 +20,7 @@ namespace schedule::gtfs {
     {
       throw std::runtime_error("Error opening file: " + std::string(filename));
     }
-    LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
+    LoggingPool::getInstance().getLogger(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
     std::string line;
     std::getline(infile, line); // Get Header line
     // get indices of header columns
@@ -41,7 +41,8 @@ namespace schedule::gtfs {
                                              Route{std::string(fields[headerMap["route_id"]]),
                                                    std::string(fields[headerMap["route_short_name"]]),
                                                    std::string(fields[headerMap["route_long_name"]]),
-                                                   static_cast<Route::RouteType>(std::stoi(std::string(fields[headerMap["route_type"]])))});
+                                                   static_cast<Route::RouteType>(std::stoi(std::string(fields[headerMap["route_type"]]))),
+                                                   std::string(fields[headerMap["agency_id"]])});
     }
   }
 

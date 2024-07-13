@@ -28,7 +28,7 @@ namespace schedule::gtfs {
       // throw std::runtime_error("Error opening file: " + std::string(filename));
       return;
     }
-    LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
+    LoggingPool::getInstance().getLogger(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
     constexpr size_t bufferSize = 1 << 20; // 1 MB buffer size
     std::vector<char> buffer(bufferSize);
     infile.rdbuf()->pubsetbuf(buffer.data(), bufferSize);
@@ -58,11 +58,13 @@ namespace schedule::gtfs {
           exceptionType = CalendarDate::ExceptionType::SERVICE_ADDED;
           break;
         case '2':
-          // exceptionType = CalendarDate::ExceptionType::SERVICE_REMOVED;
-          [[fallthrough]];
+          exceptionType = CalendarDate::ExceptionType::SERVICE_REMOVED;
+          //[[fallthrough]]; // TODO maybe add [[fallthrough]] in the future again
+        break;
         default:
-          continue;
+          //continue;
           //TODO lets discuss this - throw std::runtime_error("Error: invalid exception type.");
+          exceptionType = CalendarDate::ExceptionType::SERVICE_REMOVED;
       }
 
       aReader.getData().get().calendarDates[std::string(fields[headerMap["service_id"]])].emplace_back(

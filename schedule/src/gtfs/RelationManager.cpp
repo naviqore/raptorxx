@@ -17,27 +17,32 @@ namespace schedule::gtfs {
   }
 
   void RelationManager::createRelations() {
+    // Reserve capacity if possible, e.g., data.trips.size() as an estimate
     for (const auto& stopTimes : data.stopTimes | std::views::values)
     {
       for (const auto& stopTime : stopTimes)
       {
-        for (auto& trips = data.trips.at(stopTime.tripId);
-             auto& trip : trips)
+        auto tripIter = data.trips.find(stopTime.tripId);
+        if (tripIter != data.trips.end())
         {
-          trip.stopTimes.insert(stopTime);
-
+          for (auto& trip : tripIter->second)
+          {
+            trip.stopTimes.insert(stopTime);
+          }
+        }
+        else
+        {
+          // TODO: Handle error
         }
       }
     }
+
     for (auto& trips : data.trips | std::views::values)
     {
       for (auto& trip : trips)
       {
-        // std::ranges::sort(trip.stopTimes,
-        //                   [](const StopTime& a, const StopTime& b) {
-        //                     return a.stopSequence < b.stopSequence;
-        //                   });
-        data.routes.at(trip.routeId).trips.push_back(trip);
+        auto& route = data.routes.at(trip.routeId); // Use operator[] to access or insert
+        route.trips.push_back(trip);
       }
     }
 
@@ -48,7 +53,7 @@ namespace schedule::gtfs {
       {
         for (const auto& stopTime : trip.stopTimes)
         {
-          uniqueStopIds.insert(stopTime.stopId);
+          uniqueStopIds.emplace(stopTime.stopId);
         }
       }
       for (const auto& stopId : uniqueStopIds)
@@ -57,6 +62,55 @@ namespace schedule::gtfs {
       }
     }
   }
+
+
+  //void RelationManager::createRelations() {
+  //  for (const auto& stopTimes : data.stopTimes | std::views::values)
+  //  {
+  //    for (const auto& stopTime : stopTimes)
+  //    {
+  //      auto tripIter = data.trips.find(stopTime.tripId);
+  //      if (tripIter != data.trips.end()) {
+  //        for (auto& trip : tripIter->second) {
+  //          trip.stopTimes.insert(stopTime);
+  //        }
+  //      } else {
+  //        // TODO: Handle error
+  //      }
+  //    }
+  //  }
+  //  for (auto& trips : data.trips | std::views::values)
+  //  {
+  //    for (auto& trip : trips)
+  //    {
+  //      // std::ranges::sort(trip.stopTimes,
+  //      //                   [](const StopTime& a, const StopTime& b) {
+  //      //                     return a.stopSequence < b.stopSequence;
+  //      //                   });
+  //      if (data.routes.contains(trip.routeId)) {
+  //        data.routes.at(trip.routeId).trips.push_back(trip);
+  //      } else {
+  //        // TODO: Handle error
+  //      }
+  //    }
+  //  }
+
+  //  for (auto& route : data.routes | std::views::values)
+  //  {
+  //    std::unordered_set<std::string> uniqueStopIds;
+  //    for (const auto& trip : route.trips)
+  //    {
+  //      for (const auto& stopTime : trip.stopTimes)
+  //      {
+  //        uniqueStopIds.insert(stopTime.stopId);
+  //      }
+  //    }
+  //    for (const auto& stopId : uniqueStopIds)
+  //    {
+  //      route.stops.insert(data.stops.at(stopId));
+  //    }
+  //  }
+  //}
 
   const GtfsData& RelationManager::getData() const {
     return data;

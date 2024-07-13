@@ -28,7 +28,10 @@ void schedule::gtfs::GtfsReader::readData() {
     strategy(*this);
   });
 #else
-  std::ranges::for_each(strategies, [this](const auto& strategy) {
+  /*std::ranges::for_each(strategies, [this](const auto& strategy) {
+    strategy(*this);
+  });*/
+  std::for_each(std::execution::par, strategies.begin(), strategies.end(), [this](const auto& strategy) {
     strategy(*this);
   });
 

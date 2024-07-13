@@ -72,27 +72,27 @@ namespace fmt {
 void printCalendar(const std::vector<schedule::gtfs::Calendar>& calendars) {
   std::array<std::string, 7> weekday_names = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
   std::ranges::for_each(calendars, [&](const auto& calendar) {
-    LoggingPool::getInstance(Target::CONSOLE)->info(fmt::format("Service ID: {}", calendar.serviceId));
-    LoggingPool::getInstance(Target::CONSOLE)->info(fmt::format("Start Date: {}-{}-{}", calendar.startDate.year(), calendar.startDate.month(), calendar.startDate.day()));
-    LoggingPool::getInstance(Target::CONSOLE)->info(fmt::format("End Date: {}-{}-{}", calendar.endDate.year(), calendar.endDate.month(), calendar.endDate.day()));
-    LoggingPool::getInstance(Target::CONSOLE)->info(fmt::format("Weekday Service: "));
+    LoggingPool::getInstance().getLogger(Target::CONSOLE)->info(fmt::format("Service ID: {}", calendar.serviceId));
+    LoggingPool::getInstance().getLogger(Target::CONSOLE)->info(fmt::format("Start Date: {}-{}-{}", calendar.startDate.year(), calendar.startDate.month(), calendar.startDate.day()));
+    LoggingPool::getInstance().getLogger(Target::CONSOLE)->info(fmt::format("End Date: {}-{}-{}", calendar.endDate.year(), calendar.endDate.month(), calendar.endDate.day()));
+    LoggingPool::getInstance().getLogger(Target::CONSOLE)->info(fmt::format("Weekday Service: "));
 
     std::ranges::for_each(calendar.weekdayService, [&](const auto& dayService) {
       auto [day, service] = dayService;
       auto day_name = weekday_names[day.c_encoding()];
-      LoggingPool::getInstance(Target::CONSOLE)->info(fmt::format("{}: {}", day_name, (service ? "Service" : "No service")));
+      LoggingPool::getInstance().getLogger(Target::CONSOLE)->info(fmt::format("{}: {}", day_name, (service ? "Service" : "No service")));
     });
   });
 }
 
 void printAgency(const std::vector<schedule::gtfs::Agency>& agencies) {
   std::ranges::for_each(
-    agencies, [](const auto& agency) { LoggingPool::getInstance(Target::CONSOLE)->info(fmt::format("Agency: {} {} {}", agency.agencyId, agency.name, agency.timezone)); });
+    agencies, [](const auto& agency) { LoggingPool::getInstance().getLogger(Target::CONSOLE)->info(fmt::format("Agency: {} {} {}", agency.agencyId, agency.name, agency.timezone)); });
 }
 
 void printCalendarDates(const std::vector<schedule::gtfs::CalendarDate>& calendarDates) {
   std::ranges::for_each(calendarDates, [](const auto& calendarDate) {
-    LoggingPool::getInstance(Target::CONSOLE)->info(fmt::format("Service ID: {} Date: {}-{}-{} Exception Type: {}", calendarDate.serviceId, calendarDate.date.year(), calendarDate.date.month(), calendarDate.date.day(), static_cast<int>(calendarDate.exceptionType)));
+    LoggingPool::getInstance().getLogger(Target::CONSOLE)->info(fmt::format("Service ID: {} Date: {}-{}-{} Exception Type: {}", calendarDate.serviceId, calendarDate.date.year(), calendarDate.date.month(), calendarDate.date.day(), static_cast<int>(calendarDate.exceptionType)));
   });
 }
 
@@ -103,7 +103,7 @@ TEST(GTFS, TestStrategyReader) {
 
   auto readerFactory = schedule::gtfs::GtfsReaderStrategyFactory(std::move(basePath));
 
-  LoggingPool::getInstance(Target::CONSOLE)->setLevel(LoggerBridge::ERROR);
+  LoggingPool::getInstance().getLogger(Target::CONSOLE)->setLevel(LoggerBridge::ERROR);
 
 
   // create strategy callable objects
