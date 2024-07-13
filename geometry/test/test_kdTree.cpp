@@ -3,7 +3,7 @@
 //
 
 #include <gtest/gtest.h>
-#include "LoggingPool.h"
+#include "../../logging/src/LoggingPool.h"
 #include "utils.h"
 #include "usings.h"
 

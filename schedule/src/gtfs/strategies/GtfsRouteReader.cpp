@@ -4,7 +4,7 @@
 
 #include "GtfsRouteReader.h"
 
-#include "LoggingPool.h"
+#include "LoggerFactory.h"
 #include "gtfs/GtfsReader.h"
 #include "src/utils/utils.h"
 #include "utils/scopedTimer.h"
@@ -20,7 +20,7 @@ namespace schedule::gtfs {
     {
       throw std::runtime_error("Error opening file: " + std::string(filename));
     }
-    LoggingPool::getInstance().getLogger(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
+    getLogger(Target::CONSOLE, LoggerName::GTFS)->info(std::format("Reading file: {}", filename));
     std::string line;
     std::getline(infile, line); // Get Header line
     // get indices of header columns

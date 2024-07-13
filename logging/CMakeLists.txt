@@ -9,11 +9,14 @@ find_package(spdlog CONFIG REQUIRED)
 add_library(${PROJECT_NAME} SHARED)
 
 target_sources(${PROJECT_NAME} PRIVATE
- "src/LoggingPool.cpp"  
- "src/LoggerBridgeImpl.h"
- PUBLIC 
- "include/LoggingPool.h"
-"include/LoggerBridge.h"
+        "src/LoggingPool.cpp"
+        "src/LoggerBridgeImpl.h"
+        "src/LoggerBridgeImpl.cpp"
+        "src/LoggerFactory.cpp"
+        "src/LoggingPool.h"
+        PUBLIC
+        "include/LoggerBridge.h"
+        "include/LoggerFactory.h"
 
 )
 

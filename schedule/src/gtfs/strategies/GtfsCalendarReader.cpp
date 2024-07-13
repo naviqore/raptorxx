@@ -4,7 +4,8 @@
 
 #include "GtfsCalendarReader.h"
 
-#include "LoggingPool.h"
+
+#include "LoggerFactory.h"
 #include "gtfs/GtfsReader.h"
 #include "src/utils/utils.h"
 #include "utils/scopedTimer.h"
@@ -23,7 +24,7 @@ namespace schedule::gtfs {
       // TODO log error
       throw std::runtime_error("Error opening file: " + std::string(filename));
     }
-    LoggingPool::getInstance().getLogger(Target::CONSOLE)->info(std::format("Reading file: {}", filename));
+    getLogger(Target::CONSOLE, LoggerName::GTFS)->info(std::format("Reading file: {}", filename));
     std::string line;
     std::getline(infile, line); // Skip header line
     std::map<std::string, size_t> headerMap = utils::getGtfsColumnIndices(line);
@@ -35,7 +36,7 @@ namespace schedule::gtfs {
       if (fields.size() < 10)
       {
         // TODO: Handle error
-        LoggingPool::getInstance().getLogger(Target::CONSOLE)->error(std::format("Invalid calendar filename: {} line: {} GTFS data {}", std::source_location::current().file_name(), std::source_location::current().line(), line));
+        getLogger(Target::CONSOLE, LoggerName::GTFS)->error(std::format("Invalid calendar filename: {} line: {} GTFS data {}", std::source_location::current().file_name(), std::source_location::current().line(), line));
         continue;
       }
       Calendar::WeekdayServiceHashMap weekdayService

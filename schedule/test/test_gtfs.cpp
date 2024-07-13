@@ -2,7 +2,6 @@
 
 #include "DataReader.h"
 #include "gtfs/GtfsReader.h"
-#include "LoggingPool.h"
 #include "gtfs/GtfsReaderStrategyFactory.h"
 #include "gtfs/RelationManager.h"
 #include "gtfs/strategies/GtfsAgencyReader.h"

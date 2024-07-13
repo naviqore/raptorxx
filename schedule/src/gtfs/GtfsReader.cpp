@@ -23,19 +23,9 @@ void schedule::gtfs::GtfsReader::readData() {
 // TODO test on Apple Clang
 // execute registered strategies
 #if defined(HAS_EXECUTION) && !(defined(__clang__) && defined(__apple_build_version__)) // https://en.cppreference.com/w/cpp/compiler_support
-#ifdef NDEBUG
   std::for_each(std::execution::par, strategies.begin(), strategies.end(), [this](const auto& strategy) {
     strategy(*this);
   });
-#else
-  /*std::ranges::for_each(strategies, [this](const auto& strategy) {
-    strategy(*this);
-  });*/
-  std::for_each(std::execution::par, strategies.begin(), strategies.end(), [this](const auto& strategy) {
-    strategy(*this);
-  });
-
-#endif
 #else
   std::vector<std::future<void>> futures;
   for (const auto& strategy : strategies)

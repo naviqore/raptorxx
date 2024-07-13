@@ -4,6 +4,7 @@
 
 
 #include "DataReader.h"
+#include "LoggerFactory.h"
 #include "gtfs/GtfsData.h"
 #include "gtfs/GtfsReaderStrategyFactory.h"
 #include "gtfs/RelationManager.h"
@@ -66,8 +67,8 @@ int main(int argc, char* argv[]) {
   auto relationManager = schedule::gtfs::RelationManager(std::move(reader->getData().get()));
 
   const auto& agency = relationManager.getData().agencies.at(agencyName);
-  LoggingPool::getInstance().getLogger(Target::CONSOLE)->info(agency.name);
-  LoggingPool::getInstance().getLogger(Target::CONSOLE)->info(agency.agencyId);
+  getLogger(Target::CONSOLE, LoggerName::GTFS)->info(agency.name);
+  getLogger(Target::CONSOLE, LoggerName::GTFS)->info(agency.agencyId);
 
   std::vector<schedule::gtfs::Route> routes;
   std::vector<schedule::gtfs::Trip> trips;
@@ -108,12 +109,12 @@ int main(int argc, char* argv[]) {
         }
         else
         {
-          LoggingPool::getInstance().getLogger(Target::CONSOLE)->warn("No calendar dates found for service id: " + calendar.serviceId);
+          getLogger(Target::CONSOLE, LoggerName::GTFS)->warn("No calendar dates found for service id: " + calendar.serviceId);
         }
       }
       else
       {
-        LoggingPool::getInstance().getLogger(Target::CONSOLE)->warn("No calendar found for service id: " + trip.serviceId);
+        getLogger(Target::CONSOLE, LoggerName::GTFS)->warn("No calendar found for service id: " + trip.serviceId);
       }
 
       for (const auto& stopTime : trip.stopTimes)
@@ -127,7 +128,7 @@ int main(int argc, char* argv[]) {
         }
         else
         {
-          LoggingPool::getInstance().getLogger(Target::CONSOLE)->warn("No stop found for stop id: " + stopTime.stopId);
+          getLogger(Target::CONSOLE, LoggerName::GTFS)->warn("No stop found for stop id: " + stopTime.stopId);
         }
 
         auto transferRange = allTransfersFrom | std::views::values | std::views::filter([&stopTime](const auto& transfers) {
@@ -163,7 +164,7 @@ int main(int argc, char* argv[]) {
   // create a subfolder for the agency
   if (false == std::filesystem::create_directory(gtfsDirectoryForAgency))
   {
-    LoggingPool::getInstance().getLogger(Target::CONSOLE)->info("Error creating directory: " + dataDirectoryPath + agencyName + " it may already exists");
+    getLogger(Target::CONSOLE, LoggerName::GTFS)->info("Error creating directory: " + dataDirectoryPath + agencyName + " it may already exists");
   }
 
   // write gtfs files in parallel
@@ -293,7 +294,7 @@ int main(int argc, char* argv[]) {
     future.get();
   }
 
-  LoggingPool::getInstance().getLogger(Target::CONSOLE)->info("GTFS files written successfully");
+  getLogger(Target::CONSOLE, LoggerName::GTFS)->info("GTFS files written successfully");
 
 
   return EXIT_SUCCESS;
