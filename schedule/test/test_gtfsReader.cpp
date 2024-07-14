@@ -4,17 +4,17 @@
 
 #include "LoggerFactory.h"
 #include "gtfs/GtfsReaderStrategyFactory.h"
-#include "gtfs/strategies/GtfsCalendarDateReader.h"
-#include "gtfs/strategies/GtfsRouteReader.h"
-#include "gtfs/strategies/GtfsStopReader.h"
-#include "gtfs/strategies/GtfsStopTimeReader.h"
-#include "gtfs/strategies/GtfsTransferReader.h"
-#include "gtfs/strategies/GtfsTripReader.h"
+#include "gtfs/strategies/txt_reader/GtfsCalendarDateReader.h"
+#include "gtfs/strategies/txt_reader/GtfsRouteReader.h"
+#include "gtfs/strategies/txt_reader/GtfsStopReader.h"
+#include "gtfs/strategies/txt_reader/GtfsStopTimeReader.h"
+#include "gtfs/strategies/txt_reader/GtfsTransferReader.h"
+#include "gtfs/strategies/txt_reader/GtfsTripReader.h"
 #include "utils/utils.h"
 #include <DataReader.h>
 #include <gtfs/GtfsReader.h>
-#include <gtfs/strategies/GtfsAgencyReader.h>
-#include <gtfs/strategies/GtfsCalendarReader.h>
+#include <gtfs/strategies/txt_reader/GtfsAgencyReader.h>
+#include <gtfs/strategies/txt_reader/GtfsCalendarReader.h>
 
 #include <memory>
 #include <algorithm>

@@ -15,8 +15,8 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/DataReader.h
         src/gtfs/GtfsReader.h
         include/model/Agency.h
-        src/gtfs/strategies/GtfsAgencyReader.cpp
-        src/gtfs/strategies/GtfsAgencyReader.h
+        src/gtfs/strategies/txt_reader/GtfsAgencyReader.cpp
+        src/gtfs/strategies/txt_reader/GtfsAgencyReader.h
         src/utils/utils.h
         src/gtfs/GtfsData.h
         include/model/Stop.h
@@ -26,20 +26,20 @@ target_sources(${PROJECT_NAME} PRIVATE
         include/model/Calendar.h
         include/model/CalendarDate.h
         include/model/Transfer.h
-        src/gtfs/strategies/GtfsCalendarReader.cpp
-        src/gtfs/strategies/GtfsCalendarReader.h
-        src/gtfs/strategies/GtfsCalendarDateReader.cpp
-        src/gtfs/strategies/GtfsCalendarDateReader.h
-        src/gtfs/strategies/GtfsRouteReader.cpp
-        src/gtfs/strategies/GtfsRouteReader.h
-        src/gtfs/strategies/GtfsStopReader.cpp
-        src/gtfs/strategies/GtfsStopReader.h
-        src/gtfs/strategies/GtfsStopTimeReader.cpp
-        src/gtfs/strategies/GtfsStopTimeReader.h
-        src/gtfs/strategies/GtfsTransferReader.cpp
-        src/gtfs/strategies/GtfsTransferReader.h
-        src/gtfs/strategies/GtfsTripReader.cpp
-        src/gtfs/strategies/GtfsTripReader.h
+        src/gtfs/strategies/txt_reader/GtfsCalendarReader.cpp
+        src/gtfs/strategies/txt_reader/GtfsCalendarReader.h
+        src/gtfs/strategies/txt_reader/GtfsCalendarDateReader.cpp
+        src/gtfs/strategies/txt_reader/GtfsCalendarDateReader.h
+        src/gtfs/strategies/txt_reader/GtfsRouteReader.cpp
+        src/gtfs/strategies/txt_reader/GtfsRouteReader.h
+        src/gtfs/strategies/txt_reader/GtfsStopReader.cpp
+        src/gtfs/strategies/txt_reader/GtfsStopReader.h
+        src/gtfs/strategies/txt_reader/GtfsStopTimeReader.cpp
+        src/gtfs/strategies/txt_reader/GtfsStopTimeReader.h
+        src/gtfs/strategies/txt_reader/GtfsTransferReader.cpp
+        src/gtfs/strategies/txt_reader/GtfsTransferReader.h
+        src/gtfs/strategies/txt_reader/GtfsTripReader.cpp
+        src/gtfs/strategies/txt_reader/GtfsTripReader.h
         src/utils/scopedTimer.h
         src/gtfs/GtfsReader.cpp
         src/utils/DataContainer.h

@@ -6,13 +6,13 @@
 
 #include <utility>
 
-#include "strategies/GtfsAgencyReader.h"
-#include "strategies/GtfsCalendarReader.h"
-#include "strategies/GtfsRouteReader.h"
-#include "strategies/GtfsStopReader.h"
-#include "strategies/GtfsStopTimeReader.h"
-#include "strategies/GtfsTransferReader.h"
-#include "strategies/GtfsTripReader.h"
+#include "strategies/txt_reader/GtfsAgencyReader.h"
+#include "strategies/txt_reader/GtfsCalendarReader.h"
+#include "strategies/txt_reader/GtfsRouteReader.h"
+#include "strategies/txt_reader/GtfsStopReader.h"
+#include "strategies/txt_reader/GtfsStopTimeReader.h"
+#include "strategies/txt_reader/GtfsTransferReader.h"
+#include "strategies/txt_reader/GtfsTripReader.h"
 
 
 namespace schedule::gtfs {
