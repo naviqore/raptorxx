@@ -37,11 +37,12 @@ namespace schedule::gtfs {
       Monorail = 12
     };
 
-    Route(std::string&& aRouteId, std::string&& aRouteShortName, std::string&& aRouteLongName, const RouteType aRouteType)
+    Route(std::string&& aRouteId, std::string&& aRouteShortName, std::string&& aRouteLongName, const RouteType aRouteType, std::string&& aAgencyId)
       : routeId(std::move(aRouteId))
       , routeShortName(std::move(aRouteShortName))
       , routeLongName(std::move(aRouteLongName))
-      , routeType(aRouteType) {
+      , routeType(aRouteType)
+      , agencyId(std::move(aAgencyId)) {
       if (routeId.empty()) // || routeShortName.empty()  || routeLongName.empty()
       {
         throw std::invalid_argument("Mandatory route fields must not be empty");
@@ -56,7 +57,7 @@ namespace schedule::gtfs {
     std::string routeShortName;
     std::string routeLongName;
     RouteType routeType;
-    // std::string agency_id;
+    std::string agencyId;
     std::vector<Trip> trips{};
     std::unordered_set<Stop, decltype(stopHash), decltype(stopEqual)> stops{};
   };

@@ -2,6 +2,11 @@
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
+
+add_executable(gtfsSubsetWriter
+        src/gtfs/agencySubsetWriter/gtfsSubsetWriter.cpp
+)
+
 add_library(${PROJECT_NAME} SHARED)
 
 target_sources(${PROJECT_NAME} PRIVATE
@@ -49,13 +54,20 @@ target_sources(${PROJECT_NAME} PRIVATE
 message("CU_LIST_DIR UO: ${CMAKE_CURRENT_LIST_DIR}")
 
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging/src)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging/include)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/geometry/include)
 target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
 
+target_include_directories(gtfsSubsetWriter PRIVATE ${CMAKE_SOURCE_DIR}/logging/include)
+target_include_directories(gtfsSubsetWriter PRIVATE ${CMAKE_SOURCE_DIR}/schedule/src)
+target_include_directories(gtfsSubsetWriter PUBLIC ${CMAKE_SOURCE_DIR}/geometry/include)
+target_include_directories(gtfsSubsetWriter PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)
 
 find_package(spdlog CONFIG REQUIRED)
 
@@ -63,6 +75,13 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         logging
         geometry
         spdlog::spdlog
+)
+
+target_link_libraries(gtfsSubsetWriter PRIVATE
+        logging
+        geometry
+        spdlog::spdlog
+        ${PROJECT_NAME}
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE GTFS_DLL_EXPORTS)

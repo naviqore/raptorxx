@@ -6,7 +6,7 @@
 #define RELATIONMANAGER_H
 
 #include "GtfsData.h"
-#include "LoggingPool.h"
+#include "../../../logging/src/LoggingPool.h"
 
 
 #include <map>
