@@ -79,7 +79,6 @@ namespace schedule::gtfs {
         {
           columnActions.at(columnName)(tempAgency, value);
         }
-
         ++index;
       }
       if (!tempAgency.name.empty())
