@@ -2,8 +2,7 @@ project("raptor"
         DESCRIPTION "C++ implementation of raptor algorithm"
 )
 
-add_library(${PROJECT_NAME} SHARED
-        include/IRaptor.h)
+add_library(${PROJECT_NAME} SHARED)
 
 target_sources(${PROJECT_NAME} PRIVATE
         src/Raptor.cpp
@@ -19,6 +18,14 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/strategies/RaptorStrategy.h
         include/raptorTypes.h
         include/IConnection.h
+        include/IRaptor.h
+        src/ConnectionImpl.cpp
+        src/ConnectionImpl.h
+        src/utils/Label.h
+        src/utils/IndexedVisitedHashMap.cpp
+        src/utils/IndexedVisitedHashMap.h
+        src/utils/IndexedVisitedSet.cpp
+        src/utils/IndexedVisitedSet.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
