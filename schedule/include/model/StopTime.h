@@ -37,7 +37,7 @@ namespace schedule::gtfs {
     return std::hash<std::string>{}(stopTime.stopId);
     // const std::size_t tripIdHash = std::hash<std::string>{}(stopTime.tripId);
 
-   //  return stopIdHash ^ (tripIdHash << 1);
+    //  return stopIdHash ^ (tripIdHash << 1);
   };
 
   inline auto stopTimeEqual = [](StopTime const& lhs, StopTime const& rhs) noexcept {

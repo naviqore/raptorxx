@@ -39,12 +39,17 @@ namespace schedule::gtfs {
 
     while (std::getline(infile, line))
     {
+      /*if (!line.empty() && line.back() == '\r')
+      {
+        line.pop_back();
+      }*/
       fields = utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 5)
       {
         // TODO: Handle error
         continue;
       }
+
       aReader.getData().get().stopTimes[std::string(fields[headerMap["stop_id"]])].emplace_back(
         std::string(fields[headerMap["trip_id"]]),
         std::string(fields[headerMap["arrival_time"]]),

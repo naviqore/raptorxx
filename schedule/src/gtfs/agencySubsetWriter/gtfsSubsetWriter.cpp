@@ -45,8 +45,6 @@ int main(int argc, char* argv[]) {
   }
   std::string agencyName = argv[2];
 
-  std::cout << "Hello World";
-
   std::map<schedule::gtfs::utils::GTFS_FILE_TYPE, std::string> lFileNameMap;
 
   auto readerFactory = std::make_unique<schedule::gtfs::GtfsReaderStrategyFactory>(dataDirectoryPath.data());
@@ -164,14 +162,14 @@ int main(int argc, char* argv[]) {
   // create a subfolder for the agency
   if (false == std::filesystem::create_directory(gtfsDirectoryForAgency))
   {
-    getLogger(Target::CONSOLE, LoggerName::GTFS)->info("Error creating directory: " + dataDirectoryPath + agencyName + " it may already exists");
+    getLogger(Target::CONSOLE, LoggerName::GTFS)->info("Error creating directory: " + dataDirectoryPath + agencyName + " ,it may already exists");
   }
 
   // write gtfs files in parallel
   std::vector<std::future<void>> futures;
   // Write routes
   futures.emplace_back(std::async(std::launch::async, [&]() {
-    std::ofstream file(gtfsDirectoryForAgency + "\\" + "routes.txt");
+    std::ofstream file(gtfsDirectoryForAgency + "\\" + "routes.txt", std::ios::binary);
     file << routesHeader;
     for (const auto& route : routes)
     {
@@ -186,7 +184,7 @@ int main(int argc, char* argv[]) {
 
   // Write trips
   futures.emplace_back(std::async(std::launch::async, [&]() {
-    std::ofstream file(gtfsDirectoryForAgency + "\\" + "trips.txt");
+    std::ofstream file(gtfsDirectoryForAgency + "\\" + "trips.txt", std::ios::binary);
     file << tripsHeader;
     for (const auto& trip : trips)
     {
@@ -204,13 +202,13 @@ int main(int argc, char* argv[]) {
 
   // Write stopTimes
   futures.emplace_back(std::async(std::launch::async, [&]() {
-    std::ofstream file(gtfsDirectoryForAgency + "\\" + "stop_times.txt");
+    std::ofstream file(gtfsDirectoryForAgency + "\\" + "stop_times.txt", std::ios::binary);
     file << stopTimesHeader;
     for (const auto& stopTime : stopTimes)
     {
       file << std::quoted(stopTime.tripId) << ","
-           << std::quoted(std::to_string(stopTime.arrivalTime.toSeconds())) << ","
-           << std::quoted(std::to_string(stopTime.departureTime)) << ","
+           << std::quoted(stopTime.arrivalTime.toString()) << ","
+           << std::quoted(stopTime.departureTime.toString()) << ","
            << std::quoted(stopTime.stopId) << ","
            << std::quoted(std::to_string(stopTime.stopSequence)) << "\n";
     }
@@ -218,7 +216,7 @@ int main(int argc, char* argv[]) {
 
   // write stops
   futures.emplace_back(std::async(std::launch::async, [&]() {
-    std::ofstream file(gtfsDirectoryForAgency + "\\" + "stops.txt");
+    std::ofstream file(gtfsDirectoryForAgency + "\\" + "stops.txt", std::ios::binary);
     file << stopsHeader;
     for (const auto& stop : stops)
     {
@@ -246,7 +244,7 @@ int main(int argc, char* argv[]) {
 
   // Write calendar
   futures.emplace_back(std::async(std::launch::async, [&]() {
-    std::ofstream file(gtfsDirectoryForAgency + "\\" + "calendar.txt");
+    std::ofstream file(gtfsDirectoryForAgency + "\\" + "calendar.txt", std::ios::binary);
     file << calendarHeader;
     for (const auto& calendar : calendars)
     {
@@ -266,7 +264,7 @@ int main(int argc, char* argv[]) {
 
   // Write calendar dates
   futures.emplace_back(std::async(std::launch::async, [&]() {
-    std::ofstream file(gtfsDirectoryForAgency + "\\" + "calendar_dates.txt");
+    std::ofstream file(gtfsDirectoryForAgency + "\\" + "calendar_dates.txt", std::ios::binary);
     file << calendarDatesHeader;
     for (const auto& calendarDate : calendarDates)
     {
@@ -278,7 +276,7 @@ int main(int argc, char* argv[]) {
 
   // Write transfer items
   futures.emplace_back(std::async(std::launch::async, [&]() {
-    std::ofstream file(gtfsDirectoryForAgency + "\\" + "transfers.txt");
+    std::ofstream file(gtfsDirectoryForAgency + "\\" + "transfers.txt", std::ios::binary);
     file << transfersHeader;
     for (const auto& transfer : transferItems)
     {
