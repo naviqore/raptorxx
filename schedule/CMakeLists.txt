@@ -9,8 +9,6 @@ add_executable(gtfsSubsetWriter
 
 add_library(${PROJECT_NAME} SHARED)
 
-find_path(P_RANAV_CSV2_INCLUDE_DIRS "csv2/mio.hpp")
-
 target_sources(${PROJECT_NAME} PRIVATE
         src/DataReader.h
         src/gtfs/GtfsReader.h
@@ -50,11 +48,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/utils/ServiceDayTime.h
         src/gtfs/GtfsReaderStrategyFactory.cpp
         src/gtfs/GtfsReaderStrategyFactory.h
-        src/gtfs/strategies/csv_reader/GtfsAgencyReaderCsv.cpp
-        src/gtfs/strategies/csv_reader/GtfsAgencyReaderCsv.h
-        src/utils/DataTypeConverter.h
-        src/gtfs/strategies/csv_reader/GtfsCalendarDateReaderCsv.cpp
-        src/gtfs/strategies/csv_reader/GtfsCalendarDateReaderCsv.h
 )
 
 
@@ -67,7 +60,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
-target_include_directories(${PROJECT_NAME} PRIVATE ${P_RANAV_CSV2_INCLUDE_DIRS})
 
 target_include_directories(gtfsSubsetWriter PRIVATE ${CMAKE_SOURCE_DIR}/logging/include)
 target_include_directories(gtfsSubsetWriter PRIVATE ${CMAKE_SOURCE_DIR}/schedule/src)

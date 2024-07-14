@@ -9,25 +9,15 @@
 #include <limits>
 
 namespace raptor::utils {
-  static constexpr auto INFINITY_VALUE = std::numeric_limits<unsigned int>::max();
-
-  using stopId = std::string;
+  static constexpr auto INFINITY_VALUE = std::numeric_limits<int>::max();
 
   struct ConnectionRequest
   {
-    explicit ConnectionRequest(std::vector<std::string>&& departureStopId,
-                               std::vector<std::string>&& arrivalStopId,
-                               const unsigned int earliestDepartureTime)
-      : departureStopId(std::move(departureStopId)),
-        arrivalStopId(std::move(arrivalStopId)),
-        earliestDepartureTime(earliestDepartureTime)
-    {
-      latestDepartureTime = earliestDepartureTime + 3'600;
-    }
-    std::vector<std::string> departureStopId{};
-    std::vector<std::string> arrivalStopId{};
-    unsigned int earliestDepartureTime{};
-    unsigned int latestDepartureTime{};
+    // schedule::gtfs::Stop departureStop;
+    std::string departureStopId{};
+    std::string arrivalStopId{};
+    int departureTime{};
+    // schedule::gtfs::Stop arrivalStop;
   };
 }
 

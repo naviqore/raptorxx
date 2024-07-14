@@ -9,20 +9,7 @@
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
-      "ctestCommandArgs": "",
-      "cmakeToolchain": "C:/Users/MichaelBrunner/.vcpkg-clion/vcpkg-raptorxx/scripts/buildsystems/vcpkg.cmake"
-    },
-    {
-      "name": "x64-Release",
-      "generator": "Ninja",
-      "configurationType": "Release",
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
-      "ctestCommandArgs": "",
-      "inheritEnvironments": [ "msvc_x64_x64" ],
-      "cmakeToolchain": "C:/Users/MichaelBrunner/.vcpkg-clion/vcpkg-raptorxx/scripts/buildsystems/vcpkg.cmake"
+      "ctestCommandArgs": ""
     }
   ]
 }

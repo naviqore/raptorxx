@@ -31,11 +31,11 @@ namespace schedule::gtfs {
     while (std::getline(infile, line))
     {
       fields = utils::splitLineAndRemoveQuotes(line);
-      //if (fields.size() < 6)
-      //{
-      //  // TODO: Handle error
-      //  continue;
-      //}
+      if (fields.size() < 6)
+      {
+        // TODO: Handle error
+        continue;
+      }
 
       aReader.getData().get().routes.emplace(std::string(fields[headerMap["route_id"]]),
                                              Route{std::string(fields[headerMap["route_id"]]),

@@ -11,7 +11,5 @@
     "name" : "spdlog"
   }, {
     "name" : "benchmark"
-  }, {
-    "name" : "p-ranav-csv2"
   } ]
 }

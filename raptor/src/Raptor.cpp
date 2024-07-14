@@ -4,7 +4,7 @@
 
 #include "Raptor.h"
 
-#include "LoggerFactory.h"
+#include "LoggingPool.h"
 
 #include <utility>
 #include "raptorTypes.h"
@@ -24,7 +24,7 @@ namespace raptor {
     return strategy->execute(request);
   }
   void Raptor::testFunction() {
-    getLogger(Target::CONSOLE, LoggerName::RAPTOR)->info("Test function called");
+    LoggingPool::getInstance(Target::CONSOLE)->info("Test function called");
   }
 
 

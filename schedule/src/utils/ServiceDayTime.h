@@ -99,7 +99,7 @@ namespace schedule::gtfs::utils {
 } // utils
 // gtfs
 
-inline schedule::gtfs::utils::ServiceDayTime::Second operator"" _sec(const unsigned long long seconds) {
+inline schedule::gtfs::utils::ServiceDayTime::Second operator"" _sec(unsigned long long seconds) {
   return schedule::gtfs::utils::ServiceDayTime::Second(static_cast<unsigned int>(seconds));
 }
 
