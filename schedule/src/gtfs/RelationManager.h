@@ -6,10 +6,6 @@
 #define RELATIONMANAGER_H
 
 #include "GtfsData.h"
-#include "../../../logging/src/LoggingPool.h"
-
-
-#include <map>
 #include <vector>
 #include "model/StopTime.h"
 #include "model/Trip.h"
@@ -18,7 +14,6 @@
 
 #include <iostream>
 #include <schedule_export.h>
-#include <span>
 #include <ranges>
 
 namespace schedule::gtfs {
@@ -29,8 +24,6 @@ namespace schedule::gtfs {
 
   public:
     explicit RelationManager(GtfsData&& data);
-
-    void createRelations();
 
     [[nodiscard]] const GtfsData& getData() const;
 
@@ -55,6 +48,7 @@ namespace schedule::gtfs {
     [[nodiscard]] const std::vector<Trip>& getTripsFromStopTimeTripId(std::string const& aTripId) const;
 
   private:
+    void createRelations();
     // // TODO reserve size for maps
     // // using stopTimeId = std::string;
     // using stopId = std::string;

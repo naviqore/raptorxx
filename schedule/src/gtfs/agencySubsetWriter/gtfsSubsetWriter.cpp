@@ -6,7 +6,7 @@
 #include "DataReader.h"
 #include "LoggerFactory.h"
 #include "gtfs/GtfsData.h"
-#include "gtfs/GtfsReaderStrategyFactory.h"
+#include "gtfs/GtfsTxtReaderStrategyFactory.h"
 #include "gtfs/RelationManager.h"
 #include "utils/DataContainer.h"
 
@@ -21,7 +21,15 @@
 #include <sstream>
 #include <string>
 
+#include <csv2/writer.hpp>
+
 #include "utils/scopedTimer.h"
+
+template<typename T>
+std::string quote(const T& value) {
+  return std::format("\"{}\"", value);
+}
+
 
 int main(int argc, char* argv[]) {
 
@@ -47,16 +55,16 @@ int main(int argc, char* argv[]) {
 
   std::map<schedule::gtfs::utils::GTFS_FILE_TYPE, std::string> lFileNameMap;
 
-  auto readerFactory = std::make_unique<schedule::gtfs::GtfsReaderStrategyFactory>(dataDirectoryPath.data());
+  auto readerFactory = std::make_unique<schedule::gtfs::GtfsTxtReaderStrategyFactory>(dataDirectoryPath.data());
 
-  const auto agencyStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::AGENCY);
-  const auto calendarStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::CALENDAR);
-  const auto calendarDatesStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::CALENDAR_DATE);
-  const auto routesStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::ROUTE);
-  const auto stopStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::STOP);
-  const auto stopTimeStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::STOP_TIME);
-  const auto transferStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::TRANSFER);
-  const auto tripStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::TRIP);
+  const auto agencyStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::AGENCY);
+  const auto calendarStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::CALENDAR);
+  const auto calendarDatesStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::CALENDAR_DATE);
+  const auto routesStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::ROUTE);
+  const auto stopStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::STOP);
+  const auto stopTimeStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::STOP_TIME);
+  const auto transferStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::TRANSFER);
+  const auto tripStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::TRIP);
 
   std::vector strategies = {agencyStrategy, calendarStrategy, calendarDatesStrategy, routesStrategy, stopStrategy, stopTimeStrategy, transferStrategy, tripStrategy}; //
 
@@ -149,13 +157,13 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  std::string routesHeader = "route_id,agency_id,route_short_name,route_long_name,route_type\n";
-  std::string calendarHeader = "service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date\n";
-  std::string calendarDatesHeader = "service_id,date,exception_type\n";
-  std::string stopsHeader = "stop_id,stop_name,stop_lat,stop_lon,location_type,parent_station\n";
-  std::string stopTimesHeader = "trip_id,arrival_time,departure_time,stop_id,stop_sequence\n";
-  std::string tripsHeader = "route_id,service_id,trip_id,trip_headsign,trip_short_name,direction_id\n";
-  std::string transfersHeader = "from_stop_id,to_stop_id,transfer_type,min_transfer_time\n";
+  std::vector<std::string> routesHeader = {"route_id", "agency_id", "route_short_name", "route_long_name", "route_type"};
+  std::vector<std::string> calendarHeader = {"service_id", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "start_date", "end_date"};
+  std::vector<std::string> calendarDatesHeader = {"service_id", "date", "exception_type"};
+  std::vector<std::string> stopsHeader = {"stop_id", "stop_name", "stop_lat", "stop_lon", "zone_id", "parent_station"};
+  std::vector<std::string> stopTimesHeader = {"trip_id", "arrival_time", "departure_time", "stop_id", "stop_sequence"};
+  std::vector<std::string> tripsHeader = {"route_id", "service_id", "trip_id", "trip_headsign", "trip_short_name", "direction_id"};
+  std::vector<std::string> transfersHeader = {"from_stop_id", "to_stop_id", "transfer_type", "min_transfer_time"};
 
   std::string gtfsDirectoryForAgency = dataDirectoryPath + "\\" + agencyName;
 
@@ -170,69 +178,81 @@ int main(int argc, char* argv[]) {
   // Write routes
   futures.emplace_back(std::async(std::launch::async, [&]() {
     std::ofstream file(gtfsDirectoryForAgency + "\\" + "routes.txt", std::ios::binary);
-    file << routesHeader;
+    csv2::Writer<csv2::delimiter<','>> writer(file);
+    writer.write_row(routesHeader);
     for (const auto& route : routes)
     {
-      file << route.routeId << ","
-           << std::quoted(route.agencyId) << ","
-           << std::quoted(route.routeShortName) << ","
-           << std::quoted(route.routeLongName) << ","
-           << std::quoted(std::to_string(static_cast<int>(route.routeType)))
-           << "\n";
+      std::vector<std::string> row;
+      row.push_back(quote(route.routeId));
+      row.push_back(quote(route.agencyId));
+      row.push_back(quote(route.routeShortName));
+      row.push_back(quote(route.routeLongName));
+      row.push_back(quote(static_cast<int>(route.routeType)));
+
+      writer.write_row(row);
     }
   }));
 
   // Write trips
   futures.emplace_back(std::async(std::launch::async, [&]() {
     std::ofstream file(gtfsDirectoryForAgency + "\\" + "trips.txt", std::ios::binary);
-    file << tripsHeader;
+    csv2::Writer<csv2::delimiter<','>> writer(file);
+    writer.write_row(tripsHeader);
     for (const auto& trip : trips)
     {
-      file << std::quoted(trip.routeId) << ","
-           << std::quoted(trip.serviceId) << ","
-           << std::quoted(trip.tripId) << ","
-           << std::quoted("")
-           << ","
-           << std::quoted("")
-           << ","
-           << std::quoted("")
-           << "\n";
+      std::vector<std::string> row;
+      row.push_back(quote(trip.routeId));
+      row.push_back(quote(trip.serviceId));
+      row.push_back(quote(trip.tripId));
+      row.push_back(quote(""));
+      row.push_back(quote(""));
+      row.push_back(quote(""));
+      writer.write_row(row);
     }
   }));
 
   // Write stopTimes
   futures.emplace_back(std::async(std::launch::async, [&]() {
     std::ofstream file(gtfsDirectoryForAgency + "\\" + "stop_times.txt", std::ios::binary);
-    file << stopTimesHeader;
+    csv2::Writer<csv2::delimiter<','>> writer(file);
+    writer.write_row(stopTimesHeader);
     for (const auto& stopTime : stopTimes)
     {
-      file << std::quoted(stopTime.tripId) << ","
-           << std::quoted(stopTime.arrivalTime.toString()) << ","
-           << std::quoted(stopTime.departureTime.toString()) << ","
-           << std::quoted(stopTime.stopId) << ","
-           << std::quoted(std::to_string(stopTime.stopSequence)) << "\n";
+      std::vector<std::string> row;
+      row.push_back(quote(stopTime.tripId));
+      row.push_back(quote(stopTime.arrivalTime.toString()));
+      row.push_back(quote(stopTime.departureTime.toString()));
+      row.push_back(quote(stopTime.stopId));
+      row.push_back(quote(std::to_string(stopTime.stopSequence)));
+
+      writer.write_row(row);
     }
   }));
 
   // write stops
   futures.emplace_back(std::async(std::launch::async, [&]() {
     std::ofstream file(gtfsDirectoryForAgency + "\\" + "stops.txt", std::ios::binary);
-    file << stopsHeader;
+    csv2::Writer<csv2::delimiter<','>> writer(file);
+    writer.write_row(stopsHeader);
     for (const auto& stop : stops)
     {
-      file << std::quoted(stop.stopId) << ","
-           << std::quoted(stop.stopName) << ","
-           << std::quoted(std::to_string(stop.stopPoint.getFirstCoordinate())) << ","
-           << std::quoted(std::to_string(stop.stopPoint.getSecondCoordinate())) << ","
-           << std::quoted("") << ","
-           << std::quoted(stop.parentStation) << "\n";
+
+      std::vector<std::string> row;
+      row.push_back(quote(stop.stopId));
+      row.push_back(quote(stop.stopName));
+      row.push_back(quote(std::to_string(stop.stopPoint.getFirstCoordinate())));
+      row.push_back(quote(std::to_string(stop.stopPoint.getSecondCoordinate())));
+      row.push_back(quote(""));
+      row.push_back(quote(stop.parentStation));
+
+      writer.write_row(row);
     }
   }));
 
   auto formatDate = [](const std::chrono::year_month_day& ymd) {
-    unsigned year = static_cast<int>(ymd.year());
-    unsigned month = static_cast<unsigned>(ymd.month());
-    unsigned day = static_cast<unsigned>(ymd.day());
+    const unsigned year = static_cast<int>(ymd.year());
+    const unsigned month = static_cast<unsigned>(ymd.month());
+    const unsigned day = static_cast<unsigned>(ymd.day());
 
     std::ostringstream oss;
     oss << std::setw(4) << std::setfill('0') << year
@@ -245,45 +265,59 @@ int main(int argc, char* argv[]) {
   // Write calendar
   futures.emplace_back(std::async(std::launch::async, [&]() {
     std::ofstream file(gtfsDirectoryForAgency + "\\" + "calendar.txt", std::ios::binary);
-    file << calendarHeader;
+    csv2::Writer<csv2::delimiter<','>> writer(file);
+    writer.write_row(calendarHeader);
     for (const auto& calendar : calendars)
     {
-      file << std::quoted(calendar.serviceId)
-           << ","
-           << std::quoted(std::to_string(calendar.weekdayService.at(std::chrono::Monday))) << ","
-           << std::quoted(std::to_string(calendar.weekdayService.at(std::chrono::Tuesday))) << ","
-           << std::quoted(std::to_string(calendar.weekdayService.at(std::chrono::Wednesday))) << ","
-           << std::quoted(std::to_string(calendar.weekdayService.at(std::chrono::Thursday))) << ","
-           << std::quoted(std::to_string(calendar.weekdayService.at(std::chrono::Friday))) << ","
-           << std::quoted(std::to_string(calendar.weekdayService.at(std::chrono::Saturday))) << ","
-           << std::quoted(std::to_string(calendar.weekdayService.at(std::chrono::Sunday))) << ","
-           << std::quoted(formatDate(calendar.startDate)) << ","
-           << std::quoted(formatDate(calendar.endDate)) << "\n";
+      std::vector<std::string> row;
+      row.push_back(quote(calendar.serviceId));
+      row.push_back(quote(std::to_string(calendar.weekdayService.at(std::chrono::Monday))));
+      row.push_back(quote(std::to_string(calendar.weekdayService.at(std::chrono::Tuesday))));
+      row.push_back(quote(std::to_string(calendar.weekdayService.at(std::chrono::Wednesday))));
+      row.push_back(quote(std::to_string(calendar.weekdayService.at(std::chrono::Thursday))));
+      row.push_back(quote(std::to_string(calendar.weekdayService.at(std::chrono::Friday))));
+      row.push_back(quote(std::to_string(calendar.weekdayService.at(std::chrono::Saturday))));
+      row.push_back(quote(std::to_string(calendar.weekdayService.at(std::chrono::Sunday))));
+      row.push_back(quote(formatDate(calendar.startDate)));
+      row.push_back(quote(formatDate(calendar.endDate)));
+
+      writer.write_row(row);
     }
   }));
 
   // Write calendar dates
   futures.emplace_back(std::async(std::launch::async, [&]() {
     std::ofstream file(gtfsDirectoryForAgency + "\\" + "calendar_dates.txt", std::ios::binary);
-    file << calendarDatesHeader;
+    csv2::Writer<csv2::delimiter<','>> writer(file);
+    writer.write_row(calendarDatesHeader);
     for (const auto& calendarDate : calendarDates)
     {
-      file << std::quoted(calendarDate.serviceId) << ","
-           << std::quoted(formatDate(calendarDate.date)) << ","
-           << std::quoted(std::to_string(calendarDate.exceptionType)) << "\n";
+
+      std::vector<std::string> row;
+      row.push_back(quote(calendarDate.serviceId));
+      row.push_back(quote(formatDate(calendarDate.date)));
+      row.push_back(quote(std::to_string(calendarDate.exceptionType)));
+
+      writer.write_row(row);
+
     }
   }));
 
   // Write transfer items
   futures.emplace_back(std::async(std::launch::async, [&]() {
     std::ofstream file(gtfsDirectoryForAgency + "\\" + "transfers.txt", std::ios::binary);
-    file << transfersHeader;
+    csv2::Writer<csv2::delimiter<','>> writer(file);
+   writer.write_row(transfersHeader);
     for (const auto& transfer : transferItems)
     {
-      file << std::quoted(transfer.fromStopId) << ","
-           << std::quoted(transfer.toStopId) << ","
-           << std::quoted(std::to_string(transfer.transferType)) << ","
-           << std::quoted(std::to_string(transfer.minTransferTime)) << "\n";
+
+      std::vector<std::string> row;
+      row.push_back(quote(transfer.fromStopId));
+      row.push_back(quote(transfer.toStopId));
+      row.push_back(quote(std::to_string(transfer.transferType)));
+      row.push_back(quote(std::to_string(transfer.minTransferTime)));
+
+      writer.write_row(row);
     }
   }));
 

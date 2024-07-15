@@ -5,7 +5,6 @@
 #pragma once
 
 #include "LoggerBridge.h"
-#include "src/LoggingPool.h"
 #include <logging_export.h>
 
 #include <memory>
@@ -18,5 +17,10 @@ enum class LOGGER_API LoggerName
   GEOMETRY,
 };
 
+enum class LOGGER_API Target
+{
+  CONSOLE,
+  FILE
+};
 
 LOGGER_API std::shared_ptr<LoggerBridge> getLogger(Target target, LoggerName name);

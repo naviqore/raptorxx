@@ -2,7 +2,7 @@
 // Created by MichaelBrunner on 08/06/2024.
 //
 
-#include "GtfsReader.h"
+#include <GtfsReader.h>
 #include <algorithm>
 #include <future>
 #include <utility>

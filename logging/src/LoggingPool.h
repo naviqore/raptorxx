@@ -12,16 +12,13 @@
 #pragma once
 
 #include "LoggerBridge.h"
+#include "LoggerFactory.h"
+
 #include <memory>
 #include <unordered_map>
 #include <mutex>
 #include <logging_export.h>
 
-enum class LOGGER_API Target
-{
-  CONSOLE,
-  FILE
-};
 
 class LOGGER_API LoggingPool
 {

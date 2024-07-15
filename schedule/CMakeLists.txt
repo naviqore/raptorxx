@@ -13,19 +13,9 @@ find_path(P_RANAV_CSV2_INCLUDE_DIRS "csv2/mio.hpp")
 
 target_sources(${PROJECT_NAME} PRIVATE
         src/DataReader.h
-        src/gtfs/GtfsReader.h
-        include/model/Agency.h
         src/gtfs/strategies/txt_reader/GtfsAgencyReader.cpp
         src/gtfs/strategies/txt_reader/GtfsAgencyReader.h
         src/utils/utils.h
-        src/gtfs/GtfsData.h
-        include/model/Stop.h
-        include/model/Route.h
-        include/model/Trip.h
-        include/model/StopTime.h
-        include/model/Calendar.h
-        include/model/CalendarDate.h
-        include/model/Transfer.h
         src/gtfs/strategies/txt_reader/GtfsCalendarReader.cpp
         src/gtfs/strategies/txt_reader/GtfsCalendarReader.h
         src/gtfs/strategies/txt_reader/GtfsCalendarDateReader.cpp
@@ -44,17 +34,46 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/gtfs/GtfsReader.cpp
         src/utils/DataContainer.h
         src/gtfs/RelationManager.cpp
-        src/gtfs/RelationManager.h
         src/Types.h
         src/utils/ServiceDayTime.cpp
-        src/utils/ServiceDayTime.h
-        src/gtfs/GtfsReaderStrategyFactory.cpp
-        src/gtfs/GtfsReaderStrategyFactory.h
+        src/gtfs/GtfsTxtReaderStrategyFactory.cpp
+        src/gtfs/GtfsTxtReaderStrategyFactory.h
         src/gtfs/strategies/csv_reader/GtfsAgencyReaderCsv.cpp
         src/gtfs/strategies/csv_reader/GtfsAgencyReaderCsv.h
         src/utils/DataTypeConverter.h
         src/gtfs/strategies/csv_reader/GtfsCalendarDateReaderCsv.cpp
         src/gtfs/strategies/csv_reader/GtfsCalendarDateReaderCsv.h
+        src/gtfs/strategies/csv_reader/GtfsCsvHelpers.h
+        src/gtfs/strategies/csv_reader/GtfsCalendarReaderCsv.cpp
+        src/gtfs/strategies/csv_reader/GtfsCalendarReaderCsv.h
+        src/gtfs/strategies/csv_reader/GtfsRouteReaderCsv.cpp
+        src/gtfs/strategies/csv_reader/GtfsRouteReaderCsv.h
+        src/gtfs/strategies/csv_reader/GtfsStopReaderCsv.cpp
+        src/gtfs/strategies/csv_reader/GtfsStopReaderCsv.h
+        src/gtfs/strategies/csv_reader/GtfsStopTimeReaderCsv.cpp
+        src/gtfs/strategies/csv_reader/GtfsStopTimeReaderCsv.h
+        src/gtfs/strategies/csv_reader/GtfsTripReaderCsv.cpp
+        src/gtfs/strategies/csv_reader/GtfsTripReaderCsv.h
+        src/gtfs/strategies/csv_reader/GtfsTransferReaderCsv.cpp
+        src/gtfs/strategies/csv_reader/GtfsTransferReaderCsv.h
+        src/gtfs/GtfsCsvReaderStrategyFactory.cpp
+        src/gtfs/GtfsCsvReaderStrategyFactory.h
+        src/gtfs/GtfsReaderStrategyFactory.cpp
+        PUBLIC
+        src/gtfs/GtfsData.h
+        include/model/Agency.h
+        include/model/Stop.h
+        include/model/Route.h
+        include/model/Trip.h
+        include/model/StopTime.h
+        include/model/Calendar.h
+        include/model/CalendarDate.h
+        include/model/Transfer.h
+        include/GtfsReaderStrategyFactory.h
+        include/IGtfsReaderStrategyFactory.h
+        src/gtfs/RelationManager.h
+        src/utils/ServiceDayTime.h
+        include/GtfsReader.h
 )
 
 
@@ -119,6 +138,6 @@ message(BINARY_DIR: ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${CMAKE_BINARY_DIR}/${PROJECT_NAME}/test)
 
-if(USE_ZURICH_GTFS)
+if (USE_ZURICH_GTFS)
     add_compile_definitions(-DOPEN_DATA_ZURICH)
-endif()
+endif ()

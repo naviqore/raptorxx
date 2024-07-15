@@ -5,14 +5,12 @@
 #ifndef GTFSAGENCYREADERCSV_H
 #define GTFSAGENCYREADERCSV_H
 
-#include "gtfs/GtfsReader.h"
-
-#include <schedule_export.h>
+#include <GtfsReader.h>
 #include <string>
 
 namespace schedule::gtfs {
 
-  class SCHEDULE_API GtfsAgencyReaderCsv
+  class GtfsAgencyReaderCsv
   {
     std::string filename;
 

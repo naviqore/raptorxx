@@ -5,15 +5,12 @@
 #ifndef GTFSCALENDARDATEREADER_H
 #define GTFSCALENDARDATEREADER_H
 
-#include "gtfs/GtfsReader.h"
-
-
+#include <GtfsReader.h>
 #include <string>
-#include <schedule_export.h>
 
 namespace schedule::gtfs {
 
-  class SCHEDULE_API GtfsCalendarDateReader
+  class GtfsCalendarDateReader
   {
     std::string filename;
 

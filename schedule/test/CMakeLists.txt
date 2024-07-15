@@ -12,7 +12,7 @@ add_executable(${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME} PRIVATE
         test_gtfsReader.cpp
-        test_gtfs.cpp
+        test_gtfsReaderTxt.cpp
         test_main.cpp
         test_gtfsReaderCsv.cpp
 )
@@ -31,7 +31,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 set(BINARY ${PROJECT_NAME}_tests_test)
 add_test(NAME ${BINARY} COMMAND ${BINARY})
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/schedule/src)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/schedule/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging/src)

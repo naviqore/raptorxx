@@ -5,14 +5,12 @@
 #ifndef GTFSTRIPREADER_H
 #define GTFSTRIPREADER_H
 
-#include "gtfs/GtfsReader.h"
-
-#include <schedule_export.h>
+#include <GtfsReader.h>
 #include <string>
 
 namespace schedule::gtfs {
 
-  class SCHEDULE_API GtfsTripReader
+  class GtfsTripReader
   {
     std::string filename;
 

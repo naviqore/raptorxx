@@ -2,19 +2,11 @@
 // Created by MichaelBrunner on 02/06/2024.
 //
 
+#include "GtfsReaderStrategyFactory.h"
 #include "LoggerFactory.h"
-#include "gtfs/GtfsReaderStrategyFactory.h"
-#include "gtfs/strategies/txt_reader/GtfsCalendarDateReader.h"
-#include "gtfs/strategies/txt_reader/GtfsRouteReader.h"
-#include "gtfs/strategies/txt_reader/GtfsStopReader.h"
-#include "gtfs/strategies/txt_reader/GtfsStopTimeReader.h"
-#include "gtfs/strategies/txt_reader/GtfsTransferReader.h"
-#include "gtfs/strategies/txt_reader/GtfsTripReader.h"
-#include "utils/utils.h"
+#include "gtfs/GtfsTxtReaderStrategyFactory.h"
 #include <DataReader.h>
-#include <gtfs/GtfsReader.h>
-#include <gtfs/strategies/txt_reader/GtfsAgencyReader.h>
-#include <gtfs/strategies/txt_reader/GtfsCalendarReader.h>
+#include <../include/GtfsReader.h>
 
 #include <memory>
 #include <algorithm>
@@ -72,7 +64,7 @@ namespace fmt {
 void printCalendar(const std::vector<schedule::gtfs::Calendar>& calendars) {
   std::array<std::string, 7> weekday_names = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
   std::ranges::for_each(calendars, [&](const auto& calendar) {
-  getLogger(Target::CONSOLE, LoggerName::GTFS)->info(fmt::format("Service ID: {}", calendar.serviceId));
+    getLogger(Target::CONSOLE, LoggerName::GTFS)->info(fmt::format("Service ID: {}", calendar.serviceId));
     getLogger(Target::CONSOLE, LoggerName::GTFS)->info(fmt::format("Start Date: {}-{}-{}", calendar.startDate.year(), calendar.startDate.month(), calendar.startDate.day()));
     getLogger(Target::CONSOLE, LoggerName::GTFS)->info(fmt::format("End Date: {}-{}-{}", calendar.endDate.year(), calendar.endDate.month(), calendar.endDate.day()));
     getLogger(Target::CONSOLE, LoggerName::GTFS)->info(fmt::format("Weekday Service: "));
@@ -101,20 +93,20 @@ TEST(GTFS, TestStrategyReader) {
   using namespace std::literals::string_literals;
   std::string basePath = TEST_DATA_DIR;
 
-  auto readerFactory = schedule::gtfs::GtfsReaderStrategyFactory(std::move(basePath));
+  const auto readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(schedule::gtfs::ReaderType::TXT, std::move(basePath));
 
   getLogger(Target::CONSOLE, LoggerName::GTFS)->setLevel(LoggerBridge::ERROR);
 
 
   // create strategy callable objects
-  const auto agencyStrategy = readerFactory.getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::AGENCY);
-  const auto calendarStrategy = readerFactory.getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::CALENDAR);
-  const auto calendarDatesStrategy = readerFactory.getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::CALENDAR_DATE);
-  const auto routesStrategy = readerFactory.getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::ROUTE);
-  const auto stopStrategy = readerFactory.getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::STOP);
-  const auto stopTimeStrategy = readerFactory.getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::STOP_TIME);
-  const auto transferStrategy = readerFactory.getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::TRANSFER);
-  const auto tripStrategy = readerFactory.getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::TRIP);
+  const auto agencyStrategy = readerFactory->getStrategy(GtfsStrategyType::AGENCY);
+  const auto calendarStrategy = readerFactory->getStrategy(GtfsStrategyType::CALENDAR);
+  const auto calendarDatesStrategy = readerFactory->getStrategy(GtfsStrategyType::CALENDAR_DATE);
+  const auto routesStrategy = readerFactory->getStrategy(GtfsStrategyType::ROUTE);
+  const auto stopStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP);
+  const auto stopTimeStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP_TIME);
+  const auto transferStrategy = readerFactory->getStrategy(GtfsStrategyType::TRANSFER);
+  const auto tripStrategy = readerFactory->getStrategy(GtfsStrategyType::TRIP);
 
   std::vector strategies = {agencyStrategy, calendarStrategy, calendarDatesStrategy, routesStrategy, stopStrategy, stopTimeStrategy, transferStrategy, tripStrategy};
 
@@ -128,5 +120,5 @@ TEST(GTFS, TestStrategyReader) {
 }
 
 TEST(GTFS, TestReaderStrategyFactory) {
-  EXPECT_THROW(schedule::gtfs::GtfsReaderStrategyFactory(""), std::invalid_argument);
+  EXPECT_THROW(schedule::gtfs::GtfsTxtReaderStrategyFactory(""), std::invalid_argument);
 }

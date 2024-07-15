@@ -1,18 +1,10 @@
 
 
 #include "DataReader.h"
-#include "gtfs/GtfsReader.h"
-#include "gtfs/GtfsReaderStrategyFactory.h"
+#include "GtfsReaderStrategyFactory.h"
+#include "../include/GtfsReader.h"
+#include "gtfs/GtfsTxtReaderStrategyFactory.h"
 #include "gtfs/RelationManager.h"
-#include "gtfs/strategies/txt_reader/GtfsAgencyReader.h"
-#include "gtfs/strategies/txt_reader/GtfsCalendarDateReader.h"
-#include "gtfs/strategies/txt_reader/GtfsCalendarReader.h"
-#include "gtfs/strategies/txt_reader/GtfsRouteReader.h"
-#include "gtfs/strategies/txt_reader/GtfsStopReader.h"
-#include "gtfs/strategies/txt_reader/GtfsStopTimeReader.h"
-#include "gtfs/strategies/txt_reader/GtfsTransferReader.h"
-#include "gtfs/strategies/txt_reader/GtfsTripReader.h"
-#include "utils/utils.h"
 #include "model/CalendarDate.h"
 #include "utils/DataContainer.h"
 
@@ -33,17 +25,17 @@
 /////////////////////////////////////
 
 
-class GtfsReaderStrategiesTest : public testing::Test
+class GtfsCsvReaderStrategiesTest : public testing::Test
 {
 protected:
   std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> reader;
 
-  std::unique_ptr<schedule::gtfs::GtfsReaderStrategyFactory> readerFactory;
+  std::unique_ptr<schedule::gtfs::IGtfsReaderStrategyFactory> readerFactory;
 
   std::string basePath = TEST_DATA_DIR;
 
   void SetUp() override {
-    readerFactory = std::make_unique<schedule::gtfs::GtfsReaderStrategyFactory>(std::move(basePath));
+    readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(schedule::gtfs::ReaderType::TXT, std::move(basePath));
   }
 
   void TearDown() override {
@@ -52,9 +44,9 @@ protected:
   }
 };
 
-TEST_F(GtfsReaderStrategiesTest, testAgencyReader) {
+TEST_F(GtfsCsvReaderStrategiesTest, testAgencyReaderTxt) {
   auto strategy = std::vector<std::function<void(schedule::gtfs::GtfsReader&)>>();
-  const std::function<void(schedule::gtfs::GtfsReader&)> strategyReader = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::AGENCY);
+  const std::function<void(schedule::gtfs::GtfsReader&)> strategyReader =  readerFactory->getStrategy(GtfsStrategyType::AGENCY);
   strategy.push_back(strategyReader);
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
@@ -67,9 +59,9 @@ TEST_F(GtfsReaderStrategiesTest, testAgencyReader) {
   EXPECT_STREQ(data.agencies.at("Schweizerische Bundesbahnen SBB").timezone.c_str(), "Europe/Berlin");
 }
 
-TEST_F(GtfsReaderStrategiesTest, testCalendarDateReader) {
+TEST_F(GtfsCsvReaderStrategiesTest, testCalendarDateReaderTxt) {
   auto strategy = std::vector<std::function<void(schedule::gtfs::GtfsReader&)>>();
-  const std::function<void(schedule::gtfs::GtfsReader&)> strategyReader = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::CALENDAR_DATE);
+  const std::function<void(schedule::gtfs::GtfsReader&)> strategyReader =  readerFactory->getStrategy(GtfsStrategyType::CALENDAR_DATE);
   strategy.push_back(strategyReader);
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
@@ -99,9 +91,9 @@ TEST_F(GtfsReaderStrategiesTest, testCalendarDateReader) {
   ASSERT_TRUE(calendarDate[0].exceptionType == schedule::gtfs::CalendarDate::SERVICE_REMOVED);
 }
 
-TEST_F(GtfsReaderStrategiesTest, testCalendarReader) {
+TEST_F(GtfsCsvReaderStrategiesTest, testCalendarReaderTxt) {
   auto strategy = std::vector<std::function<void(schedule::gtfs::GtfsReader&)>>();
-  const std::function<void(schedule::gtfs::GtfsReader&)> strategyReader = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::CALENDAR);
+  const std::function<void(schedule::gtfs::GtfsReader&)> strategyReader =  readerFactory->getStrategy(GtfsStrategyType::CALENDAR);
   strategy.push_back(strategyReader);
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
@@ -115,9 +107,9 @@ TEST_F(GtfsReaderStrategiesTest, testCalendarReader) {
   ASSERT_EQ(static_cast<int>(calender.startDate.year()), 2023);
 }
 
-TEST_F(GtfsReaderStrategiesTest, testStopReader) {
+TEST_F(GtfsCsvReaderStrategiesTest, testStopReaderTxt) {
   auto strategy = std::vector<std::function<void(schedule::gtfs::GtfsReader&)>>();
-  const std::function<void(schedule::gtfs::GtfsReader&)> strategyReader = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::STOP);
+  const std::function<void(schedule::gtfs::GtfsReader&)> strategyReader =  readerFactory->getStrategy(GtfsStrategyType::STOP);
   strategy.push_back(strategyReader);
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
@@ -131,9 +123,9 @@ TEST_F(GtfsReaderStrategiesTest, testStopReader) {
   ASSERT_EQ(stop.parentStation, "Parent1100013");
 }
 
-TEST_F(GtfsReaderStrategiesTest, testStopTimeReader) {
+TEST_F(GtfsCsvReaderStrategiesTest, testStopTimeReaderTxt) {
   auto strategy = std::vector<std::function<void(schedule::gtfs::GtfsReader&)>>();
-  const std::function<void(schedule::gtfs::GtfsReader&)> strategyReader = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::STOP_TIME);
+  const std::function<void(schedule::gtfs::GtfsReader&)> strategyReader =  readerFactory->getStrategy(GtfsStrategyType::STOP_TIME);
   strategy.push_back(strategyReader);
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
@@ -148,9 +140,9 @@ TEST_F(GtfsReaderStrategiesTest, testStopTimeReader) {
   ASSERT_EQ(stopTimes[0].stopSequence, 1);
 }
 
-TEST_F(GtfsReaderStrategiesTest, testTransferReader) {
+TEST_F(GtfsCsvReaderStrategiesTest, testTransferReaderTxt) {
   auto strategy = std::vector<std::function<void(schedule::gtfs::GtfsReader&)>>();
-  const std::function<void(schedule::gtfs::GtfsReader&)> strategyReader = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::TRANSFER);
+  const std::function<void(schedule::gtfs::GtfsReader&)> strategyReader =  readerFactory->getStrategy(GtfsStrategyType::TRANSFER);
   strategy.push_back(strategyReader);
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
@@ -162,9 +154,9 @@ TEST_F(GtfsReaderStrategiesTest, testTransferReader) {
   ASSERT_EQ(transferFrom[0].fromStopId, "1100079");
 }
 
-TEST_F(GtfsReaderStrategiesTest, testTripReader) {
+TEST_F(GtfsCsvReaderStrategiesTest, testTripReaderTxt) {
   auto strategy = std::vector<std::function<void(schedule::gtfs::GtfsReader&)>>();
-  const std::function<void(schedule::gtfs::GtfsReader&)> strategyReader = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::TRIP);
+  const std::function<void(schedule::gtfs::GtfsReader&)> strategyReader =  readerFactory->getStrategy(GtfsStrategyType::TRIP);
   strategy.push_back(strategyReader);
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
@@ -177,9 +169,9 @@ TEST_F(GtfsReaderStrategiesTest, testTripReader) {
   ASSERT_EQ(trips[0].tripId, "1.TA.91-10-A-j24-1.1.H");
 }
 
-TEST_F(GtfsReaderStrategiesTest, testrouteReader) {
+TEST_F(GtfsCsvReaderStrategiesTest, testrouteReaderTxt) {
   auto strategy = std::vector<std::function<void(schedule::gtfs::GtfsReader&)>>();
-  const std::function<void(schedule::gtfs::GtfsReader&)> strategyReader = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::ROUTE);
+  const std::function<void(schedule::gtfs::GtfsReader&)> strategyReader =  readerFactory->getStrategy(GtfsStrategyType::ROUTE);;
   strategy.push_back(strategyReader);
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
@@ -190,11 +182,11 @@ TEST_F(GtfsReaderStrategiesTest, testrouteReader) {
   ASSERT_EQ(static_cast<int>(route.routeType), 900);
 }
 
-TEST_F(GtfsReaderStrategiesTest, testRelationManager) {
+TEST_F(GtfsCsvReaderStrategiesTest, testRelationManagerTxt) {
 
   auto strategy = std::vector<std::function<void(schedule::gtfs::GtfsReader&)>>();
-  const std::function<void(schedule::gtfs::GtfsReader&)> stopTimesStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::STOP_TIME);
-  const std::function<void(schedule::gtfs::GtfsReader&)> tripsStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::TRIP);
+  const std::function<void(schedule::gtfs::GtfsReader&)> stopTimesStrategy =  readerFactory->getStrategy(GtfsStrategyType::STOP_TIME);;
+  const std::function<void(schedule::gtfs::GtfsReader&)> tripsStrategy =  readerFactory->getStrategy(GtfsStrategyType::TRIP);;
 
   strategy.push_back(stopTimesStrategy);
   strategy.push_back(tripsStrategy);
@@ -202,6 +194,7 @@ TEST_F(GtfsReaderStrategiesTest, testRelationManager) {
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
 
-  auto relationManager = schedule::gtfs::RelationManager(std::move(reader->getData().get()));
-  relationManager.createRelations();
+  const auto relationManager = schedule::gtfs::RelationManager(std::move(reader->getData().get()));
+  auto stopIds = relationManager.getStopIdsFromStopName("Bärental, Löffelschmiede");
+  ASSERT_TRUE(stopIds.empty() == false);
 }

@@ -5,13 +5,12 @@
 #ifndef GTFSSTOPREADER_H
 #define GTFSSTOPREADER_H
 
-#include "gtfs/GtfsReader.h"
-#include <schedule_export.h>
+#include <GtfsReader.h>
 #include <string>
 
 namespace schedule::gtfs {
 
-  class SCHEDULE_API GtfsStopReader
+  class GtfsStopReader
   {
     std::string filename;
 

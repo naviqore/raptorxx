@@ -2,7 +2,7 @@
 // Created by MichaelBrunner on 16/06/2024.
 //
 
-#include "gtfs/GtfsReader.h"
+#include "../include/GtfsReader.h"
 #include "gtfs/strategies/GtfsAgencyReader.h"
 #include "gtfs/strategies/GtfsCalendarDateReader.h"
 #include "gtfs/strategies/GtfsCalendarReader.h"

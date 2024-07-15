@@ -6,13 +6,12 @@
 #define GTFSAGENCYREADERSTRATEGY_H
 
 
-#include "GtfsCalendarDateReader.h"
-#include <schedule_export.h>
+#include <GtfsReader.h>
 #include <string>
 
 namespace schedule::gtfs {
 
-  class SCHEDULE_API GtfsAgencyReader
+  class GtfsAgencyReader
   {
     std::string filename;
 

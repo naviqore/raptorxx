@@ -3,7 +3,8 @@
 //
 
 #include "GtfsAgencyReaderCsv.h"
-#include "LoggerFactory.h"
+
+#include "GtfsCsvHelpers.h"
 
 #include <csv2/reader.hpp>
 
@@ -24,39 +25,25 @@ namespace schedule::gtfs {
 
   GtfsAgencyReaderCsv::GtfsAgencyReaderCsv(std::string&& filename)
     : filename(std::move(filename)) {
-    if (filename.empty())
+    if (this->filename.empty())
     {
       throw std::invalid_argument("Filename is empty");
     }
   }
 
   void GtfsAgencyReaderCsv::operator()(GtfsReader& aReader) const {
-    auto reader = csv2::Reader<csv2::delimiter<','>,
-                               csv2::quote_character<'"'>,
-                               csv2::first_row_is_header<true>,
-                               csv2::trim_policy::trim_whitespace>();
+    auto reader = csv2::Reader();
 
     if (false == reader.mmap(filename))
     {
       throw std::runtime_error("can not read file");
     }
     const auto header = reader.header();
-    std::vector<std::string> headerItems;
-    for (const auto& headerItem : header)
-    {
-      std::string value;
-      headerItem.read_value(value);
-      headerItems.push_back(value);
-    }
+    const std::vector<std::string> headerItems = utils::mapHeaderItemsToVector(header);
 
-    std::map<size_t, std::string> headerMap;
-    std::map<std::string, std::function<void(std::string const&)>> headerTypes;
-    for (const auto& [index, value] : std::views::enumerate(headerItems))
-    {
-      headerMap[index] = value;
-    }
+    std::map<size_t, std::string> headerMap = utils::createHeaderMap(headerItems);
 
-    auto index = 0;
+    int index = 0;
     for (const auto& row : reader)
     {
       TempAgency tempAgency;
@@ -64,7 +51,7 @@ namespace schedule::gtfs {
       for (const auto& cell : row)
       {
         auto columnName = headerMap[index];
-        columnName.erase(std::ranges::remove(columnName, '\r').begin(), columnName.end());
+
         std::string value;
         cell.read_value(value);
         value.erase(std::ranges::remove(value, '\r').begin(), value.end());

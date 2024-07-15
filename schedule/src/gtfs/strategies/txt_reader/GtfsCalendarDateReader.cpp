@@ -5,7 +5,7 @@
 #include "GtfsCalendarDateReader.h"
 
 #include "LoggerFactory.h"
-#include "gtfs/GtfsReader.h"
+#include "../../../../include/GtfsReader.h"
 #include "src/utils/scopedTimer.h"
 #include "src/utils/utils.h"
 
@@ -69,7 +69,8 @@ namespace schedule::gtfs {
 
       aReader.getData().get().calendarDates[std::string(fields[headerMap["service_id"]])].emplace_back(
         std::string(fields[headerMap["service_id"]]),
-        std::string(fields[headerMap["date"]]), exceptionType);
+        std::string(fields[headerMap["date"]]),
+        exceptionType);
     }
   }
 } // gtfs

@@ -2,7 +2,11 @@
 // Created by MichaelBrunner on 13/07/2024.
 //
 
+#include "LoggingPool.h"
+
+
 #include <LoggerFactory.h>
+#include <unordered_map>
 
 
 std::shared_ptr<LoggerBridge> getLogger(Target const target, LoggerName const name) {

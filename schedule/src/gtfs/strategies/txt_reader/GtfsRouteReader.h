@@ -5,15 +5,12 @@
 #ifndef GTFSROUTERREADER_H
 #define GTFSROUTERREADER_H
 
-#include "gtfs/GtfsReader.h"
-
-
-#include <schedule_export.h>
+#include <GtfsReader.h>
 #include <string>
 
 namespace schedule::gtfs {
 
-  class SCHEDULE_API GtfsRouteReader
+  class GtfsRouteReader
   {
     std::string filename;
 

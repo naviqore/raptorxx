@@ -7,7 +7,7 @@
 
 #include "utils/DataContainer.h"
 #include "DataReader.h"
-#include "GtfsData.h"
+#include "gtfs/GtfsData.h"
 #include "Types.h"
 #include <functional>
 #include <schedule_export.h>
