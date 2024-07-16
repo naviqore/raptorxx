@@ -13,11 +13,26 @@
 
 namespace schedule::gtfs::utils {
 
+
+
+  /// @brief https://stackoverflow.com/a/2223926
+  /// @param text string to remove BOM from
+  /// @return
+  inline std::string removeUtf8Bom(const std::string& text) {
+    if (const auto utf8Bom = "\xEF\xBB\xBF";
+        text.rfind(utf8Bom, 0) == 0)
+    {                        // BOM is at the start of the string
+      return text.substr(3); // Remove the first three bytes
+    }
+    return text; // Return the original string if BOM is not found
+  }
+
   inline std::map<size_t, std::string> createHeaderMap(const std::vector<std::string>& headerItems) {
     std::map<size_t, std::string> headerMap;
     for (const auto& [index, value] : std::views::enumerate(headerItems))
     {
       auto columnName = value;
+      columnName = removeUtf8Bom(columnName);
       columnName.erase(std::ranges::remove(columnName, '\r').begin(), columnName.end());
       headerMap[index] = columnName;
     }
@@ -30,6 +45,8 @@ namespace schedule::gtfs::utils {
     {
       std::string value;
       headerItem.read_value(value);
+      value = removeUtf8Bom(value);
+
       headerItems.push_back(value);
     }
     return headerItems;

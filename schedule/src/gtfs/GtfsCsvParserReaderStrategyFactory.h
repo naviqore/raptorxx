@@ -11,14 +11,16 @@
 #include <string>
 #include <unordered_map>
 
+
 namespace schedule::gtfs {
-  class GtfsCsvReaderStrategyFactory final : public IGtfsReaderStrategyFactory
+
+  class GtfsCsvParserReaderStrategyFactory final : public IGtfsReaderStrategyFactory
   {
     std::string fileDirectory;
 
   public:
 
-    explicit GtfsCsvReaderStrategyFactory(std::string&& aGtfsFileDirectory);
+    explicit GtfsCsvParserReaderStrategyFactory(std::string&& aGtfsFileDirectory);
 
     std::function<void(GtfsReader&)>& getStrategy(GtfsStrategyType aType) override;
 
@@ -30,6 +32,11 @@ namespace schedule::gtfs {
     void init();
 
     void setUpFileNameMap();
-  };
 
-} // gtfs  // schedule
+
+};
+
+} // gtfs
+// schedule
+
+

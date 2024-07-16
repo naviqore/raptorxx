@@ -2,6 +2,13 @@
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
+#set(CSV_PARSER_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/src/gtfs/strategies/csv_reader_fast/csv.h")
+#
+#if(MSVC)
+#    set_source_files_properties(${GTFS_CALENDAR_READER_CSV_PARSER_CPP} PROPERTIES COMPILE_FLAGS "/wd2220 /wd4996 /wd4267 /wd4244")
+#else()
+#    set_source_files_properties(${CSV_PARSER_HEADER} PROPERTIES COMPILE_FLAGS "-Wno-error")
+#endif()
 
 add_executable(gtfsSubsetWriter
         src/gtfs/agencySubsetWriter/gtfsSubsetWriter.cpp
@@ -59,6 +66,26 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/gtfs/GtfsCsvReaderStrategyFactory.cpp
         src/gtfs/GtfsCsvReaderStrategyFactory.h
         src/gtfs/GtfsReaderStrategyFactory.cpp
+        ${CSV_PARSER_HEADER}
+        src/gtfs/strategies/csv_reader_fast/GtfsAgencyReaderCsvParser.h
+        src/gtfs/strategies/csv_reader_fast/GtfsAgencyReaderCsvParser.cpp
+        src/gtfs/strategies/csv_reader_fast/GtfsCalendarDateReaderCsvParser.h
+        src/gtfs/strategies/csv_reader_fast/GtfsCalendarDateReaderCsvParser.cpp
+        src/gtfs/strategies/csv_reader_fast/GtfsCalendarReaderCsvParser.h
+        src/gtfs/strategies/csv_reader_fast/GtfsCalendarReaderCsvParser.cpp
+        src/gtfs/strategies/csv_reader_fast/GtfsRouteReaderCsvParser.h
+        src/gtfs/strategies/csv_reader_fast/GtfsRouteReaderCsvParser.cpp
+        src/gtfs/strategies/csv_reader_fast/GtfsStopReaderCsvParser.h
+        src/gtfs/strategies/csv_reader_fast/GtfsStopReaderCsvParser.cpp
+        src/gtfs/strategies/csv_reader_fast/GtfsStopTimeReaderCsvParser.h
+        src/gtfs/strategies/csv_reader_fast/GtfsStopTimeReaderCsvParser.cpp
+        src/gtfs/strategies/csv_reader_fast/GtfsTransferReaderCsvParser.h
+        src/gtfs/strategies/csv_reader_fast/GtfsTransferReaderCsvParser.cpp
+        src/gtfs/strategies/csv_reader_fast/GtfsTripReaderCsvParser.h
+        src/gtfs/strategies/csv_reader_fast/GtfsTripReaderCsvParser.cpp
+        src/gtfs/GtfsCsvParserReaderStrategyFactory.cpp
+        src/gtfs/GtfsCsvParserReaderStrategyFactory.h
+        src/gtfs/strategies/csv_reader_fast/csv_wrapper.h
         PUBLIC
         src/gtfs/GtfsData.h
         include/model/Agency.h

@@ -10,7 +10,7 @@
 
 #include <stdexcept>
 #include <fstream>
-#include "../../../../include/GtfsReader.h"
+#include "GtfsReader.h"
 #include "utils/scopedTimer.h"
 
 namespace schedule::gtfs {

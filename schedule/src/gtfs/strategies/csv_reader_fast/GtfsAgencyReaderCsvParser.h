@@ -2,21 +2,20 @@
 // Created by MichaelBrunner on 14/07/2024.
 //
 
-#ifndef GTFSAGENCYREADERCSV_H
-#define GTFSAGENCYREADERCSV_H
+#pragma once
 
 #include <GtfsReader.h>
 #include <string>
 
 namespace schedule::gtfs {
 
-  class GtfsAgencyReaderCsv
+  class GtfsAgencyReaderCsvParser
   {
     std::string filename;
 
   public:
-    explicit GtfsAgencyReaderCsv(std::string&& filename);
-    explicit GtfsAgencyReaderCsv(std::string const& filename);
+    explicit GtfsAgencyReaderCsvParser(std::string&& filename);
+    explicit GtfsAgencyReaderCsvParser(std::string const& filename);
 
     void operator()(GtfsReader& aReader) const;
   };
@@ -25,4 +24,4 @@ namespace schedule::gtfs {
 } // gtfs
 // schedule
 
-#endif //GTFSAGENCYREADERCSV_H
+

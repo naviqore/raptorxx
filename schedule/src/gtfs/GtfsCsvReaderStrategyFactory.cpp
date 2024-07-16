@@ -17,7 +17,7 @@
 namespace schedule::gtfs {
   GtfsCsvReaderStrategyFactory::GtfsCsvReaderStrategyFactory(std::string&& aGtfsFileDirectory)
     : fileDirectory(std::move(aGtfsFileDirectory)) {
-    if (fileDirectory.empty())
+    if (this->fileDirectory.empty())
     {
       throw std::invalid_argument("fileDirectory must not be empty");
     }
@@ -29,14 +29,14 @@ namespace schedule::gtfs {
   void GtfsCsvReaderStrategyFactory::init() {
     setUpFileNameMap();
 
-    strategies[GtfsStrategyType::AGENCY] = GtfsAgencyReaderCsv(std::move(fileNameMap[utils::GTFS_FILE_TYPE::AGENCY]));
-    strategies[GtfsStrategyType::CALENDAR] = GtfsCalendarReaderCsv(std::move(fileNameMap[utils::GTFS_FILE_TYPE::CALENDAR]));
-    strategies[GtfsStrategyType::CALENDAR_DATE] = GtfsCalendarDateReaderCsv(std::move(fileNameMap[utils::GTFS_FILE_TYPE::CALENDAR_DATES]));
-    strategies[GtfsStrategyType::ROUTE] = GtfsRouteReaderCsv(std::move(fileNameMap[utils::GTFS_FILE_TYPE::ROUTES]));
-    strategies[GtfsStrategyType::STOP] = GtfsStopReaderCsv(std::move(fileNameMap[utils::GTFS_FILE_TYPE::STOP]));
-    strategies[GtfsStrategyType::STOP_TIME] = GtfsStopTimeReaderCsv(std::move(fileNameMap[utils::GTFS_FILE_TYPE::STOP_TIMES]));
-    strategies[GtfsStrategyType::TRANSFER] = GtfsTransferReaderCsv(std::move(fileNameMap[utils::GTFS_FILE_TYPE::TRANSFERS]));
-    strategies[GtfsStrategyType::TRIP] = GtfsTripReaderCsv(std::move(fileNameMap[utils::GTFS_FILE_TYPE::TRIPS]));
+    strategies[GtfsStrategyType::AGENCY] = GtfsAgencyReaderCsv(fileNameMap[utils::GTFS_FILE_TYPE::AGENCY]);
+    strategies[GtfsStrategyType::CALENDAR] = GtfsCalendarReaderCsv(fileNameMap[utils::GTFS_FILE_TYPE::CALENDAR]);
+    strategies[GtfsStrategyType::CALENDAR_DATE] = GtfsCalendarDateReaderCsv(fileNameMap[utils::GTFS_FILE_TYPE::CALENDAR_DATES]);
+    strategies[GtfsStrategyType::ROUTE] = GtfsRouteReaderCsv(fileNameMap[utils::GTFS_FILE_TYPE::ROUTES]);
+    strategies[GtfsStrategyType::STOP] = GtfsStopReaderCsv(fileNameMap[utils::GTFS_FILE_TYPE::STOP]);
+    strategies[GtfsStrategyType::STOP_TIME] = GtfsStopTimeReaderCsv(fileNameMap[utils::GTFS_FILE_TYPE::STOP_TIMES]);
+    strategies[GtfsStrategyType::TRANSFER] = GtfsTransferReaderCsv(fileNameMap[utils::GTFS_FILE_TYPE::TRANSFERS]);
+    strategies[GtfsStrategyType::TRIP] = GtfsTripReaderCsv(fileNameMap[utils::GTFS_FILE_TYPE::TRIPS]);
   }
 
   void GtfsCsvReaderStrategyFactory::setUpFileNameMap() {

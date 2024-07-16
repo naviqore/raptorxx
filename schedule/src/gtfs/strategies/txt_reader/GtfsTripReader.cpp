@@ -6,7 +6,7 @@
 
 #include "LoggerFactory.h"
 #include "src/utils/utils.h"
-#include "../../../../include/GtfsReader.h"
+#include "GtfsReader.h"
 #include "utils/scopedTimer.h"
 
 #include <fstream>

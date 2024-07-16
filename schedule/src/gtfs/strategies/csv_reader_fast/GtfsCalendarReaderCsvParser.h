@@ -2,8 +2,7 @@
 // Created by MichaelBrunner on 15/07/2024.
 //
 
-#ifndef GTFSROUTEREADERCSV_H
-#define GTFSROUTEREADERCSV_H
+#pragma once
 
 #include <string>
 #include <GtfsReader.h>
@@ -11,13 +10,13 @@
 namespace schedule::gtfs {
 
 
-  class GtfsRouteReaderCsv
+  class GtfsCalendarReaderCsvParser
   {
     std::string filename;
 
   public:
-    explicit GtfsRouteReaderCsv(std::string&& filename);
-    explicit GtfsRouteReaderCsv(std::string const& filename);
+    explicit GtfsCalendarReaderCsvParser(std::string&& filename);
+    explicit GtfsCalendarReaderCsvParser(std::string const& filename);
 
     void operator()(GtfsReader& aReader) const;
   };
@@ -25,4 +24,4 @@ namespace schedule::gtfs {
 } // gtfs
 // schedule
 
-#endif //GTFSROUTEREADERCSV_H
+

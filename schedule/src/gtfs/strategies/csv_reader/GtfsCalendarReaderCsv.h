@@ -17,6 +17,7 @@ namespace schedule::gtfs {
 
   public:
     explicit GtfsCalendarReaderCsv(std::string&& filename);
+    explicit GtfsCalendarReaderCsv(std::string const& filename);
 
     void operator()(GtfsReader& aReader) const;
   };

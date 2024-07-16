@@ -25,6 +25,13 @@ namespace schedule::gtfs {
       throw std::invalid_argument("Filename is empty");
     }
   }
+  GtfsRouteReaderCsv::GtfsRouteReaderCsv(std::string const& filename)
+    : filename(filename) {
+    if (this->filename.empty())
+    {
+      throw std::invalid_argument("Filename is empty");
+    }
+  }
 
   void GtfsRouteReaderCsv::operator()(GtfsReader& aReader) const {
     auto reader = csv2::Reader();
@@ -49,6 +56,8 @@ namespace schedule::gtfs {
         std::string value;
         cell.read_value(value);
         value.erase(std::ranges::remove(value, '\r').begin(), value.end());
+        value = utils::removeUtf8Bom(value);
+        value = utils::removeQuotesFromStringView(value);
 
         static const std::map<std::string, std::function<void(TempRoute&, const std::string&)>> columnActions = {
           {"route_id", [](TempRoute& route, const std::string& val) { route.routeId = val; }},
@@ -76,7 +85,7 @@ namespace schedule::gtfs {
                                                  std::move(tempRoute.routeId),
                                                  std::move(tempRoute.routeShortName),
                                                  std::move(tempRoute.routeLongName),
-                                                 static_cast<Route::RouteType>(std::stoi(tempRoute.routeType)),
+                                                 static_cast<Route::RouteType>(std::stoi(tempRoute.routeType.empty() == false ? tempRoute.routeType : "99999")), // defined 99999 as undefined
                                                  std::move(tempRoute.agencyId),
                                                });
       }

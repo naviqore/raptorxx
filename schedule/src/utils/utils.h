@@ -49,6 +49,15 @@ namespace schedule::gtfs::utils {
     TRIPS
   };
 
+  inline std::string_view removeQuotesFromStringView(std::string_view field) {
+    if (field.size() >= 2 && field.front() == '\"' && field.back() == '\"')
+    {
+      field.remove_prefix(1);
+      field.remove_suffix(1);
+    }
+    return field;
+  }
+
   inline std::vector<std::string_view> splitLineAndRemoveQuotes(const std::string_view line) {
     std::vector<std::string_view> result;
     size_t start = 0;
@@ -65,28 +74,16 @@ namespace schedule::gtfs::utils {
       {
         end = i;
         std::string_view field = line.substr(start, end - start);
-
-        // Remove quotes at the beginning and end of the field
-        if (field.front() == '\"' && field.back() == '\"')
-        {
-          field.remove_prefix(1);
-          field.remove_suffix(1);
-        }
-
+        field = removeQuotesFromStringView(field);
         result.push_back(field);
         start = end + 1;
       }
     }
 
-    // Add the last field
     if (start < line.size())
     {
       std::string_view field = line.substr(start);
-      if (field.front() == '\"' && field.back() == '\"')
-      {
-        field.remove_prefix(1);
-        field.remove_suffix(1);
-      }
+      field = removeQuotesFromStringView(field);
       result.push_back(field);
     }
 

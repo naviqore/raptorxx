@@ -34,7 +34,8 @@ namespace schedule::gtfs {
       AerialLift = 6,
       Funicular = 7,
       Trolleybus = 11,
-      Monorail = 12
+      Monorail = 12,
+      Undefined = 9'999
     };
 
     Route(std::string&& aRouteId, std::string&& aRouteShortName, std::string&& aRouteLongName, const RouteType aRouteType, std::string&& aAgencyId)

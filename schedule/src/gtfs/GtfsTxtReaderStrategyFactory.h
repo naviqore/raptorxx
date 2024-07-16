@@ -11,11 +11,10 @@
 #include <functional>
 #include <string>
 #include <unordered_map>
-#include <schedule_export.h>
 
 namespace schedule::gtfs {
 
-  class SCHEDULE_API GtfsTxtReaderStrategyFactory final : public IGtfsReaderStrategyFactory
+  class GtfsTxtReaderStrategyFactory final : public IGtfsReaderStrategyFactory
   {
     std::string fileDirectory;
 

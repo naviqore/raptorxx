@@ -4,6 +4,7 @@
 
 
 #include "DataReader.h"
+#include "GtfsReaderStrategyFactory.h"
 #include "LoggerFactory.h"
 #include "gtfs/GtfsData.h"
 #include "gtfs/GtfsTxtReaderStrategyFactory.h"
@@ -55,16 +56,16 @@ int main(int argc, char* argv[]) {
 
   std::map<schedule::gtfs::utils::GTFS_FILE_TYPE, std::string> lFileNameMap;
 
-  auto readerFactory = std::make_unique<schedule::gtfs::GtfsTxtReaderStrategyFactory>(dataDirectoryPath.data());
+  auto readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(schedule::gtfs::ReaderType::CSV, std::move(dataDirectoryPath));
 
-  const auto agencyStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::AGENCY);
-  const auto calendarStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::CALENDAR);
-  const auto calendarDatesStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::CALENDAR_DATE);
-  const auto routesStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::ROUTE);
-  const auto stopStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::STOP);
-  const auto stopTimeStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::STOP_TIME);
-  const auto transferStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::TRANSFER);
-  const auto tripStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::TRIP);
+  const auto agencyStrategy = readerFactory->getStrategy(GtfsStrategyType::AGENCY);
+  const auto calendarStrategy = readerFactory->getStrategy(GtfsStrategyType::CALENDAR);
+  const auto calendarDatesStrategy = readerFactory->getStrategy(GtfsStrategyType::CALENDAR_DATE);
+  const auto routesStrategy = readerFactory->getStrategy(GtfsStrategyType::ROUTE);
+  const auto stopStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP);
+  const auto stopTimeStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP_TIME);
+  const auto transferStrategy = readerFactory->getStrategy(GtfsStrategyType::TRANSFER);
+  const auto tripStrategy = readerFactory->getStrategy(GtfsStrategyType::TRIP);
 
   std::vector strategies = {agencyStrategy, calendarStrategy, calendarDatesStrategy, routesStrategy, stopStrategy, stopTimeStrategy, transferStrategy, tripStrategy}; //
 
@@ -99,16 +100,16 @@ int main(int argc, char* argv[]) {
     {
       trips.push_back(trip);
 
-      auto calIt = allCalendars.find(trip.serviceId);
-      if (calIt != allCalendars.end())
+      auto calendarIterator = allCalendars.find(trip.serviceId);
+      if (calendarIterator != allCalendars.end())
       {
-        const auto& calendar = calIt->second;
+        const auto& calendar = calendarIterator->second;
         calendars.push_back(calendar);
 
-        auto calDateIt = allCalendarDates.find(calendar.serviceId);
-        if (calDateIt != allCalendarDates.end())
+        auto calendarDateIterator = allCalendarDates.find(calendar.serviceId);
+        if (calendarDateIterator != allCalendarDates.end())
         {
-          for (const auto& calendarDate : calDateIt->second)
+          for (const auto& calendarDate : calendarDateIterator->second)
           {
             calendarDates.push_back(calendarDate);
           }
@@ -127,10 +128,10 @@ int main(int argc, char* argv[]) {
       {
         stopTimes.push_back(stopTime);
 
-        auto stopIt = allStops.find(stopTime.stopId);
-        if (stopIt != allStops.end())
+        auto stopIterator = allStops.find(stopTime.stopId);
+        if (stopIterator != allStops.end())
         {
-          stops.insert(stopIt->second);
+          stops.insert(stopIterator->second);
         }
         else
         {
@@ -299,7 +300,6 @@ int main(int argc, char* argv[]) {
       row.push_back(quote(std::to_string(calendarDate.exceptionType)));
 
       writer.write_row(row);
-
     }
   }));
 
@@ -307,7 +307,7 @@ int main(int argc, char* argv[]) {
   futures.emplace_back(std::async(std::launch::async, [&]() {
     std::ofstream file(gtfsDirectoryForAgency + "\\" + "transfers.txt", std::ios::binary);
     csv2::Writer<csv2::delimiter<','>> writer(file);
-   writer.write_row(transfersHeader);
+    writer.write_row(transfersHeader);
     for (const auto& transfer : transferItems)
     {
 

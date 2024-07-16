@@ -17,6 +17,7 @@ namespace schedule::gtfs {
 
   public:
     explicit GtfsStopTimeReaderCsv(std::string&& filename);
+    explicit GtfsStopTimeReaderCsv(std::string const& filename);
 
     void operator()(GtfsReader& aReader) const;
   };

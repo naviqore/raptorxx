@@ -5,7 +5,7 @@
 #include "GtfsRouteReader.h"
 
 #include "LoggerFactory.h"
-#include "../../../../include/GtfsReader.h"
+#include "GtfsReader.h"
 #include "src/utils/utils.h"
 #include "utils/scopedTimer.h"
 

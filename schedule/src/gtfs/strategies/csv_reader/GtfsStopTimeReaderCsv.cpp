@@ -25,6 +25,13 @@ namespace schedule::gtfs {
       throw std::invalid_argument("Filename is empty");
     }
   }
+  GtfsStopTimeReaderCsv::GtfsStopTimeReaderCsv(std::string const& filename)
+    : filename(filename) {
+    if (this->filename.empty())
+    {
+      throw std::invalid_argument("Filename is empty");
+    }
+  }
 
   void GtfsStopTimeReaderCsv::operator()(GtfsReader& aReader) const {
     auto reader = csv2::Reader();
@@ -49,6 +56,8 @@ namespace schedule::gtfs {
         std::string value;
         cell.read_value(value);
         value.erase(std::ranges::remove(value, '\r').begin(), value.end());
+        value = utils::removeUtf8Bom(value);
+        value = utils::removeQuotesFromStringView(value);
 
         static const std::map<std::string, std::function<void(TempStopTime&, const std::string&)>> columnActions = {
           {"stop_id", [](TempStopTime& stop, const std::string& val) { stop.stopId = val; }},
