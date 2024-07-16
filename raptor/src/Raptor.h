@@ -4,20 +4,31 @@
 
 #ifndef RAPTOR_H
 #define RAPTOR_H
-#include <utility>
 
-#include "gtfs/GtfsData.h"
-#include "gtfs/RelationManager.h"
+#include "IRaptor.h"
+
+
+#include <IConnection.h>
+#include <gtfs/RelationManager.h>
+#include <IRaptorAlgorithmStrategy.h>
+#include <memory>
+#include <raptor_export.h>
 
 namespace raptor {
+  namespace utils {
+    struct ConnectionRequest;
+  }
 
-  class Raptor
+  class RAPTOR_API Raptor final : public IRaptor
   {
-    constexpr auto INFINITY_VALUE = std::numeric_limits<int>::max();
-    schedule::gtfs::RelationManager relationManager;
+    std::unique_ptr<strategy::IRaptorAlgorithmStrategy> strategy;
 
   public:
-    explicit Raptor(schedule::gtfs::RelationManager  relationManager);
+    explicit Raptor(std::unique_ptr<strategy::IRaptorAlgorithmStrategy>&& strategy);
+
+    [[nodiscard]] std::shared_ptr<IConnection> getConnections(utils::ConnectionRequest const& request) const override;
+
+    void testFunction() override;
   };
 
 } // raptor

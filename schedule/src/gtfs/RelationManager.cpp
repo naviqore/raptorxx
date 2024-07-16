@@ -6,81 +6,173 @@
 
 #include <algorithm>
 #include <ranges>
+#include <utility>
 
 
 namespace schedule::gtfs {
 
-  RelationManager::RelationManager(const GtfsData& data)
-    : data(data) {
+  RelationManager::RelationManager(GtfsData&& data)
+    : data(std::move(data)) {
+    createRelations();
   }
 
   void RelationManager::createRelations() {
-    collectStopTimesForTrips();
-    collectStopTimesForStops();
-    collectTripsForRoutes();
-    collectRoutesForStops();
+    // Reserve capacity if possible, e.g., data.trips.size() as an estimate
+    for (const auto& stopTimes : data.stopTimes | std::views::values)
+    {
+      for (const auto& stopTime : stopTimes)
+      {
+        auto tripIter = data.trips.find(stopTime.tripId);
+        if (tripIter != data.trips.end())
+        {
+          for (auto& trip : tripIter->second)
+          {
+            trip.stopTimes.insert(stopTime);
+          }
+        }
+        else
+        {
+          // TODO: Handle error
+        }
+      }
+    }
+
+    for (auto& trips : data.trips | std::views::values)
+    {
+      for (auto& trip : trips)
+      {
+        auto& route = data.routes.at(trip.routeId); // Use operator[] to access or insert
+        route.trips.push_back(trip);
+      }
+    }
+
+    for (auto& route : data.routes | std::views::values)
+    {
+      std::unordered_set<std::string> uniqueStopIds;
+      for (const auto& trip : route.trips)
+      {
+        for (const auto& stopTime : trip.stopTimes)
+        {
+          uniqueStopIds.emplace(stopTime.stopId);
+        }
+      }
+      for (const auto& stopId : uniqueStopIds)
+      {
+        route.stops.insert(data.stops.at(stopId));
+      }
+    }
   }
 
-  const std::vector<StopTime>& RelationManager::getStopTimesForTrip(const std::string& tripId) const {
-    return stopTimeTrips.at(tripId);
-  }
 
-  const std::vector<StopTime>& RelationManager::getStopTimesForStop(const std::string& stopId) const {
-    return stopTimeStops.at(stopId);
-  }
+  //void RelationManager::createRelations() {
+  //  for (const auto& stopTimes : data.stopTimes | std::views::values)
+  //  {
+  //    for (const auto& stopTime : stopTimes)
+  //    {
+  //      auto tripIter = data.trips.find(stopTime.tripId);
+  //      if (tripIter != data.trips.end()) {
+  //        for (auto& trip : tripIter->second) {
+  //          trip.stopTimes.insert(stopTime);
+  //        }
+  //      } else {
+  //        // TODO: Handle error
+  //      }
+  //    }
+  //  }
+  //  for (auto& trips : data.trips | std::views::values)
+  //  {
+  //    for (auto& trip : trips)
+  //    {
+  //      // std::ranges::sort(trip.stopTimes,
+  //      //                   [](const StopTime& a, const StopTime& b) {
+  //      //                     return a.stopSequence < b.stopSequence;
+  //      //                   });
+  //      if (data.routes.contains(trip.routeId)) {
+  //        data.routes.at(trip.routeId).trips.push_back(trip);
+  //      } else {
+  //        // TODO: Handle error
+  //      }
+  //    }
+  //  }
 
-  const std::vector<Trip>& RelationManager::getTripsForRoute(const std::string& routeId) const {
-    return tripsRoutes.at(routeId);
-  }
-
-  const std::vector<std::string>& RelationManager::getStopsForRoute(const std::string& routeId) const {
-    return routesStops.at(routeId);
-  }
-
-  /// @brief Attention span lives on the stack, so the data it points to must be valid for the duration of its lifetime
-  /// Span does not own the data it points to, so it is not responsible for its lifetime management.
-  /// @param routeId
-  /// @return span of StopTime objects
-  std::span<const StopTime> RelationManager::getStopTimesForRouteSpan(const std::string& routeId) const {
-    const auto& stopTimes = stopTimeStops.at(routeId);
-    return {stopTimes.data(), stopTimes.size()};
-  }
+  //  for (auto& route : data.routes | std::views::values)
+  //  {
+  //    std::unordered_set<std::string> uniqueStopIds;
+  //    for (const auto& trip : route.trips)
+  //    {
+  //      for (const auto& stopTime : trip.stopTimes)
+  //      {
+  //        uniqueStopIds.insert(stopTime.stopId);
+  //      }
+  //    }
+  //    for (const auto& stopId : uniqueStopIds)
+  //    {
+  //      route.stops.insert(data.stops.at(stopId));
+  //    }
+  //  }
+  //}
 
   const GtfsData& RelationManager::getData() const {
     return data;
   }
 
-  void RelationManager::collectStopTimesForTrips() {
-    for (const auto& stopTime : data.stopTimes)
-    {
-      stopTimeTrips[stopTime.tripId].push_back(stopTime);
-    }
+  const std::string& RelationManager::getStopNameFromStopId(std::string const& aStopId) const {
+    return data.stops.at(aStopId).stopName;
+  }
+  const std::string& RelationManager::getStopIdFromStopName(std::string const& aStopName) const {
+    return std::ranges::find_if(data.stops,
+                                [&aStopName](const auto& stop) { return stop.second.stopName == aStopName; })
+      ->first;
+  }
+  std::vector<std::string> RelationManager::getStopIdsFromStopName(std::string const& aStopName) const {
+    return data.stops | std::views::filter([&aStopName](const auto& stop) { return stop.second.stopName == aStopName; })
+           | std::views::keys | std::ranges::to<std::vector<std::string>>();
+  }
+  const StopTime& RelationManager::getStopTimeFromStopId(std::string const& aStopId) const {
+    return data.stopTimes.at(aStopId).front();
   }
 
-  void RelationManager::collectStopTimesForStops() {
-    for (const auto& stopTime : data.stopTimes)
-    {
-      stopTimeStops[stopTime.stopId].push_back(stopTime);
-    }
+  std::vector<Stop> RelationManager::getAllStopsOnTrip(std::string const& aTripId) const {
+    // Retrieve all StopTimes for the given tripId, sorted by departure time
+    auto stopTimesMatchingTripId
+      = data.stopTimes | std::views::values | std::views::join
+        | std::views::filter([&](const StopTime& stopTime) { return stopTime.tripId == aTripId; })
+        | std::ranges::to<std::vector<StopTime>>();
+
+    std::ranges::sort(stopTimesMatchingTripId,
+                      [](const StopTime& a, const StopTime& b) { return a.departureTime < b.departureTime; });
+
+    std::vector<Stop> stopsForTrip;
+    for (const auto& stopTime : stopTimesMatchingTripId)
+    { stopsForTrip.push_back(data.stops.at(stopTime.stopId)); }
+
+    return stopsForTrip;
   }
 
-  void RelationManager::collectTripsForRoutes() {
-    for (const auto& trip : data.trips)
-    {
-      tripsRoutes[trip.routeId].push_back(trip);
-    }
+  const std::vector<StopTime>& RelationManager::getStopTimesFromStopId(std::string const& aStopId) const {
+    return data.stopTimes.at(aStopId);
+  }
+  std::vector<Route> RelationManager::getRouteFromTripId(std::string const& aTripId) const {
+    return data.trips.at(aTripId)
+           | std::views::transform([this](const Trip& trip) { return data.routes.at(trip.routeId); })
+           | std::ranges::to<std::vector<Route>>();
+  }
+  std::vector<StopTime> RelationManager::getStopTimesFromStopIdStartingFromSpecificTime(
+    std::string const& aStopId, unsigned int secondsGreaterThan) const {
+    return data.stopTimes.at(aStopId) | std::views::filter([secondsGreaterThan, this](const StopTime& stopTime) {
+             return stopTime.departureTime.toSeconds() > secondsGreaterThan;
+           })
+           | std::ranges::to<std::vector<StopTime>>();
   }
 
-  void RelationManager::collectRoutesForStops() {
-    std::ranges::for_each(data.stopTimes, [&](const auto& stopTime) {
-      auto tripIter = std::ranges::find_if(data.trips, [&stopTime](const auto& trip) {
-        return trip.tripId == stopTime.tripId;
-      });
-
-      if (tripIter != data.trips.end())
-      {
-        routesStops[tripIter->routeId].push_back(stopTime.stopId);
-      }
-    });
+  bool RelationManager::isServiceActiveOnDay(std::string const& aServiceId, const std::chrono::weekday aDay) const {
+    return data.calendars.at(aServiceId).weekdayService.contains(aDay);
   }
+
+  const std::vector<Trip>& RelationManager::getTripsFromStopTimeTripId(std::string const& aTripId) const {
+    return data.trips.at(aTripId);
+  }
+
+
+
 } // gtfs

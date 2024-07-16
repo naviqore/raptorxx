@@ -6,56 +6,69 @@
 #define RELATIONMANAGER_H
 
 #include "GtfsData.h"
-
-
-#include <map>
 #include <vector>
 #include "model/StopTime.h"
 #include "model/Trip.h"
 #include "model/Stop.h"
 #include "model/Route.h"
+
+#include <iostream>
 #include <schedule_export.h>
-#include <span>
+#include <ranges>
 
 namespace schedule::gtfs {
 
-  class GTFS_API RelationManager
+  class SCHEDULE_API RelationManager
   {
+    GtfsData data;
+
   public:
-    explicit RelationManager(const GtfsData& data);
-
-    void createRelations();
-
-    [[nodiscard]] const std::vector<StopTime>& getStopTimesForTrip(const std::string& tripId) const;
-
-    [[nodiscard]] const std::vector<StopTime>& getStopTimesForStop(const std::string& stopId) const;
-
-    [[nodiscard]] const std::vector<Trip>& getTripsForRoute(const std::string& routeId) const;
-
-    [[nodiscard]] const std::vector<std::string>& getStopsForRoute(const std::string& routeId) const;
-
-    [[nodiscard]] std::span<const StopTime> getStopTimesForRouteSpan(const std::string& routeId) const;
+    explicit RelationManager(GtfsData&& data);
 
     [[nodiscard]] const GtfsData& getData() const;
 
+    [[nodiscard]] const std::string& getStopNameFromStopId(std::string const& aStopId) const;
+
+    [[nodiscard]] const std::string& getStopIdFromStopName(std::string const& aStopName) const;
+
+    [[nodiscard]] std::vector<std::string> getStopIdsFromStopName(std::string const& aStopName) const;
+
+    [[nodiscard]] const StopTime& getStopTimeFromStopId(std::string const& aStopId) const;
+
+    [[nodiscard]] std::vector<Stop> getAllStopsOnTrip(std::string const& aTripId) const;
+
+    [[nodiscard]] const std::vector<StopTime>& getStopTimesFromStopId(std::string const& aStopId) const;
+
+    [[nodiscard]] std::vector<Route> getRouteFromTripId(std::string const& aTripId) const;
+
+    [[nodiscard]] std::vector<StopTime> getStopTimesFromStopIdStartingFromSpecificTime(std::string const& aStopId, unsigned int secondsGreaterThan) const;
+
+    [[nodiscard]] bool isServiceActiveOnDay(std::string const& aServiceId, std::chrono::weekday aDay) const;
+
+    [[nodiscard]] const std::vector<Trip>& getTripsFromStopTimeTripId(std::string const& aTripId) const;
+
   private:
-    const GtfsData& data;
-
-    // TODO reserve size for maps
-    std::unordered_map<std::string, std::vector<StopTime>> stopTimeTrips;
-    std::unordered_map<std::string, std::vector<StopTime>> stopTimeStops;
-    std::unordered_map<std::string, std::vector<Trip>> tripsRoutes;
-    std::unordered_map<std::string, std::vector<std::string>> routesStops;
-
-    void collectStopTimesForTrips();
-
-    void collectStopTimesForStops();
-
-    void collectTripsForRoutes();
-
-    void collectRoutesForStops();
+    void createRelations();
+    // // TODO reserve size for maps
+    // // using stopTimeId = std::string;
+    // using stopId = std::string;
+    // using tripId = std::string;
+    // using routeId = std::string;
+    // using serviceId = std::string;
+    //
+    // // via Stop - stop_id we can get the StopTime
+    // std::unordered_map<stopId, std::vector<StopTime>> stopTimeForStop;
+    // // Transfer has two stop items from - to
+    // std::unordered_map<stopId, std::vector<Transfer>> transfersForStop;
+    // // via stopTime - trip_id we can get the Trip
+    // std::unordered_map<tripId, std::vector<Trip>> tripsForRoute;
+    // // via Trip - route_id we can get the Route
+    // std::unordered_map<routeId, std::vector<Route>> routesForStop;
+    // // via Trip - service_id we can get the calendar
+    // std::unordered_map<serviceId, Calendar> calendarForTrip;
+    // // via Calendar - service_id we can get the CalendarDates
+    // std::unordered_map<serviceId, CalendarDate> calendarDatesForCalendar;
   };
-
 } // gtfs
 
 #endif //RELATIONMANAGER_H

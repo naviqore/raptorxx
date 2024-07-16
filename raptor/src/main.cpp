@@ -4,7 +4,7 @@
 
 /////// PSEUDO IMPLEMENTATION OF RAPTOR ALGORITHM ///////
 
-/*
+
 #include <vector>
 #include <limits>
 #include <optional>
@@ -242,4 +242,58 @@ std::vector<Label> RAPTOR(const Stop& source, const Stop& target, int departure_
   // ... (omitted for brevity)
   return journey;
 }
-*/
+
+
+
+
+#include "RaptorStrategy.h"
+#include <limits>
+#include <vector>
+#include <queue>
+
+namespace raptor::strategy {
+
+std::shared_ptr<IConnection> RaptorStrategy::execute(const utils::ConnectionRequest& request) {
+    // Initialization
+    const auto& stops = relationManager.getData().stops;
+    const auto& routes = relationManager.getData().routes;
+    std::vector<int> arrivalTimes(stops.size(), std::numeric_limits<int>::max());
+    std::vector<bool> marked(stops.size(), false);
+    std::queue<int> queue; // For stops to explore in the next round
+
+    // Set the departure stop's arrival time to the departure time
+    arrivalTimes[request.departureStopId] = request.departureTime;
+    marked[request.departureStopId] = true;
+    queue.push(request.departureStopId);
+
+    while (!queue.empty()) {
+        int currentStopId = queue.front();
+        queue.pop();
+        marked[currentStopId] = false;
+
+        // Explore routes from the current stop
+        for (const auto& routeId : stops.at(currentStopId).routes) {
+            const auto& route = routes.at(routeId);
+            // Find the earliest trip that can be taken from this stop on this route
+            for (const auto& tripId : route.trips) {
+                const auto& trip = relationManager.getTripsFromStopTimeTripId(std::to_string(tripId));
+                // Update arrival times for stops on this trip
+                for (const auto& stopTime : trip) {
+                    if (arrivalTimes[stopTime.stopId] > stopTime.arrivalTime) {
+                        arrivalTimes[stopTime.stopId] = stopTime.arrivalTime;
+                        if (!marked[stopTime.stopId]) {
+                            marked[stopTime.stopId] = true;
+                            queue.push(stopTime.stopId);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Construct and return the connection based on the updated arrival times
+    // This part is left as an exercise, as it depends on the structure of IConnection and how you want to represent the result
+    return nullptr;
+}
+
+} // namespace raptor::strategy

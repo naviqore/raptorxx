@@ -17,19 +17,21 @@
 
 #include <vector>
 #include <schedule_export.h>
+#include <unordered_set>
 
 namespace schedule::gtfs {
 
-  struct GTFS_API GtfsData
+  struct SCHEDULE_API GtfsData
   {
-    std::vector<Agency> agencies;
-    std::vector<Calendar> calendars;
-    std::vector<CalendarDate> calendarDates;
-    std::vector<Route> routes;
-    std::vector<Stop> stops;
-    std::vector<StopTime> stopTimes;
-    std::vector<Transfer> transfers;
-    std::vector<Trip> trips;
+    std::unordered_map<std::string, Agency> agencies;
+    std::unordered_map<std::string, Calendar> calendars;
+    std::unordered_map<std::string, std::vector<CalendarDate>> calendarDates;
+    std::unordered_map<std::string, Route> routes;
+    std::unordered_map<std::string, Stop> stops;
+    std::unordered_map<std::string, std::vector<StopTime>> stopTimes;
+    std::unordered_map<std::string, std::vector<Transfer>> transferFrom;
+    std::unordered_map<std::string, std::vector<Transfer>> transferTo;
+    std::unordered_map<std::string, std::vector<Trip>> trips;
   };
 
 } // gtfs
