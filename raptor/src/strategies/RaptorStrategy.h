@@ -42,18 +42,26 @@ namespace raptor::strategy {
       StopEvent(const int depTime, const int arrTime) : depTime(depTime), arrTime(arrTime) {}
     };
 
+    std::vector<std::string> sources;
+    std::vector<std::string> targets;
+    int sourceDepartureTime;
     std::vector<int> stops;
     std::vector<std::string> stopNames;
     std::vector<std::vector<StopEvent>> stopEventsOfTrip;
     std::vector<int> trips;
     std::vector<int> firstTripOfRoute;
     std::vector<schedule::gtfs::Transfer> transfers;
-    std::unordered_map<std::string, int> stopMap;
+
+
+    std::vector<std::string> flatStopIds;
+    std::vector<unsigned int> arrivalTimes;
+
     std::unordered_map<std::string, int> tripMap;
     std::unordered_map<int, int> tripOriginalRoute;
     std::unordered_map<std::string, int> routeMap;
+    std::vector<utils::LabelEarliestArrival> earliestArrival;
 
-    std::vector<std::string> earliestArrival; // utils::LabelEarliestArrival
+    // std::vector<std::string> earliestArrival; // utils::LabelEarliestArrival
     std::vector<std::vector<utils::LabelEarliestArrival>> rounds;
     utils::IndexedVisitedSet stopsUpdated;
     utils::IndexedVisitedSet stopsReached;

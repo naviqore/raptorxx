@@ -12,16 +12,16 @@ namespace raptor::utils {
   static constexpr auto INFINITY_VALUE = std::numeric_limits<unsigned int>::max();
 
   using stopId = std::string;
+  using routeId = std::string;
 
   struct ConnectionRequest
   {
     explicit ConnectionRequest(std::vector<std::string>&& departureStopId,
                                std::vector<std::string>&& arrivalStopId,
                                const unsigned int earliestDepartureTime)
-      : departureStopId(std::move(departureStopId)),
-        arrivalStopId(std::move(arrivalStopId)),
-        earliestDepartureTime(earliestDepartureTime)
-    {
+      : departureStopId(std::move(departureStopId))
+      , arrivalStopId(std::move(arrivalStopId))
+      , earliestDepartureTime(earliestDepartureTime) {
       latestDepartureTime = earliestDepartureTime + 3'600;
     }
     std::vector<std::string> departureStopId{};

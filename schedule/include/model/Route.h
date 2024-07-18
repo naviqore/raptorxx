@@ -60,7 +60,8 @@ namespace schedule::gtfs {
     RouteType routeType;
     std::string agencyId;
     std::vector<Trip> trips{};
-    std::unordered_set<Stop, decltype(stopHash), decltype(stopEqual)> stops{};
+   // std::unordered_set<Stop, decltype(stopHash), decltype(stopEqual)> stops{};
+    std::vector<Stop> stopsInOrder{};
   };
 
   inline auto routeHash = [](const Route& route) {

@@ -3,6 +3,8 @@
 //
 
 #include "ServiceDayTime.h"
+
+#include <chrono>
 #include <stdexcept>
 
 
@@ -13,8 +15,7 @@ namespace schedule::gtfs::utils {
   ServiceDayTime::ServiceDayTime(const Hour hour, const Minute minute, const Second second) {
     totalSeconds = hour * SECONDS_PER_HOUR + minute * SECONDS_PER_MINUTE + second;
   }
-  ServiceDayTime::ServiceDayTime(unsigned int const hour, unsigned int const minute, unsigned int const second)
-   {
+  ServiceDayTime::ServiceDayTime(unsigned int const hour, unsigned int const minute, unsigned int const second) {
     totalSeconds = hour * SECONDS_PER_HOUR + minute * SECONDS_PER_MINUTE + second;
   }
 
@@ -61,14 +62,28 @@ namespace schedule::gtfs::utils {
     const unsigned int second = std::stoi(std::string(timeString.substr(start)));
 
     return ServiceDayTime(Hour(hour), Minute(minute), Second(second));
-
   }
 
+  // std::string ServiceDayTime::toString() const {
+  //   const unsigned int hour = totalSeconds / SECONDS_PER_HOUR;
+  //   const unsigned int minute = (totalSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE;
+  //   const unsigned int second = totalSeconds % SECONDS_PER_MINUTE;
+  //   return std::string(std::to_string(hour) + ":" + std::to_string(minute) + ":" + std::to_string(second));
+  // }
+
   std::string ServiceDayTime::toString() const {
-    const unsigned int hour = totalSeconds / SECONDS_PER_HOUR;
-    const unsigned int minute = (totalSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE;
-    const unsigned int second = totalSeconds % SECONDS_PER_MINUTE;
-    return std::string(std::to_string(hour) + ":" + std::to_string(minute) + ":" + std::to_string(second));
+    auto seconds = std::chrono::seconds(totalSeconds);
+    const auto hours = std::chrono::duration_cast<std::chrono::hours>(seconds);
+    seconds -= hours; // remove hours from seconds
+    const auto minutes = std::chrono::duration_cast<std::chrono::minutes>(seconds);
+    seconds -= minutes; // remove minutes from seconds
+
+    std::ostringstream stream;
+    stream << std::setw(2) << std::setfill('0') << hours.count() << ":"
+           << std::setw(2) << std::setfill('0') << minutes.count() << ":"
+           << std::setw(2) << std::setfill('0') << seconds.count();
+
+    return stream.str();
   }
 
   ServiceDayTime ServiceDayTime::fromSeconds(Second seconds) {

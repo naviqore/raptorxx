@@ -49,25 +49,6 @@ namespace schedule::gtfs {
 
   private:
     void createRelations();
-    // // TODO reserve size for maps
-    // // using stopTimeId = std::string;
-    // using stopId = std::string;
-    // using tripId = std::string;
-    // using routeId = std::string;
-    // using serviceId = std::string;
-    //
-    // // via Stop - stop_id we can get the StopTime
-    // std::unordered_map<stopId, std::vector<StopTime>> stopTimeForStop;
-    // // Transfer has two stop items from - to
-    // std::unordered_map<stopId, std::vector<Transfer>> transfersForStop;
-    // // via stopTime - trip_id we can get the Trip
-    // std::unordered_map<tripId, std::vector<Trip>> tripsForRoute;
-    // // via Trip - route_id we can get the Route
-    // std::unordered_map<routeId, std::vector<Route>> routesForStop;
-    // // via Trip - service_id we can get the calendar
-    // std::unordered_map<serviceId, Calendar> calendarForTrip;
-    // // via Calendar - service_id we can get the CalendarDates
-    // std::unordered_map<serviceId, CalendarDate> calendarDatesForCalendar;
   };
 } // gtfs
 

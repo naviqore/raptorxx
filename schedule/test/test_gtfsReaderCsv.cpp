@@ -36,7 +36,7 @@ protected:
   std::string basePath = TEST_DATA_DIR;
 
   void SetUp() override {
-    readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(schedule::gtfs::ReaderType::CSV, std::move(basePath));
+    readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(schedule::gtfs::ReaderType::CSV_PARALLEL, std::move(basePath));
   }
 
   void TearDown() override {

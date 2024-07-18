@@ -11,14 +11,14 @@
 #include <string>
 #include <optional>
 
-namespace raptor::utils
-{
+namespace raptor::utils {
 
   struct LabelEarliestArrival
   {
-    unsigned int arrivalTime{};
-    unsigned int parentDepartureTime{};
+    unsigned int arrivalTime = INFINITY_VALUE;
+    unsigned int parentDepartureTime = INFINITY_VALUE;
     stopId stopId{};
+    routeId routeId{};
     bool useRoute{false};
   };
 
@@ -44,6 +44,6 @@ namespace raptor::utils
     }
   };
 
-  }
+}
 
 #endif //LABEL_H

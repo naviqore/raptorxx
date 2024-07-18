@@ -4,21 +4,15 @@
 
 
 #include "DataReader.h"
+#include "GtfsReaderStrategyFactory.h"
 #include "IRaptorAlgorithmFactory.h"
 #include "LoggerFactory.h"
 #include "Raptor.h"
 #include "RaptorAlgorithmFactory.h"
 #include "raptorTypes.h"
 #include "gtfs/GtfsTxtReaderStrategyFactory.h"
-#include "gtfs/strategies/GtfsAgencyReader.h"
-#include "gtfs/strategies/GtfsCalendarReader.h"
-#include "gtfs/strategies/GtfsRouteReader.h"
-#include "gtfs/strategies/GtfsStopReader.h"
-#include "gtfs/strategies/GtfsStopTimeReader.h"
-#include "gtfs/strategies/GtfsTransferReader.h"
-#include "gtfs/strategies/GtfsTripReader.h"
 
-#include <../../schedule/include/GtfsReader.h>
+#include <GtfsReader.h>
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -86,13 +80,13 @@ protected:
 
   std::string basePath = TEST_DATA_DIRRECTORY;
 
-  std::unique_ptr<schedule::gtfs::GtfsTxtReaderStrategyFactory> readerFactory;
+  std::unique_ptr<schedule::gtfs::IGtfsReaderStrategyFactory> readerFactory;
 
   std::map<schedule::gtfs::utils::GTFS_FILE_TYPE, std::string> lFileNameMap;
 
   void SetUp() override {
     basePath.back() == '/' ? basePath : basePath += '/';
-    readerFactory = std::make_unique<schedule::gtfs::GtfsTxtReaderStrategyFactory>(std::move(basePath));
+    readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(schedule::gtfs::ReaderType::CSV_PARALLEL, std::move(basePath));
   }
 
   void TearDown() override {
@@ -108,11 +102,11 @@ TEST_F(RaptorTest, InitialTest) {
   // const auto agencyStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::AGENCY);
   // const auto calendarStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::CALENDAR);
   // const auto calendarDatesStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::CALENDAR_DATE);
-  const auto routesStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::ROUTE);
-  const auto stopStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::STOP);
-  const auto stopTimeStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::STOP_TIME);
-  const auto transferStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::TRANSFER);
-  const auto tripStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::TRIP);
+  const auto routesStrategy = readerFactory->getStrategy(GtfsStrategyType::ROUTE);
+  const auto stopStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP);
+  const auto stopTimeStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP_TIME);
+  const auto transferStrategy = readerFactory->getStrategy(GtfsStrategyType::TRANSFER);
+  const auto tripStrategy = readerFactory->getStrategy(GtfsStrategyType::TRIP);
 
   std::vector strategies = {/*agencyStrategy, calendarStrategy, calendarDatesStrategy,*/ routesStrategy, stopStrategy, stopTimeStrategy, transferStrategy, tripStrategy}; //
 
@@ -153,53 +147,39 @@ TEST_F(RaptorTest, InitialTest) {
 TEST_F(RaptorTest, RaptorAlgorithm) {
 
   // const auto agencyStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsReaderStrategyFactory::Type::AGENCY);
-  const auto calendarStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::CALENDAR);
-  const auto calendarDatesStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::CALENDAR_DATE);
-  const auto routesStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::ROUTE);
-  const auto stopStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::STOP);
-  const auto stopTimeStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::STOP_TIME);
-  const auto transferStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::TRANSFER);
-  const auto tripStrategy = readerFactory->getStrategy(schedule::gtfs::GtfsTxtReaderStrategyFactory::Type::TRIP);
+  const auto calendarStrategy = readerFactory->getStrategy(GtfsStrategyType::CALENDAR);
+  const auto calendarDatesStrategy = readerFactory->getStrategy(GtfsStrategyType::CALENDAR_DATE);
+  const auto routesStrategy = readerFactory->getStrategy(GtfsStrategyType::ROUTE);
+  const auto stopStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP);
+  const auto stopTimeStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP_TIME);
+  const auto transferStrategy = readerFactory->getStrategy(GtfsStrategyType::TRANSFER);
+  const auto tripStrategy = readerFactory->getStrategy(GtfsStrategyType::TRIP);
 
-  std::vector strategies = {/*agencyStrategy,*/ calendarStrategy, calendarDatesStrategy, routesStrategy, stopStrategy, stopTimeStrategy, transferStrategy, tripStrategy}; //
+  std::vector strategies = {/*agencyStrategy,*/
+                            calendarStrategy,
+                            calendarDatesStrategy,
+                            routesStrategy,
+                            stopStrategy,
+                            stopTimeStrategy,
+                            transferStrategy,
+                            tripStrategy}; //
 
-  const std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategies));
+  const auto reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategies));
   reader->readData();
 
   auto relationManager = schedule::gtfs::RelationManager(std::move(reader->getData().get()));
 
-  //// "BEATTY_AIRPORT_STATION","Nye County Airport Station (Demo)","36.868446","-116.784582","","","1235","1",""
-  auto stopIdSources = relationManager.getStopIdsFromStopName("St. Gallen, Vonwil"); // Zürich, Bahnhof Stadelhofen
+  auto stopIdSources = relationManager.getStopIdsFromStopName("St. Gallen, Vonwil");
   ASSERT_TRUE(!stopIdSources.empty());
 
-  auto stopIdTargets = relationManager.getStopIdsFromStopName("St. Gallen,Klinik Stephanshorn"); // Zürich, Schiffbau
+  auto stopIdTargets = relationManager.getStopIdsFromStopName("St. Gallen,Klinik Stephanshorn");
   ASSERT_TRUE(!stopIdTargets.empty());
   std::unordered_map<std::string, std::vector<std::string>> routeStops;
-
-  // Log all stops for each trip that stops at the source stop
-  // getLogger(Target::CONSOLE, LoggerName::RAPTOR)->info("Log all stops for each trip that stops at the source stop");
-  // for (const auto& stopId : stopIdSources)
-  // {
-  //   for (const auto& stopTimes = relationManager.getData().stopTimes.at(stopId);
-  //        const auto& stopTime : stopTimes)
-  //   {
-  //     for (const auto& trips = relationManager.getData().trips.at(stopTime.tripId);
-  //          const auto& trip : trips)
-  //     {
-  //       getLogger(Target::CONSOLE, LoggerName::RAPTOR)->info(" ");
-  //       getLogger(Target::CONSOLE, LoggerName::RAPTOR)->info(std::format("Trip: {}", trip.tripId));
-  //
-  //       std::ranges::for_each(trip.stopTimes, [&](const auto& stopTimeItem) {
-  //         getLogger(Target::CONSOLE, LoggerName::RAPTOR)->info(std::format("Stop: {} {}", stopTimeItem.stopId, relationManager.getStopNameFromStopId(stopTimeItem.stopId)));
-  //       });
-  //     }
-  //   }
-  // }
 
   getLogger(Target::CONSOLE, LoggerName::RAPTOR)->info(" ------------------------- ");
   getLogger(Target::CONSOLE, LoggerName::RAPTOR)->info(" ");
 
-  const std::unique_ptr<raptor::strategy::factory::IRaptorAlgorithmFactory> factory = std::make_unique<raptor::strategy::factory::RaptorAlgorithmFactory>();
+  const auto factory = std::make_unique<raptor::strategy::factory::RaptorAlgorithmFactory>();
   ASSERT_TRUE(factory);
 
   auto strategy = factory->create(raptor::strategy::factory::IRaptorAlgorithmFactory::RAPTOR, std::move(relationManager));
