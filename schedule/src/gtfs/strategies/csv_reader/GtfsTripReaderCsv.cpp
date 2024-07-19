@@ -74,10 +74,10 @@ namespace schedule::gtfs {
       {
         auto tripId = tempTrip.tripId;
 
-        aReader.getData().get().trips[tripId].emplace_back(
-          std::move(tempTrip.routeId),
-          std::move(tempTrip.serviceId),
-          std::move(tempTrip.tripId));
+        aReader.getData().get().trips.emplace(tripId,
+                                              Trip{std::move(tempTrip.routeId),
+                                                   std::move(tempTrip.serviceId),
+                                                   std::move(tempTrip.tripId)});
       }
     }
   }

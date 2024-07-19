@@ -21,1042 +21,614 @@
 #include <utils/Label.h>
 
 namespace raptor::strategy {
-  void removeDominatedLabels(std::vector<utils::Label>& labels, const utils::Label& newLabel) {
-    std::erase_if(labels, [&](const utils::Label& label) {
-      return label.isDominatedBy(newLabel);
-    });
+
+  RaptorStrategy::RaptorStrategy(schedule::gtfs::TimetableManager&& relationManager)
+    : gtfsData(std::move(relationManager))
+    , stopsUpdated(static_cast<int>(this->gtfsData.getData().stops.size()))
+    , stopsReached(static_cast<int>(this->gtfsData.getData().stops.size()))
+    , routesServingUpdatedStops(static_cast<int>(this->gtfsData.getData().routes.size())) {
+    earliestArrival.assign(gtfsData.getData().stops.size(), std::numeric_limits<int>::max());
+    previousRoundArrival.assign(gtfsData.getData().stops.size(), std::numeric_limits<int>::max());
+
+    initialize();
+    initializeStopEventsOfTrip();
+
+    raptorUtil.initialize(gtfsData.getData());
   }
 
-  bool isParetoOptimal(const std::set<utils::Label>& labels, const utils::Label& newLabel) {
-    return std::ranges::all_of(labels, [&](const utils::Label& label) {
-      return !newLabel.isDominatedBy(label);
-    });
-  }
+  std::shared_ptr<IConnection> RaptorStrategy::execute(const std::string& sourceStop, const std::string& targetStop, int departureTime) {
+    source = sourceStop;
+    target = targetStop;
+    earliestDepartureTime = departureTime;
+    sourceLatestDepartureTime = earliestDepartureTime + 60 * 60; // 1 hour later
 
-  void updateLabels(std::set<utils::Label>& labels, const utils::Label& newLabel) {
-    // removeDominatedLabels(labels, newLabel);
-    if (isParetoOptimal(labels, newLabel))
-    {
-      labels.insert(newLabel);
-    }
-  }
+    bestTimes.assign(gtfsData.getData().stops.size(), std::numeric_limits<int>::infinity());
+    bestTimes[raptorUtil.getStopIndexFromId(sourceStop)] = departureTime;
 
-  std::unordered_map<std::string, std::set<utils::Label>> RaptorStrategy::initializeStopLabels(unsigned int const sourceDepartureTime, std::vector<std::string> const& departureStopIds) const {
-    std::unordered_map<std::string, std::set<utils::Label>> stopLabels;
-    for (const auto& stopId : departureStopIds)
-    {
-      if (auto stopTimesIter = relationManager.getData().stopTimes.find(stopId); stopTimesIter != relationManager.getData().stopTimes.end())
-      {
-        for (const auto& stopTime : stopTimesIter->second)
-        {
-          const auto trips = relationManager.getData().trips.at(stopTime.tripId);
-          const auto tripItem = std::ranges::find_if(trips, [&](const schedule::gtfs::Trip& aTrip) { return aTrip.tripId == stopTime.tripId; });
-          std::string currentRouteId = tripItem != trips.end() ? tripItem->routeId : "";
-          stopLabels[stopId].emplace(utils::Label{sourceDepartureTime, 0, std::nullopt, currentRouteId, stopTime.tripId});
-        }
-      }
-      else
-      {
-        stopLabels[stopId].emplace(utils::Label{sourceDepartureTime, 0, std::nullopt, "", ""});
-      }
-    }
-    return stopLabels;
-  }
-
-  /// @brief
-  /// @param relationManager
-  RaptorStrategy::RaptorStrategy(schedule::gtfs::RelationManager&& relationManager)
-    : relationManager(std::move(relationManager))
-    , sourceDepartureTime(0)
-    , stopsUpdated(0)
-    , stopsReached(0)
-    , routesServingUpdatedStops(0) {
-  }
-
-  std::vector<std::tuple<std::string, unsigned int, std::string, std::string>> RaptorStrategy::reconstructConnections(const std::unordered_map<std::string, std::set<utils::Label>>& stopLabels, const std::vector<std::string>& arrivalStopIds) {
-    std::vector<std::tuple<std::string, unsigned int, std::string, std::string>> path;
-
-    auto allLabels = stopLabels | std::views::keys;
-    std::ranges::for_each(allLabels, [&](const auto& label) {
-      getLogger(Target::CONSOLE, LoggerName::RAPTOR)->info(std::format("Stop: {}", relationManager.getStopNameFromStopId(label)));
-    });
-
-    // Assuming there is only one arrival stop for simplicity
-    std::string currentStopId = arrivalStopIds.front();
-
-    while (!currentStopId.empty())
-    {
-      if (stopLabels.contains(currentStopId) == false)
-      {
-        break;
-      }
-      const auto& labels = stopLabels.at(currentStopId);
-      auto minLabelIt = std::ranges::min_element(labels, [](const utils::Label& lhs, const utils::Label& rhs) {
-        return lhs.arrivalTime < rhs.arrivalTime;
-      });
-
-      if (minLabelIt != labels.end())
-      {
-        path.emplace_back(currentStopId,
-                          minLabelIt->arrivalTime,
-                          minLabelIt->routeId ? minLabelIt->routeId.value() : "",
-                          minLabelIt->tripId ? minLabelIt->tripId.value() : "");
-        currentStopId = minLabelIt->previousStopId ? minLabelIt->previousStopId.value() : "";
-      }
-      else
-      {
-        currentStopId = ""; // Break condition if no previous stop ID is found
-      }
-    }
-
-    std::ranges::reverse(path); // Reverse to get the path from source to destination
-
-    return path;
-  }
-
-  size_t RaptorStrategy::getTotalNumberOfStops() const {
-    return relationManager.getData().stops.size();
-  }
-
-  std::unordered_map<std::string, int> RaptorStrategy::createStopIndexMap() const {
-    return relationManager.getData().stops
-           | std::views::keys
-           | std::views::enumerate
-           | std::views::transform([](const auto& pair) {
-               return std::pair<std::string, int>(std::get<1>(pair), static_cast<int>(std::get<0>(pair)));
-             })
-           | std::ranges::to<std::unordered_map<std::string, int>>();
-  }
-
-  std::vector<schedule::gtfs::StopTime> RaptorStrategy::stopTimesForStopIdAndTimeGreaterThan(std::string const& stopId, unsigned int const departureTime) const {
-    return relationManager.getData().stopTimes.at(stopId) | std::views::filter([&](const schedule::gtfs::StopTime& stopTime) {
-             return stopTime.departureTime.toSeconds() >= departureTime;
-           })
-           | std::ranges::to<std::vector>();
-  }
-
-  std::optional<int> findEarliestTrip(const std::vector<schedule::gtfs::Trip>& trips, const int stopIndex, const unsigned int currentArrivalTime) {
-
-
-
-    // for (int i = 0; i < trips.size(); ++i)
+    // collectDepartureTimes();
+    // initialize();
+    //
+    // int k = 0;
+    // while (k < MAX_ROUNDS)
     // {
-    //   const auto& tripStopTimes = trips[i].stopTimes;
-    //   std::vector<schedule::gtfs::StopTime> tripsWithStop;
-    //   std::ranges::transform(tripStopTimes, std::back_inserter(tripsWithStop), [&](const auto& stopTime) {
-    //     return stopTime;
-    //   });
-    //   if (tripsWithStop[stopIndex].departureTime.toSeconds() >= currentArrivalTime)
-    //   {
-    //     return i;
-    //   }
+    //   relaxTransfers();
+    //   startNewRound();
+    //   collectRoutesServingUpdatedStops();
+    //   scanRoutes();
+    //   ++k;
     // }
-    return std::nullopt;
+    return nullptr;
   }
 
-  std::shared_ptr<IConnection> RaptorStrategy::execute(const utils::ConnectionRequest& request) {
-    // Initialize variables and data structures
-    sources = request.departureStopId;
-    targets = request.arrivalStopId;
-    const unsigned int sourceDepartureTime = request.earliestDepartureTime;
-
-    const auto& [agencies,
-                 calendars,
-                 calendarDates,
-                 routes,
-                 stops,
-                 stopTimes,
-                 transferFrom,
-                 transferTo,
-                 trips]
-      = relationManager.getData();
-
-    std::vector<std::string> allStops;
-    std::vector<std::string> allRoutes;
-    std::vector<schedule::gtfs::StopTime> allStopTimes;
-
-    std::vector<int> routesIndices;
-    std::vector<int> stopsIndices;
-    std::vector<int> stopTimesIndices;
-    std::vector<size_t> routesStopsSizes;
-    std::vector<size_t> stopTimesSizes;
-
-    for (const auto& [routeId, route] : routes)
+  void RaptorStrategy::collectDepartureTimes() {
+    collectedDepTimes.clear();
+    for (const auto& [routeId, route] : gtfsData.getData().routes)
     {
-      routesIndices.push_back(static_cast<int>(allRoutes.size()));
-      allRoutes.push_back(routeId);
-      routesStopsSizes.push_back(route.stopsInOrder.size());
-
       for (const auto& trip : route.trips)
       {
-        stopTimesSizes.push_back(trip.stopTimes.size());
         for (const auto& stopTime : trip.stopTimes)
         {
-          stopTimesIndices.push_back(static_cast<int>(allStopTimes.size()));
-          allStopTimes.push_back(stopTime);
-        }
-      }
-      for (const auto& stop : route.stopsInOrder)
-      {
-        stopsIndices.push_back(static_cast<int>(allStops.size()));
-        allStops.push_back(stop.stopId);
-      }
-    }
-
-    std::map<std::string, int> stopMap;
-    for (const auto& [index, stop] : std::views::enumerate(allStops))
-    {
-      stopMap[stop] = static_cast<int>(index);
-    }
-
-    earliestArrival.resize(allStops.size(), utils::LabelEarliestArrival{});
-    // utils::LabelEarliestArrival{.arrivalTime = utils::INFINITY_VALUE, .parentDepartureTime = utils::INFINITY_VALUE, .stopId = "", .routeId = "", .useRoute = false}
-    std::vector<std::vector<int>> previousStop(MAX_ROUNDS + 1, std::vector<int>(allStops.size(), -1));
-    std::vector<std::vector<int>> previousTrip(MAX_ROUNDS + 1, std::vector<int>(allStops.size(), -1));
-
-    if (const auto firstStopIndexInRouteIter = std::ranges::find(allStops, sources.front());
-        firstStopIndexInRouteIter != allStops.end())
-    {
-      const auto firstStopIndexInRoute = std::distance(allStops.begin(), firstStopIndexInRouteIter);
-      earliestArrival[firstStopIndexInRoute].arrivalTime = sourceDepartureTime;
-      earliestArrival[firstStopIndexInRoute].stopId = sources.front();
-    }
-
-    auto lAbelThatIsNotInfinitive = earliestArrival | std::views::filter([](const utils::LabelEarliestArrival& label) {
-                                      return label.arrivalTime != utils::INFINITY_VALUE;
-                                    });
-    if (lAbelThatIsNotInfinitive.empty())
-    {
-      return nullptr;
-    }
-
-    const auto stopName = relationManager.getStopNameFromStopId(lAbelThatIsNotInfinitive.front().stopId);
-    getLogger(Target::CONSOLE, LoggerName::RAPTOR)->info(std::format("Stop: {}", stopName));
-
-
-    auto findStopIndices = [&](const int routeIndex) {
-      size_t stopsStartIndex = 0;
-
-      for (int i = 0; i < routeIndex; ++i)
-      {
-        stopsStartIndex += routes.at(allRoutes[i]).stopsInOrder.size();
-      }
-
-      size_t stopsEndIndex = stopsStartIndex + routes.at(allRoutes[routeIndex]).stopsInOrder.size();
-
-      return std::make_pair(stopsStartIndex, stopsEndIndex);
-    };
-
-
-    auto findStopTimesIndices = [&](const int routeIndex, const int tripIndex) {
-      size_t stopTimesStartIndex = 0;
-
-      for (int i = 0; i < routeIndex; ++i)
-      {
-        for (const auto& trip : routes.at(allRoutes[i]).trips)
-        {
-          stopTimesStartIndex += trip.stopTimes.size();
-        }
-      }
-
-      for (int i = 0; i < tripIndex; ++i)
-      {
-        stopTimesStartIndex += routes.at(allRoutes[routeIndex]).trips[i].stopTimes.size();
-      }
-
-      size_t stopTimesEndIndex = stopTimesStartIndex + routes.at(allRoutes[routeIndex]).trips[tripIndex].stopTimes.size();
-
-      return std::make_pair(stopTimesStartIndex, stopTimesEndIndex);
-    };
-
-
-    int k = 1;
-    bool updated = true; // change to false in future
-    while (k < MAX_ROUNDS && updated)
-    {
-      std::vector<std::pair<int, int>> routeQueue; // queue // (routeIndex, stopIndex)
-      // for each marked stop p
-      for (int stopIndex = 0; stopIndex < allStops.size(); ++stopIndex)
-      {
-        if (earliestArrival[stopIndex].arrivalTime != utils::INFINITY_VALUE)
-        {
-          // for each route r serving p
-          for (int routeIndex{0}; routeIndex < routesIndices.size(); ++routeIndex)
+          if (stopTime.departureTime >= earliestDepartureTime && stopTime.departureTime <= sourceLatestDepartureTime)
           {
-            const auto& route = routes.at(allRoutes[routeIndex]);
-            const auto& stopsOnRoute = route.stopsInOrder;
-            const auto it = std::ranges::find_if(stopsOnRoute, [&](const auto& stop) {
-              return stop.stopId == allStops[stopIndex];
-            });
-            if (it != stopsOnRoute.end())
+            collectedDepTimes.emplace_back(DepartureLabel{stopTime.departureTime, stopTime.stopId});
+          }
+        }
+      }
+    }
+    std::sort(collectedDepTimes.begin(), collectedDepTimes.end(), [](const DepartureLabel& a, const DepartureLabel& b) {
+      return a.depTime > b.depTime;
+    });
+  }
+
+  void RaptorStrategy::initialize() {
+    clear();
+    const int sourceIndex = stopIdIndexMap[source];
+    updateArrivalTime(sourceIndex, earliestDepartureTime);
+    stopsReached.insert(sourceIndex);
+    currentRound()[stopIdIndexMap[source]].parentDepartureTime = earliestDepartureTime;
+    currentRound()[stopIdIndexMap[source]].useRoute = false;
+    currentRound()[stopIdIndexMap[source]].routeId = "";
+    // allStops = std::views::keys(gtfsData.getData().stops) | std::ranges::to<std::vector<std::string>>();
+    // for (int i = 0; i < allStops.size(); ++i)
+    // {
+    //   stopIdIndexMap[allStops[i]] = i;
+    // }
+    // allRoutes = std::views::keys(gtfsData.getData().routes) | std::ranges::to<std::vector<std::string>>();
+    // for (int i = 0; i < allRoutes.size(); ++i)
+    // {
+    //   routeIdIndexMap[allRoutes[i]] = i;
+    // }
+  }
+  void RaptorStrategy::initializeStopEventsOfTrip() {
+    stopEventsOfTrip.clear();
+    stopEventsOfTrip.resize(gtfsData.getData().trips.size());
+
+    int routeIndex = 0;
+    for (const auto& [routeId, route] : gtfsData.getData().routes)
+    {
+      for (const auto& trip : route.trips)
+      {
+        stopEventsOfTrip[routeIndex].resize(trip.stopTimes.size());
+        for (int stopTimeIndex = 0; stopTimeIndex < trip.stopTimes.size(); ++stopTimeIndex)
+        {
+          const auto& stopTime = trip.getStopTimesSorted()[stopTimeIndex];
+          stopEventsOfTrip[routeIndex][stopTimeIndex] = {stopTime.departureTime, stopTime.arrivalTime};
+        }
+      }
+      routeIdIndexMap[routeId] = routeIndex;
+      ++routeIndex;
+    }
+
+    int stopIndex = 0;
+    for (const auto& stopId : gtfsData.getData().stops | std::views::keys)
+    {
+      stopIdIndexMap[stopId] = stopIndex;
+      allStops.push_back(stopId);
+      ++stopIndex;
+    }
+
+    for (const auto& routeId : gtfsData.getData().routes | std::views::keys)
+    {
+      allRoutes.push_back(routeId);
+    }
+  }
+
+  void RaptorStrategy::clear() {
+    earliestArrival.assign(gtfsData.getData().stops.size(), std::numeric_limits<int>::max());
+    rounds.emplace_back(gtfsData.getData().stops.size(), utils::LabelEarliestArrival{});
+    stopsUpdated.clear();
+    stopsReached.clear();
+    routesServingUpdatedStops.clear();
+  }
+
+  bool RaptorStrategy::updateArrivalTime(int stopIndex, int arrivalTime) {
+    if (earliestArrival[stopIndex] > arrivalTime)
+    {
+      earliestArrival[stopIndex] = arrivalTime;
+      stopsUpdated.insert(stopIndex);
+      stopsReached.insert(stopIndex);
+      return true;
+    }
+    return false;
+  }
+
+  void RaptorStrategy::relaxTransfers() {
+    for (const int stopIndex : stopsUpdated.getElements())
+    {
+      if (const std::string& stopId = allStops[stopIndex];
+          gtfsData.getData().transferFrom.contains(stopId))
+      {
+        for (const auto& transfer : gtfsData.getData().transferFrom.at(stopId))
+        {
+          const int toStopIndex = stopIdIndexMap[transfer.toStopId];
+          const int newArrivalTime = earliestArrival[stopIndex] + transfer.minTransferTime;
+          if (updateArrivalTime(toStopIndex, newArrivalTime))
+          {
+            currentRound()[toStopIndex].stopId = transfer.toStopId;
+            currentRound()[toStopIndex].parentDepartureTime = earliestArrival[stopIndex];
+            currentRound()[toStopIndex].useRoute = false;
+            currentRound()[toStopIndex].routeId = "";
+          }
+        }
+      }
+    }
+  }
+
+  void RaptorStrategy::startNewRound() {
+    // initialize a new vector of LabelEarliestArrival and add it to the rounds vector
+    rounds.emplace_back(gtfsData.getData().stops.size(), utils::LabelEarliestArrival{});
+  }
+
+  void RaptorStrategy::collectRoutesServingUpdatedStops() {
+    routesServingUpdatedStops.clear();
+
+    for (const int stopIndex : stopsUpdated.getElements())
+    {
+      const std::string& stopId = allStops[stopIndex];
+      for (const auto& [routeId, route] : gtfsData.getData().routes)
+      {
+        for (const auto& trip : route.trips)
+        {
+          for (size_t i = 0; i < trip.stopTimes.size(); ++i)
+          {
+            if (trip.getStopTimesSorted()[i].stopId == stopId)
             {
-              getLogger(Target::CONSOLE, LoggerName::RAPTOR)->info(std::format("Stop: {}", it->stopName));
-              if (std::ranges::find(routeQueue, std::pair<int, int>(routeIndex, stopIndex)) == routeQueue.end()) // Check if the route is already in the queue ?
-              {
-                routeQueue.emplace_back(routeIndex, stopIndex);
-              }
+              routesServingUpdatedStops.insert(routeIdIndexMap[routeId], static_cast<int>(i));
+              break;
             }
           }
-          // unmark p
-          earliestArrival[stopIndex].arrivalTime = utils::INFINITY_VALUE;
         }
       }
-
-      // traverse each route in queue
-      for (const auto& [routeIndex, stopIndex] : routeQueue)
-      {
-        const auto& route = routes.at(allRoutes[routeIndex]);
-        const auto& stopsOnRoute = route.stopsInOrder;
-        const auto& tripsOnRoute = route.trips;
-        const auto numberOfTripsForRoute = tripsOnRoute.size();
-
-        // STOPS
-        auto [startOfCurrentRouteStops, endOfCurrentRouteStops] = findStopIndices(routeIndex);
-       // const auto startOfCurrentRouteStops = std::accumulate(routesStopsSizes.begin(), routesStopsSizes.begin() + routeIndex, size_t{0});
-       // const auto endOfCurrentRouteStops = std::accumulate(routesStopsSizes.begin(), routesStopsSizes.begin() + 1 + routeIndex, size_t{0}); //startOfCurrentRouteStops + (routesStopsSizes[routeIndex]);
-        const auto numberOfStopsInCurrentTrip = endOfCurrentRouteStops - startOfCurrentRouteStops;
-        const auto differenceCurrentStopIndexToArrayStart = endOfCurrentRouteStops - stopIndex;
-
-        std::optional<int> currentTrip = std::nullopt;
-
-        for (auto stopTimeIndex = startOfCurrentRouteStops; stopTimeIndex < endOfCurrentRouteStops; ++stopTimeIndex) // startOfCurrentRouteStops
-        {
-          getLogger(Target::CONSOLE, LoggerName::RAPTOR)->info(std::format("Stop: {}", relationManager.getStopNameFromStopId(allStops[stopTimeIndex])));
-        }
-
-        // foreach stop p of r beginning with p
-        for (auto stopTimeIndex = startOfCurrentRouteStops; stopTimeIndex < endOfCurrentRouteStops; ++stopTimeIndex)
-        {
-          if (false == currentTrip.has_value())
-          {
-            // Walk through all trips on the route
-            for (int tripIndex = 0; tripIndex < tripsOnRoute.size(); ++tripIndex)
-            {
-              auto [stopTimesStartIndex, stopTimesEndIndex] = findStopTimesIndices(routeIndex, tripIndex);
-              // Compute starting index for StopTimes for the current trip
-              // STOP TIMES
-              auto tripsRoute = tripsOnRoute[tripIndex];
-
-              getLogger(Target::CONSOLE, LoggerName::RAPTOR)->info(std::format("difference stop times {}", stopTimesEndIndex - stopTimesStartIndex));
-              getLogger(Target::CONSOLE, LoggerName::RAPTOR)->info(std::format("difference stop index {}", endOfCurrentRouteStops - startOfCurrentRouteStops));
-
-              for (auto i = stopTimesStartIndex; i < stopTimesEndIndex; ++i)
-              {
-                getLogger(Target::CONSOLE, LoggerName::RAPTOR)
-                  ->info(std::format("StopTimeItem: {} departure Time {}",
-                                     relationManager.getStopNameFromStopId(allStopTimes[i].stopId),
-                                     allStopTimes[i].departureTime.toString()));
-                if (const auto& stopTime = allStopTimes[i];
-                    stopTime.departureTime.toSeconds() >= sourceDepartureTime)
-                {
-                  currentTrip = tripIndex;
-                  break;
-                }
-              }
-              // Log all stops in the range
-              for (auto i = stopIndex + differenceCurrentStopIndexToArrayStart; i < endOfCurrentRouteStops - 1; ++i) // startOfCurrentRouteStops
-              {
-                getLogger(Target::CONSOLE, LoggerName::RAPTOR)->info(std::format("Stop: {}", relationManager.getStopNameFromStopId(allStops[i])));
-              }
-
-
-              // auto tt = tripsOnRoute[tripIndex].getStopTimesSorted()[stopIndex];
-              // if (tripsOnRoute[tripIndex].getStopTimesSorted()[stopIndex].departureTime.toSeconds() >= sourceDepartureTime) {
-              //     currentTrip = tripIndex;
-              //     break;
-              // }
-            }
-          }
-
-          if (currentTrip)
-          {
-            // const auto& trip = tripsOnRoute[*currentTrip];
-            // const auto& stopTime = trip.stopTimes[stopTimeIndex];
-            //
-            // if (earliestArrival[stopIndexOnRoute].arrivalTime > stopTime.arrivalTime.toSeconds())
-            // {
-            //   earliestArrival[stopIndexOnRoute].arrivalTime = stopTime.arrivalTime.toSeconds();
-            //   earliestArrival[stopIndexOnRoute].parentDepartureTime = stopTime.departureTime.toSeconds();
-            //   earliestArrival[stopIndexOnRoute].stopId = stopId;
-            //   earliestArrival[stopIndexOnRoute].routeId = route.routeId;
-            //   earliestArrival[stopIndexOnRoute].useRoute = true;
-            //   updated = true;
-            //
-            //   previousStop[k][stopIndexOnRoute] = stopTimeIndex;
-            //   previousTrip[k][stopIndexOnRoute] = *currentTrip;
-          }
-        }
-      }
-      ++k;
     }
+  }
+  void RaptorStrategy::scanRoutes() {
+    stopsUpdated.clear();
 
-    return nullptr;
+    // for (const auto& [routeIndex, stopIndex] : routesServingUpdatedStops.getElements())
+    // {
+    //   const auto& routeId = allRoutes[routeIndex];
+    //   const auto& tripsForRoute = gtfsData.getData().routes.at(routeId).trips;
+    //
+    //   for (const auto& trip : tripsForRoute)
+    //   {
+    //     auto stopsOnTrip = trip.getStopTimesSorted();
+    //   }
+
+    // if (tripsForRoute.empty()) continue;
+    //
+    // for (const auto& stopIndex : stopsReached.getElements())
+    // {
+    //   int earliestBoardingTime = std::numeric_limits<int>::max();
+    //   int tripIndexForEarliestBoarding = -1;
+    //   int stopIndexInTrip = -1;
+    //
+    //   // Find the earliest trip that can be boarded at this stop
+    //   for (int tripIndex = 0; tripIndex < tripsForRoute.size(); ++tripIndex)
+    //   {
+    //     const auto& trip = tripsForRoute[tripIndex];
+    //     for (int stopTimeIndex = 0; stopTimeIndex < trip.stopTimes.size(); ++stopTimeIndex)
+    //     {
+    //       const auto stopTime = trip.getStopTimesSorted()[stopTimeIndex];
+    //       auto testObject = gtfsData.getData().stops.at(stopTime.stopId);
+    //       auto id1 = allStops[stopIndex];
+    //       auto id2 = stopTime.stopId;
+    //       if (stopTime.stopId == allStops[stopIndex] && static_cast<int>(stopTime.departureTime.toSeconds()) >= earliestArrival[stopIndex])
+    //       {
+    //         if (static_cast<int>(stopTime.departureTime.toSeconds()) < earliestBoardingTime)
+    //         {
+    //           earliestBoardingTime = static_cast<int>(stopTime.departureTime.toSeconds());
+    //           tripIndexForEarliestBoarding = tripIndex;
+    //           stopIndexInTrip = stopTimeIndex;
+    //           break; // Found earliest boarding time for this trip
+    //         }
+    //       }
+    //     }
+    //   }
+    //
+    //   if (tripIndexForEarliestBoarding == -1) continue; // No trip found that can be boarded
+    //
+    //   // Update arrival times for all subsequent stops in the trip
+    //   const auto& trip = tripsForRoute[tripIndexForEarliestBoarding];
+    //   for (int stopTimeIndex = stopIndexInTrip + 1; stopTimeIndex < trip.stopTimes.size(); ++stopTimeIndex)
+    //   {
+    //     const auto& stopTime = trip.getStopTimesSorted()[stopTimeIndex];
+    //     int stopIndexForNextStop = stopIdIndexMap[stopTime.stopId];
+    //     if (updateArrivalTime(stopIndexForNextStop, stopTime.arrivalTime))
+    //     {
+    //       stopsUpdated.insert(stopIndexForNextStop);
+    //       currentRound()[stopIndexForNextStop].parentDepartureTime = earliestBoardingTime;
+    //       currentRound()[stopIndexForNextStop].useRoute = true;
+    //       currentRound()[stopIndexForNextStop].routeId = routeId;
+    //     }
+    //   }
+    // }
+    // }
+  }
+
+  int RaptorStrategy::getFirstTripOfRoute(const std::string& routeId) const {
+    auto routeIndex = getRouteIndex(routeId);
+    return routeIndex < static_cast<int>(stopEventsOfTrip.size()) ? static_cast<int>(stopEventsOfTrip[routeIndex][0].arrivalTime) : -1;
+  }
+
+  int RaptorStrategy::getLastTripOfRoute(const std::string& routeId) const {
+    auto routeIndex = getRouteIndex(routeId);
+    return routeIndex < static_cast<int>(stopEventsOfTrip.size()) ? static_cast<int>(stopEventsOfTrip[routeIndex].back().arrivalTime) : -1;
+  }
+  int RaptorStrategy::getRouteIndex(const std::string& routeId) const {
+    auto it = routeIdIndexMap.find(routeId);
+    return it != routeIdIndexMap.end() ? it->second : -1;
+  }
+  std::vector<utils::LabelEarliestArrival>& RaptorStrategy::currentRound() {
+    return rounds.back();
   }
 } // namespace raptor::strategy
 
 
 
-//       for (const auto& [routeIndex, stopIndex] : routeQueue)
-//       {
-//         const auto& route = routes.at(allRoutes[routeIndex]);
-//         const auto& stopsOnRoute = route.stopsInOrder;
-//         auto offset = static_cast<int>(stopsOnRoute.size());
-//         const auto& tripsOnRoute = route.trips;
-//
-//         // StopTimes grouped by trip and sorted by departure time per Route
-//         std::vector<std::vector<schedule::gtfs::StopTime>> tripsWithStopTimes; // earliest to latest
-//         std::ranges::transform(tripsOnRoute, std::back_inserter(tripsWithStopTimes), [](const auto& trip) {
-//           return trip.stopTimes
-//                  | std::views::transform([&](const auto& stopTime) { return stopTime; })
-//                  | std::ranges::to<std::vector>();
-//         });
-//         std::ranges::sort(tripsWithStopTimes, [](const std::vector<schedule::gtfs::StopTime>& lhs, const std::vector<schedule::gtfs::StopTime>& rhs) {
-//           return lhs.front().departureTime.toSeconds() < rhs.front().departureTime.toSeconds();
-//         });
-//
-//         const auto numberOfTripsInRoute = tripsOnRoute.size();
-//         std::optional<int> currentTrip = std::nullopt;
-//
-//         for (int stopTimeIndex = static_cast<int>(stopsOnRoute.size()) - 1; stopTimeIndex >= 0; --stopTimeIndex)
-//         {
-//           const auto& stop = stopsOnRoute[stopTimeIndex];
-//           const auto& stopId = stop.stopId;
-//           const auto& stopIndexOnRoute = stopMap.at(stopId);
-//           const auto& stopTimeIndexOnRoute = stopTimesIndices[stopIndexOnRoute];
-//           const auto& stopTimeValue = allStopTimes[stopTimeIndexOnRoute];
-//
-//           if (!currentTrip)
-//           {
-//             auto stopTimeIndexOfCurrentTrip = std::accumulate(routesStopsSizes.begin(), routesStopsSizes.begin() + static_cast<size_t>(routeIndex), static_cast<size_t>(0));
-//             auto stopTimeIndexOnRouteOfCurrentTrip = stopTimesIndices[stopTimeIndexOfCurrentTrip];
-//             auto stopTimeItem = allStopTimes[stopTimeIndexOnRouteOfCurrentTrip];
-//             if (stopTimeItem.departureTime.toSeconds() >= sourceDepartureTime)
-//             {
-//               currentTrip = static_cast<int>(stopTimeIndexOfCurrentTrip);
-//             }
-//
-//             /*auto availableStopTimes = stopTimes.at(stopTimeItem.stopId);
-//             // get all stopTimes that are serving the stop
-//             auto stopTimesServingStop = stopTimes.at(stopId);
-//             std::ranges::sort(stopTimesServingStop, [](const schedule::gtfs::StopTime& lhs, const schedule::gtfs::StopTime& rhs) {
-//               return lhs.departureTime.toSeconds() < rhs.departureTime.toSeconds();
-//             });
-//
-//             const auto& tripId = stopTimesServingStop.front().tripId;
-//             const auto& trip = trips.at(tripId);*/
-//           }
-//
-//           // if current trip
-//           // if (earliestArrival[stopIndexOnRoute].arrivalTime > stopTimes.at(allStopTimes[stopTimeIndexOnRoute]).arrivalTime)
-//           // {
-//           //   earliestArrival[stopIndexOnRoute].arrivalTime = stopTimes.at(allStopTimes[stopTimeIndexOnRoute]).arrivalTime;
-//           //   updated = true;
-//           // }
-//           //
-//           // // check if the label of round k-1 improves the active trip
-//           // if (earliestArrival[stopIndexOnRoute].arrivalTime <= previousStop[k - 1][stopIndexOnRoute])
-//           // {
-//           //   previousTrip[k][stopIndexOnRoute] = stopTimeIndex;
-//           // }
-//         }
-//       }
-//
-//
-//       ++k;
-
-
-/*
-*    struct RouteStructure
-    {
-      std::string routeId;
-      std::vector<std::string> routeStops;
-      struct Trip
-      {
-        std::vector<schedule::gtfs::StopTime> stopTimes;
-      };
-
-      std::vector<Trip> trips;
-    };
-
-    std::vector<RouteStructure> routeStructures;
-    for (const auto& route : routes)
-    {
-      RouteStructure routeStructure;
-      routeStructure.routeId = route.first;
-      std::ranges::transform(route.second.stopsInOrder, std::back_inserter(routeStructure.routeStops), [](const auto& stop) {
-        return stop.stopId;
-      });
-      for (const auto& trip : route.second.trips)
-      {
-        RouteStructure::Trip tripStructure;
-        tripStructure.stopTimes = {trip.stopTimes.begin(), trip.stopTimes.end()};
-        routeStructure.trips.push_back(tripStructure);
-      }
-      std::ranges::sort(routeStructure.trips, [](const RouteStructure::Trip& lhs, const RouteStructure::Trip& rhs) {
-        return lhs.stopTimes.front().departureTime.toSeconds() < rhs.stopTimes.front().departureTime.toSeconds();
-      });
-      routeStructures.push_back(routeStructure);
-    }
- */
-
-/*
- * std::vector<std::string> flatRoutes{};
-    std::vector<std::string> routeStopItems{};
-    std::vector<std::string> routeStopTimes{};
-    for (const auto& routeItem : routes | std::views::values)
-    {
-      flatRoutes.push_back(routeItem.routeId);
-      bool stopItemsAdded = false;
-      for (const auto& tripItem : routeItem.trips)
-      {
-        std::ranges::transform(tripItem.stopTimes, std::back_inserter(routeStopTimes), [](const auto& stopTime) {
-          return stopTime.stopId;
-        });
-
-        if (stopItemsAdded == false)
-        {
-          std::ranges::transform(tripItem.stopTimes, std::back_inserter(routeStopItems), [](const auto& stopTime) {
-            return stopTime.stopId;
-          });
-          stopItemsAdded = true;
-        }
-      }
-    }
-
-    std::unordered_map<std::string, int> stopMap;
-
-    for (const auto& [index, routeStop] : std::views::enumerate(routeStopItems))
-    {
-      stopMap[routeStop] = static_cast<int>(index);
-    }
-
-    // Initialize arrival times with infinity
-    earliestArrival.resize(routeStopItems.size(), utils::LabelEarliestArrival{.arrivalTime = utils::INFINITY_VALUE});
-    std::vector<std::vector<int>> previousStop(MAX_ROUNDS + 1, std::vector<int>(routeStopItems.size(), -1));
-    std::vector<std::vector<int>> previousTrip(MAX_ROUNDS + 1, std::vector<int>(routeStopItems.size(), -1));
-
-    auto sourceStopIndex = stopMap.at(sources.front());
-    auto targetStopIndex = stopMap.at(targets.front());
-
-    earliestArrival[sourceStopIndex].arrivalTime = sourceDepartureTime;
-    earliestArrival[sourceStopIndex].stopId = sources.front();
-
-    int k = 1;
-    bool updated = true;
-
-    while (k < MAX_ROUNDS && updated)
-    {
-      updated = false;
-      std::vector<std::pair<int, int>> routeQueue; // (routeIndex, stopIndex)
-
-      // Accumulate routes serving marked stops from previous round
-      for (int stopIndex = 0; stopIndex < request.departureStopId.size(); ++stopIndex)
-      {
-        if (earliestArrival[stopMap[request.departureStopId[stopIndex]]].arrivalTime != utils::INFINITY_VALUE)
-        {
-          for (const auto& routeItem : routes | std::views::values)
-          {
-            const auto it = std::ranges::find_if(routeItem.stops, [&](const auto& stopItem) {
-              return stopItem.stopId == routeStopItems[stopIndex];
-            });
-            if (it != routeItem.stops.end())
-            {
-              routeQueue.emplace_back(static_cast<int>(std::distance(routes.begin(), routes.find(routeItem.routeId))), stopIndex);
-            }
-          }
-          earliestArrival[stopIndex].arrivalTime = utils::INFINITY_VALUE;
-        }
-      }
-
-      // Traverse each route in queue
-      // for (const auto& routeIndex : routeQueue | std::views::keys) {
-      //   int currentTrip = -1;
-      //   const auto& route = routes.at(flatRoutes[routeIndex]);
-      //   for (size_t stopIndex = routeStopItems.size(); stopIndex-- > 0;) {
-      //     const int stopTimeIndex = stopIndex;
-      //     int stopId = stopMap.at(routeStopItems[stopTimeIndex]);
-      //     // Check if current trip improves the arrival time
-      //     if (currentTrip == -1 && stopTimes.at(routeStopTimes[stopTimeIndex]).arrivalTime < std::min(earliestArrival[stopId].arrivalTime, earliestArrival[targetStopIndex].arrivalTime)) {
-      //       earliestArrival[stopId].arrivalTime = stopTimes.at(routeStopTimes[stopTimeIndex]).arrivalTime;
-      //       earliestArrival[targetStopIndex].arrivalTime = stopTimes.at(routeStopTimes[stopTimeIndex]).arrivalTime;
-      //       updated = true;
-      //     }
-      //     // Check if the label of round k-1 improves the active trip
-      //     if (earliestArrival[stopId].arrivalTime <= previousStop[k - 1][stopId]) {
-      //       currentTrip = stopTimeIndex;
-      //     }
-      //   }
-      // }
-
-      //
-      // // Consider foot-paths
-      // for (int stopIndex = 0; stopIndex < numStops; ++stopIndex)
-      // {
-      //   if (earliestArrival[stopIndex].arrivalTime != utils::INFINITY_VALUE)
-      //   {
-      //     for (const auto& transfer : transferFrom.at(stopIndex))
-      //     {
-      //       int targetStopIndex = stopMap.at(transfer.toStopId);
-      //       int travelTime = transfer.duration;
-      //       if (earliestArrival[targetStopIndex].arrivalTime > earliestArrival[stopIndex].arrivalTime + travelTime)
-      //       {
-      //         earliestArrival[targetStopIndex].arrivalTime = earliestArrival[stopIndex].arrivalTime + travelTime;
-      //         updated = true;
-      //       }
-      //     }
-      //     // Mark the stop
-      //     earliestArrival[stopIndex].arrivalTime = utils::INFINITY_VALUE;
-      //   }
-      // }
-      //
-      // if (updated)
-      // {
-      //   std::vector<utils::LabelEarliestArrival> newRound(numStops, utils::LabelEarliestArrival{.arrivalTime = utils::INFINITY_VALUE});
-      //   rounds.push_back(newRound);
-      // }
-
-      ++k;
-    }
-*/
-
-
-/*
- *std::shared_ptr<IConnection> RaptorStrategy::execute(const utils::ConnectionRequest& request) {
-    // Initialize variables and data structures
-    sources = request.departureStopId;
-    targets = request.arrivalStopId;
-    const unsigned int sourceDepartureTime = request.earliestDepartureTime;
-
-    const auto numStops = getTotalNumberOfStops();
-
-    earliestArrival.resize(numStops, utils::LabelEarliestArrival{});
-    std::vector<std::vector<int>> previousStop(MAX_ROUNDS + 1, std::vector<int>(numStops, -1));
-    std::vector<std::vector<int>> previousTrip(MAX_ROUNDS + 1, std::vector<int>(numStops, -1));
-
-    stopMap = createStopIndexMap();
-
-    int sourceStopIndex = stopMap.at(sources.front());
-    int targetStopIndex = stopMap.at(targets.front());
-
-    earliestArrival[sourceStopIndex].arrivalTime = sourceDepartureTime;
-
-    const auto& [agencies,
-                 calendars,
-                 calendarDates,
-                 routes,
-                 stops,
-                 stopTimes,
-                 transferFrom,
-                 transferTo,
-                 trips]
-      = relationManager.getData();
-
-    flatStopIds.reserve(stops.size());
-    flatStopIds = stops | std::views::keys | std::ranges::to<std::vector>();
-
-    tripMap = trips | std::views::keys | std::views::enumerate | std::views::transform([](const auto& pair) {
-                return std::pair<std::string, int>(std::get<1>(pair), static_cast<int>(std::get<0>(pair)));
-              })
-              | std::ranges::to<std::unordered_map<std::string, int>>();
-
-
-    arrivalTimes.reserve(stops.size());
-
-    // First round
-    const auto stopTimesForStopId = stopTimesForStopIdAndTimeGreaterThan(sources.front(), sourceDepartureTime);
-    const auto tripsForStopTime = stopTimesForStopId | std::views::transform([&](const schedule::gtfs::StopTime& stopTime) {
-                                    return trips.at(stopTime.tripId);
-                                  })
-                                  | std::ranges::to<std::vector>();
-
-    earliestArrival[sourceStopIndex].arrivalTime = sourceDepartureTime;
-    earliestArrival[sourceStopIndex].stopId = sources.front();
-
-    const auto initialRoute = tripsForStopTime.front().front().routeId;
-    const auto initialRouteToScan = routes.at(initialRoute);
-    const auto stopsOfInitialRoute = initialRouteToScan.stops;
-
-    const auto allRoutes = routes | std::views::keys | std::ranges::to<std::vector>();
-
-    std::vector<std::string> routeBuiltWithSortedStopTimes{};
-
-    std::vector<std::string> allStopTimeItems;
-    std::vector<std::string> allStopItems;
-
-    for (const auto& tripItems : trips | std::views::values)
-    {
-      bool routeStopsAdded = false;
-      for (const auto& tripItem : tripItems)
-      {
-        for (const auto& route = routes.at(tripItem.routeId);
-             const auto& stopItem : route.stops)
-        {
-          // allStopItems.push_back(stopItem.stopId);
-          auto values = tripItem.stopTimes | std::views::transform([](const auto& stopTime) {
-                          return stopTime.stopId;
-                        });
-          allStopTimeItems.insert(allStopTimeItems.end(), values.begin(), values.end());
-          if (routeStopsAdded == false)
-          {
-            allStopItems.insert(allStopItems.end(), values.begin(), values.end());
-            routeStopsAdded = true;
-          }
-        }
-      }
-    }
-
-    std::vector<std::vector<utils::LabelEarliestArrival>> rounds;
-    rounds.emplace_back(allStopItems.size());
-
-    auto& currentRound = rounds.back();
-    currentRound[sourceStopIndex].arrivalTime = sourceDepartureTime;
-    currentRound[sourceStopIndex].stopId = sources.front();
-
-
-    int k = 1;
-    bool updated = true;
-
-
-
-    while (k < MAX_ROUNDS)
-    {
-      const auto& stopTimesForStop = relationManager.getStopTimesFromStopIdStartingFromSpecificTime(sources.front(), sourceDepartureTime);
-      for (const auto& stopTime : stopTimesForStop)
-      {
-        const auto& tripItems = relationManager.getData().trips.at(stopTime.tripId);
-        for (const auto& tripItem : tripItems)
-        {
-          for (const auto& stop : tripItem.stopTimes)
-          {
-            const auto& stopIndex = stopMap.at(stop.stopId);
-
-            if (currentRound[stopIndex].arrivalTime > stopTime.departureTime.toSeconds())
-            {
-              currentRound[stopIndex].arrivalTime = stopTime.arrivalTime.toSeconds();
-              currentRound[stopIndex].stopId = stop.stopId;
-              currentRound[stopIndex].useRoute = true;
-            }
-          }
-        }
-      }
-      ++k;
-    }
-
-    // Return null pointer for now, as the connection construction is not fully implemented
-    return nullptr;
-  }
-  */
-
-
-/*
- *    auto stopLabels = initializeStopLabels(sourceDepartureTime, departureStopIds);
-    std::unordered_map<std::string, unsigned int> stopEarliestArrivalTime;
-
-    std::vector<utils::LabelEarliestArrival> rounds;
-
-    for (const auto& stopId : departureStopIds)
-    {
-      stopEarliestArrivalTime[stopId] = sourceDepartureTime;
-    }
-
-    for (const auto& stopId : departureStopIds)
-    {
-     // rou
-    }
-
-
-
-    std::set<std::string> markedStops(departureStopIds.begin(), departureStopIds.end());
-
-    for (unsigned int round = 1; round <= MAX_ROUNDS; ++round) // for each round k <-- 1, 2, ..., K
-    {
-      std::unordered_map<std::string, utils::Label> newStopLabels;
-      std::queue<std::pair<std::string, std::string>> Q;
-      std::set<std::pair<std::string, std::string>> seen; // To avoid duplicates
-
-      // Accumulate routes serving marked stops without duplicates
-      for (const auto& stopId : markedStops)
-      {
-        auto stopTimesIter = relationManager.getData().stopTimes.find(stopId);
-        auto dropBasedOnTime = stopTimesIter->second | std::views::drop_while([&](const schedule::gtfs::StopTime& stopTime) {
-                                 return stopTime.departureTime.toSeconds() < stopEarliestArrivalTime[stopId] && stopTime.arrivalTime.toSeconds() < stopEarliestArrivalTime[arrivalStopIds.front()];
-                               });
-
-        if (auto stopTimesIter = relationManager.getData().stopTimes.find(stopId);
-            stopTimesIter != relationManager.getData().stopTimes.end())
-        {
-          auto stopTimesGreaterThanMinTime = stopTimesIter->second | std::views::filter([&](const schedule::gtfs::StopTime& stopTime) {
-                                               return stopTime.departureTime.toSeconds() >= stopEarliestArrivalTime[stopId];
-                                             })
-                                             | std::ranges::to<std::vector>();
-
-          std::ranges::sort(stopTimesGreaterThanMinTime, [](const schedule::gtfs::StopTime& lhs, const schedule::gtfs::StopTime& rhs) {
-            return lhs.departureTime.toSeconds() < rhs.departureTime.toSeconds();
-          });
-          auto firstStopTime = stopTimesGreaterThanMinTime.front();
-          getLogger(Target::CONSOLE, LoggerName::RAPTOR)->info(std::format("Stop: {}, Time: {}, Route: {}", relationManager.getStopNameFromStopId(firstStopTime.stopId), firstStopTime.departureTime.toSeconds(), firstStopTime.tripId));
-          // for (const auto& stopTime : stopTimesGreaterThanMinTime)
-          // {
-          //   LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Stop: {}, Time: {}, Route: {}", relationManager.getStopNameFromStopId(stopTime.stopId), stopTime.departureTime.toSeconds(), stopTime.tripId));
-          //  //  const auto& trip = relationManager.getData().trips.at(stopTime.tripId);
-          //   // Q.emplace(trip.front().routeId, stopId);
-          // }
-        }
-      }
-    }
-
-
-    return nullptr;
-
-*/
-
-
-// // Initialization
-// auto stopLabels = initializeStopLabels(sourceDepartureTime, departureStopIds);
-// std::unordered_map<std::string, unsigned int> earliestArrivalTime;
-// for (const auto& stopId : departureStopIds)
+// routesServingUpdatedStops.clear();
+// for (const auto& stopsUpdatedElements = stopsUpdated.getElements();
+//      const auto stop : stopsUpdatedElements)
 // {
-//   earliestArrivalTime[stopId] = sourceDepartureTime;
-// }
-// std::set<std::string> markedStops(departureStopIds.begin(), departureStopIds.end());
-//
-// for (unsigned int round = 1; round <= MAX_ROUNDS; ++round)
-// {
-//   std::unordered_map<std::string, utils::Label> newStopLabels;
-//   std::queue<std::pair<std::string, std::string>> Q;
-//
-//   // Accumulate routes serving marked stops
-//   for (const auto& stopId : markedStops)
+//   if (const auto& stopId = allStops[stop];
+//       relationManager.getData().transferFrom.contains(stopId))
 //   {
-//     if (auto stopTimesIter = relationManager.getData().stopTimes.find(stopId); stopTimesIter != relationManager.getData().stopTimes.end())
+//     for (const auto& transfer : relationManager.getData().transferFrom.at(stopId))
 //     {
-//       for (const auto& stopTime : stopTimesIter->second)
+//       const auto& toStopId = transfer.toStopId;
+//       const auto& transferTime = transfer.minTransferTime;
+//       const auto& fromStopId = transfer.fromStopId;
+//       const auto& fromStopIndex = stopIdIndexMap[fromStopId];
+//       const auto& toStopIndex = stopIdIndexMap[toStopId];
+//
+//       if (const auto& arrivalTime = earliestArrival[fromStopIndex] + transferTime;
+//           arrivalTime < earliestArrival[toStopIndex])
 //       {
-//         const auto& trip = relationManager.getData().trips.at(stopTime.tripId); // size should be one !! TODO check
-//         Q.emplace(trip.front().routeId, stopId);
-//       }
-//     }
-//   }
-//   markedStops.clear();
-//
-//   // Traverse each route
-//   while (!Q.empty())
-//   {
-//     auto [routeId, startStop] = Q.front();
-//     Q.pop();
-//     const auto& route = relationManager.getData().routes.at(routeId);
-//     bool foundActiveTrip = false;
-//     utils::Label activeLabel;
-//
-//     for (const auto& stop : route.stops | std::views::drop_while([&](const schedule::gtfs::Stop& stop) { return stop.stopId != startStop; }))
-//     {
-//       const std::string& stopId = stop.stopId;
-//
-//       if (foundActiveTrip && activeLabel.time < std::min(earliestArrivalTime[stopId], earliestArrivalTime[arrivalStopIds.front()]))
-//       {
-//         earliestArrivalTime[stopId] = activeLabel.time;
-//         newStopLabels[stopId] = activeLabel;
-//         markedStops.insert(stopId);
-//       }
-//
-//       if (auto it = stopLabels.find(stopId); it != stopLabels.end())
-//       {
-//         const auto& labels = it->second;
-//         auto bestLabel = std::ranges::min_element(labels, [](const utils::Label& lhs, const utils::Label& rhs) { return lhs.time < rhs.time; });
-//         const auto& stopTime = relationManager.getStopTimeFromStopId(stop.stopId);
-//         if (bestLabel != labels.end() && bestLabel->time <= stopTime.departureTime.toSeconds())
+//         if (updateArrivalTime(toStopIndex, arrivalTime))
 //         {
-//           activeLabel = *bestLabel;
-//           activeLabel.time = stopTime.arrivalTime.toSeconds();
-//           activeLabel.transfers++;
-//           foundActiveTrip = true;
+//           stopsUpdated.insert(toStopIndex);
+//           currentRound()[toStopIndex].stopId = toStopId;
+//           currentRound()[toStopIndex].parentDepartureTime = earliestArrival[fromStopIndex];
+//           currentRound()[toStopIndex].routeId = "";
+//           currentRound()[toStopIndex].useRoute = false;
 //         }
 //       }
 //     }
-//   }
-//
-//   // Look at foot-paths
-//   for (const auto& stopId : markedStops)
-//   {
-//     if (auto transfersIter = relationManager.getData().transferFrom.find(stopId);
-//         transfersIter != relationManager.getData().transferFrom.end())
-//     {
-//       for (const auto& transfer : transfersIter->second)
-//       {
-//         const auto& fromStopId = transfer.fromStopId;
-//         const auto& toStopId = transfer.toStopId;
-//
-//         unsigned int transferTime = transfer.minTransferTime;
-//         unsigned int newArrivalTime = earliestArrivalTime[fromStopId] + transferTime;
-//
-//         if (newArrivalTime < earliestArrivalTime[toStopId])
-//         {
-//           earliestArrivalTime[toStopId] = newArrivalTime;
-//           newStopLabels[toStopId] = {newArrivalTime, newStopLabels[fromStopId].transfers + 1, fromStopId, "", ""};
-//           markedStops.insert(toStopId);
-//         }
-//       }
-//     }
-//   }
-//
-//   // Update stop labels with new labels
-//   for (const auto& [stopId, newLabel] : newStopLabels)
-//   {
-//     updateLabels(stopLabels[stopId], newLabel);
-//   }
-//
-//   // Stopping criterion
-//   if (markedStops.empty())
-//   {
-//     break;
 //   }
 // }
-//
-// // Reconstruct the connection from target back to source
-// const auto path = reconstructConnections(stopLabels, arrivalStopIds);
-//
-// // Logging trips and stops in the reconstructed path
-// LoggingPool::getInstance(Target::CONSOLE)->info(" ");
-// LoggingPool::getInstance(Target::CONSOLE)->info("Reconstructed path:");
-// std::string currentTrip = "";
-// for (const auto& [stopId, time, routeId, tripId] : path)
+
+
+
+// Iterate through stops that have been updated in the current round
+// for (const auto& stopIndex : stopsUpdated.getElements())
 // {
-//   if (tripId != currentTrip)
-//   {
-//     if (!currentTrip.empty())
-//     {
-//       LoggingPool::getInstance(Target::CONSOLE)->info(" ");
-//     }
-//     currentTrip = tripId;
-//     LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Trip: {}", tripId));
-//   }
-//   LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Stop: {}, Time: {}, Route: {}", stopId, time, routeId));
+//   const auto arrivalTime = this->previousRound()[stopIndex].arrivalTime;
+//   const std::string& stopId = allStops[stopIndex];
 //
-//   std::ranges::for_each(relationManager.getData().routes.at(routeId).stops, [&](const schedule::gtfs::Stop& stop) {
-//     LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Stop: {}, Name: {}", stop.stopId, stop.stopName));
+//   // Find routes that contain the current stop
+//   for (const auto& route : allRoutes)
+//   {
+//     const auto& currentRoute = relationManager.getData().routes.at(route);
+//
+//     // Check if route contains the current stop via stopId
+//     if (auto it = std::ranges::find_if(currentRoute.stopsInOrder, [stopId](const schedule::gtfs::Stop& stop) {
+//           return stop.stopId == stopId;
+//         });
+//         it != currentRoute.stopsInOrder.end())
+//     {
+//       const auto stopEventsTrip = stopEventsOfTrip[currentRoute.trips.size() - 1];
+//       if (stopEventsTrip[stopIndex].departureTime < arrivalTime)
+//       {
+//         continue;
+//       }
+//       // Store the route that serves the updated stop
+//       routesServingUpdatedStops.insert(routeIdIndexMap[route], stopIndex);
+//     }
+//   }
+// }
+
+
+
+// std::vector<schedule::gtfs::StopTime> RaptorStrategy::getStopTimesForTrip(const int routeIndex, const int tripIndex) const {
+//   const auto startIdx = tripOffsets[routeIndex] + tripIndex;
+//   const auto endIdx = tripIndex + 1 < routeObjects[routeIndex].trips.size() ? tripOffsets[routeIndex] + tripIndex + 1 : flatStopTimes.size();
+//   return {flatStopTimes.begin() + startIdx, flatStopTimes.begin() + static_cast<int>(endIdx)};
+// }
+// /// @brief
+// /// @param relationManager
+// RaptorStrategy::RaptorStrategy(schedule::gtfs::RelationManager&& relationManager)
+//   : gtfsData(std::move(relationManager))
+//   , stopsUpdated(static_cast<int>(this->gtfsData.getData().stops.size()))
+//   , stopsReached(static_cast<int>(this->gtfsData.getData().stops.size()))
+//   , routesServingUpdatedStops(static_cast<int>(this->gtfsData.getData().routes.size())) {
+//   initialize();
+// }
+//
+//
+// std::shared_ptr<IConnection> RaptorStrategy::execute(const utils::ConnectionRequest& request) {
+//   // Initialize variables and data structures
+//   source = request.departureStopId.front();
+//   target = request.arrivalStopId.front();
+//   earliestDepartureTime = static_cast<int>(request.earliestDepartureTime);
+//   sourceLatestDepartureTime = earliestDepartureTime + 60 * 60; // 1 hour later
+//
+//   const auto& [agencies,
+//                calendars,
+//                calendarDates,
+//                routes,
+//                stops,
+//                stopTimes,
+//                transferFrom,
+//                transferTo,
+//                trips]
+//     = relationManager.getData();
+//
+//   allStops = std::views::keys(stops) | std::ranges::to<std::vector<std::string>>();
+//   allRoutes = std::views::keys(routes) | std::ranges::to<std::vector<std::string>>();
+//   routeObjects = std::views::values(routes) | std::ranges::to<std::vector<schedule::gtfs::Route>>();
+//
+//   for (int i = 0; i < allStops.size(); ++i)
+//   {
+//     stopIdIndexMap[allStops[i]] = i;
+//   }
+//
+//   for (int i = 0; i < allRoutes.size(); ++i)
+//   {
+//     routeIdIndexMap[allRoutes[i]] = i;
+//   }
+//
+//   flatStopTimes.clear();
+//   routeOffsets.clear();
+//   tripOffsets.clear();
+//
+//   int stopTimeIndex = 0;
+//
+//   for (const auto& route : routes)
+//   {
+//     routeOffsets.push_back(stopTimeIndex);
+//     for (const auto& trip : route.second.trips)
+//     {
+//       tripOffsets.push_back(stopTimeIndex);
+//       for (const auto& stopTime : trip.stopTimes)
+//       {
+//         flatStopTimes.push_back(stopTime);
+//         ++stopTimeIndex;
+//       }
+//     }
+//   }
+//
+//   this->collectDepartureTimes();
+//   this->initialize();
+//
+//   auto sourceDepartureTime = 0;
+//
+//   int k = 0;
+//   while (k < MAX_ROUNDS)
+//   {
+//     this->relaxTransfers();
+//     this->startNewRound();
+//     this->collectRoutesServingUpdatedStops();
+//     this->scanRoutes();
+//     sourceDepartureTime = collectedDepTimes[k].depTime;
+//     ++k;
+//   }
+//
+//
+//   return nullptr;
+// }
+//
+// void RaptorStrategy::collectDepartureTimes() {
+//
+//   for (const auto& route : relationManager.getData().routes | std::views::values)
+//   {
+//     auto trips = route.trips; // Copy needed since getData() returns a const reference
+//     std::ranges::sort(trips, [](const schedule::gtfs::Trip& a, const schedule::gtfs::Trip& b) {
+//       return a.getStopTimesSorted().front().arrivalTime < b.getStopTimesSorted().front().arrivalTime;
+//     });
+//
+//     for (const auto& trip : trips)
+//     {
+//       const auto& stopTimesPerTrip = trip.getStopTimesSorted();
+//       for (const auto& [index, stopTime] : std::views::enumerate(stopTimesPerTrip))
+//       {
+//         if (index + 1 == stopTimesPerTrip.size()) continue; // Skip last stop sequence
+//         if (static_cast<int>(stopTime.departureTime.toSeconds()) < earliestDepartureTime
+//             || static_cast<int>(stopTime.departureTime.toSeconds()) > sourceLatestDepartureTime) continue;
+//
+//         if (const auto transferTime = getTransferTime(stopTime.stopId, source);
+//             stopTime.stopId == source || transferTime < std::numeric_limits<int>::infinity())
+//         {
+//           collectedDepTimes.emplace_back(stopTime.departureTime.toSeconds(), stopTime.stopId);
+//         }
+//       }
+//     }
+//   }
+//   // Sort the collected departure times in reverse order
+//   std::ranges::sort(collectedDepTimes, [](const DepartureLabel& a, const DepartureLabel& b) {
+//     return a.depTime > b.depTime;
 //   });
 // }
 //
-// return nullptr;
-
-
-
-// const auto& departureStopIds = request.departureStopId;
-// const auto& arrivalStopIds = request.arrivalStopId;
-// const unsigned int sourceDepartureTime = request.earliestDepartureTime;
-//
-// // Initialize stop labels
-// auto stopLabels = initializeStopLabels(sourceDepartureTime, departureStopIds);
-//
-// // Perform RAPTOR algorithm rounds
-// for (unsigned int round = 0; round < MAX_ROUNDS; ++round)
-// {
-//   std::unordered_map<std::string, utils::Label> newStopLabels;
-//
-//   for (const auto& [stopId, labels] : stopLabels)
+// int RaptorStrategy::getTransferTime(const std::string& fromStopId, const std::string& toStopId) const {
+//   const auto& transferFrom = relationManager.getData().transferFrom;
+//   if (const auto transferIter = transferFrom.find(fromStopId); transferIter != transferFrom.end())
 //   {
-//     for (const auto& label : labels)
+//     for (const auto& transfer : transferIter->second)
 //     {
-//       // get stop times for current stop
-//       auto stopTimesIter = relationManager.getData().stopTimes.find(stopId);
-//       if (stopTimesIter == relationManager.getData().stopTimes.end()) continue; // if no stop times found for stop, continue
-//
-//       for (const auto& stopTime : stopTimesIter->second)
+//       if (transfer.toStopId == toStopId)
 //       {
-//         if (stopTime.departureTime.toSeconds() < label.time) continue;
+//         return transfer.minTransferTime;
+//       }
+//     }
+//   }
+//   return std::numeric_limits<int>::max();
+// }
 //
-//         auto tripIter = relationManager.getData().trips.find(stopTime.tripId);
-//         if (tripIter == relationManager.getData().trips.end()) continue; // if no trip found for stop time, continue
+// void RaptorStrategy::initialize() {
+//   this->clear();
+//   this->updateArrivalTime(stopIdIndexMap[source], earliestDepartureTime);
+//   this->currentRound()[stopIdIndexMap[source]].parentDepartureTime = earliestDepartureTime;
+//   this->currentRound()[stopIdIndexMap[source]].useRoute = false;
+//   this->currentRound()[stopIdIndexMap[source]].routeId = "";
+// }
+// void RaptorStrategy::clear() {
+//   std::ranges::for_each(stopIdIndexMap | std::views::values, [this](const int stopIndex) {
+//     earliestArrival.push_back(std::numeric_limits<int>::max());
+//   });
+//   std::vector<utils::LabelEarliestArrival> round;
+//   for (const auto& _ : stopIdIndexMap | std::views::keys)
+//   {
+//     round.emplace_back(utils::LabelEarliestArrival{});
+//   }
+//   rounds.push_back(std::move(round));
+//   stopsUpdated = utils::IndexedVisitedSet{static_cast<int>(stopIdIndexMap.size())};
+//   stopsReached = utils::IndexedVisitedSet{static_cast<int>(stopIdIndexMap.size())};
+//   routesServingUpdatedStops = utils::IndexedVisitedHashMap{static_cast<int>(relationManager.getData().routes.size())};
+// }
 //
-//         for (const auto& trip : tripIter->second)
+// bool RaptorStrategy::updateArrivalTime(int const stopIndex, int const arrivalTime) {
+//   if (earliestArrival[stopIndex] > arrivalTime)
+//   {
+//     currentRound()[stopIndex].arrivalTime = arrivalTime;
+//     earliestArrival[stopIndex] = arrivalTime;
+//     stopsUpdated.insert(stopIndex);
+//     return true;
+//   }
+//   return false;
+// }
+//
+// std::vector<utils::LabelEarliestArrival>& RaptorStrategy::currentRound() {
+//   return rounds.back();
+// }
+// std::vector<utils::LabelEarliestArrival>& RaptorStrategy::previousRound() {
+//   return rounds[rounds.size() - 2];
+// }
+//
+// void RaptorStrategy::relaxTransfers() {
+//   for (const auto& stopIndex : stopsUpdated.getElements())
+//   {
+//     const std::string& stopId = allStops[stopIndex];
+//     if (relationManager.getData().transferFrom.contains(stopId))
+//     {
+//       for (const auto& transfer : relationManager.getData().transferFrom.at(stopId))
+//       {
+//         const std::string& toStopId = transfer.toStopId;
+//         int transferTime = transfer.minTransferTime;
+//         int toStopIndex = stopIdIndexMap[toStopId];
+//         int newArrivalTime = earliestArrival[stopIndex] + transferTime;
+//
+//         if (updateArrivalTime(toStopIndex, newArrivalTime))
 //         {
-//           try
-//           {
-//             const auto& route = relationManager.getData().routes.at(trip.routeId);
-//             bool foundArrival = false;
-//             // check if arrival stop is in route stops - if yes, calculate arrival time and update label
-//             for (const auto& arrivalStopId : arrivalStopIds)
-//             {
-//               if (auto arrivalStopIter = std::ranges::find_if(route.stops, [&](const schedule::gtfs::Stop& stop) {
-//                     return stop.stopId == arrivalStopId; // check if arrival stop is in route stops
-//                   });
-//                   arrivalStopIter != route.stops.end())
-//               {
-//                 foundArrival = true;
-//                 const unsigned int travelTime = stopTime.departureTime.toSeconds() - label.time;
-//                 const unsigned int arrivalTime = label.time + travelTime;
-//                 const int tripCount = label.transfers + 1;
-//
-//                 if (utils::Label newLabel = {arrivalTime, tripCount, stopId, trip.routeId, stopTime.tripId};
-//                     !newStopLabels.contains(arrivalStopId) || isParetoOptimal({newStopLabels[arrivalStopId]}, newLabel))
-//                 {
-//                   newStopLabels[arrivalStopId] = newLabel;
-//                 }
-//               }
-//             }
-//
-//             if (!foundArrival)
-//             {
-//               try
-//               {
-//                 for (const auto& transfer : relationManager.getData().transferFrom.at(stopId))
-//                 {
-//                   if (transfer.fromStopId == stopId)
-//                   {
-//                     const unsigned int travelTime = stopTime.departureTime.toSeconds() - label.time;
-//                     const unsigned int arrivalTime = label.time + travelTime + transfer.minTransferTime;
-//                     const int tripCount = label.transfers + 1;
-//
-//                     if (utils::Label newLabel = {arrivalTime, tripCount, stopId, trip.routeId, stopTime.tripId};
-//                         !newStopLabels.contains(transfer.toStopId) || isParetoOptimal({newStopLabels[transfer.toStopId]}, newLabel))
-//                     {
-//                       newStopLabels[transfer.toStopId] = newLabel;
-//                     }
-//                   }
-//                 }
-//               } catch (std::out_of_range& e)
-//               {
-//                 LoggingPool::getInstance(Target::CONSOLE)->error(std::format("Error: {} {}", e.what(), "No transfers found for stop ID: " + stopId));
-//               }
-//             }
-//           } catch (std::out_of_range& e)
-//           {
-//             LoggingPool::getInstance(Target::CONSOLE)->error(std::format("Error: {} {}", e.what(), "No route found for trip ID: " + trip.routeId));
-//           }
+//           currentRound()[toStopIndex].stopId = toStopId;
+//           currentRound()[toStopIndex].parentDepartureTime = earliestArrival[stopIndex];
+//           currentRound()[toStopIndex].routeId = "";
+//           currentRound()[toStopIndex].useRoute = false;
 //         }
 //       }
 //     }
 //   }
-//
-//   for (const auto& [stopId, newLabel] : newStopLabels)
-//   {
-//     updateLabels(stopLabels[stopId], newLabel);
-//   }
 // }
 //
-// // Reconstruct the connection from target back to source
-// const auto path = reconstructConnections(stopLabels, arrivalStopIds);
+// void RaptorStrategy::startNewRound() {
+//   std::vector<utils::LabelEarliestArrival> round(stopIdIndexMap.size());
+//   rounds.push_back(std::move(round));
+// }
 //
-// // Logging trips and stops in the reconstructed path
-// LoggingPool::getInstance(Target::CONSOLE)->info(" ");
-// LoggingPool::getInstance(Target::CONSOLE)->info("Reconstructed path:");
-// std::string currentTrip = "";
-// for (const auto& [stopId, time, routeId, tripId] : path)
-// {
-//   if (tripId != currentTrip)
+// std::vector<schedule::gtfs::Route> RaptorStrategy::routesContainingStop(int aStop) const {
+//
+//   return relationManager.getData().routes | std::views::values
+//          | std::views::filter([aStop, this](const schedule::gtfs::Route& route) {
+//              return std::ranges::find_if(route.stopsInOrder,
+//                                          [this, aStop](const schedule::gtfs::Stop& stop) { return stop.stopId == allStops[aStop]; })
+//                     != route.stopsInOrder.end();
+//            })
+//          | std::ranges::to<std::vector<schedule::gtfs::Route>>();
+// }
+//
+// void RaptorStrategy::collectRoutesServingUpdatedStops() {
+//   routesServingUpdatedStops.clear();
+//   for (const auto& stopIndex : stopsUpdated.getElements())
 //   {
-//     if (!currentTrip.empty())
+//     const std::string& stopId = allStops[stopIndex];
+//     for (const auto& route : relationManager.getData().routes | std::views::values)
 //     {
-//       LoggingPool::getInstance(Target::CONSOLE)->info(" ");
+//       auto it = std::ranges::find_if(route.stopsInOrder, [stopId](const schedule::gtfs::Stop& stop) {
+//         return stop.stopId == stopId;
+//       });
+//       if (it != route.stopsInOrder.end())
+//       {
+//         routesServingUpdatedStops.insert(routeIdIndexMap[route.routeId], stopIndex);
+//       }
 //     }
-//     currentTrip = tripId;
-//     LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Trip: {}", tripId));
 //   }
-//   LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Stop: {}, Time: {}, Route: {}", stopId, time, routeId));
-//
-//   std::ranges::for_each(relationManager.getData().routes.at(routeId).stops, [&](const schedule::gtfs::Stop& stop) {
-//     LoggingPool::getInstance(Target::CONSOLE)->info(std::format("Stop: {}, Name: {}", stop.stopId, stop.stopName));
-//   });
 // }
+// void RaptorStrategy::scanRoutes() {
+//   stopsUpdated.clear();
 //
-// return nullptr;
+//   for (const auto& [routeIndex, stopIndex] : routesServingUpdatedStops.getElements())
+//   {
+//     const auto& routeId = allRoutes[routeIndex];
+//     const auto& routeObject = relationManager.getData().routes.at(routeId);
+//     int firstTrip = getFirstTripOfRoute(routeId);
+//     auto trip = getLastTripOfRoute(routeId) - 1;
+//
+//     int currentStopIndex = stopIndex;
+//     int parentIndex = stopIndex;
+//     const auto& stopSequence = routeObject.stopsInOrder;
+//     std::string stop = allStops[currentStopIndex];
+//
+//     // Loop over the stops
+//     while (currentStopIndex < routeObject.stopsInOrder.size() - 1)
+//     {
+//       // Find trip to "hop on"
+//       while (trip > firstTrip && stopEventsOfTrip[trip - 1][currentStopIndex].departureTime >= previousRound()[stopIdIndexMap[stop]].arrivalTime)
+//       {
+//         --trip;
+//         parentIndex = currentStopIndex;
+//       }
+//
+//       ++currentStopIndex;
+//       stop = allStops[currentStopIndex];
+//
+//       if (updateArrivalTime(stopIdIndexMap[stop], stopEventsOfTrip[trip][currentStopIndex].arrivalTime))
+//       {
+//         stopsReached.insert(stopIdIndexMap[stop]);
+//         currentRound()[stopIdIndexMap[stop]].parentStopId = allStops[parentIndex];
+//         currentRound()[stopIdIndexMap[stop]].useRoute = true;
+//         currentRound()[stopIdIndexMap[stop]].parentDepartureTime = stopEventsOfTrip[trip][parentIndex].departureTime;
+//         currentRound()[stopIdIndexMap[stop]].routeId = routeId;
+//       }
+//
+//       ++currentStopIndex;
+//     }
+//   }
+// }
+// int RaptorStrategy::getRouteIndex(const std::string& routeId) const {
+//   for (size_t i = 0; i < routeObjects.size(); ++i)
+//   {
+//     if (routeObjects[i].routeId == routeId)
+//     {
+//       return static_cast<int>(i);
+//     }
+//   }
+//   throw std::invalid_argument("Route ID not found");
+// }s

@@ -17,11 +17,11 @@ namespace raptor::strategy::factory {
   class RAPTOR_API RaptorAlgorithmFactory final : public IRaptorAlgorithmFactory
   {
   public:
-    std::unique_ptr<IRaptorAlgorithmStrategy> create(AlgorithmType type, schedule::gtfs::RelationManager&& relationManager) override;
+    std::unique_ptr<IRaptorAlgorithmStrategy> create(AlgorithmType type, schedule::gtfs::TimetableManager&& relationManager) override;
 
   private:
-    std::map<AlgorithmType, std::function<std::unique_ptr<IRaptorAlgorithmStrategy>(schedule::gtfs::RelationManager&& relationManager)>> strategies{
-      {RAPTOR, [](schedule::gtfs::RelationManager&& relationManager) { return std::make_unique<RaptorStrategy>(std::move(relationManager)); }}};
+    std::map<AlgorithmType, std::function<std::unique_ptr<IRaptorAlgorithmStrategy>(schedule::gtfs::TimetableManager&& relationManager)>> strategies{
+      {RAPTOR, [](schedule::gtfs::TimetableManager&& relationManager) { return std::make_unique<RaptorStrategy>(std::move(relationManager)); }}};
   };
 
 } // factory

@@ -59,9 +59,23 @@ namespace schedule::gtfs {
     std::string routeLongName;
     RouteType routeType;
     std::string agencyId;
-    std::vector<Trip> trips{};
+   //  std::vector<const Trip*> trips{};
+    std::vector<std::string> trips{};
    // std::unordered_set<Stop, decltype(stopHash), decltype(stopEqual)> stops{};
-    std::vector<Stop> stopsInOrder{};
+    std::vector<std::string> stops{};
+
+    [[nodiscard]] size_t stopIndex(const std::string_view stopId) const {
+      for (size_t i = 0; i < stops.size(); ++i) {
+        if (stops[i] == stopId) {
+          return i;
+        }
+      }
+      return stops.size();
+    }
+
+    [[nodiscard]] bool isEarlierStop(const std::string_view stopId1, const std::string_view stopId2) const {
+      return stopIndex(stopId1) < stopIndex(stopId2);
+    }
   };
 
   inline auto routeHash = [](const Route& route) {

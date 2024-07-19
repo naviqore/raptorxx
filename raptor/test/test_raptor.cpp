@@ -112,7 +112,7 @@ TEST_F(RaptorTest, InitialTest) {
 
   const std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategies));
   reader->readData();
-  auto relationManager = schedule::gtfs::RelationManager(std::move(reader->getData().get()));
+  auto relationManager = schedule::gtfs::TimetableManager(std::move(reader->getData().get()));
 
   // auto stopIdSource = relationManager.getStopIdFromStopName("Zürich, Bahnhof Affoltern");
   // ASSERT_STREQ(stopIdSource.c_str(), "ch:1:sloid:91054::22");
@@ -167,7 +167,7 @@ TEST_F(RaptorTest, RaptorAlgorithm) {
   const auto reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategies));
   reader->readData();
 
-  auto relationManager = schedule::gtfs::RelationManager(std::move(reader->getData().get()));
+  auto relationManager = schedule::gtfs::TimetableManager(std::move(reader->getData().get()));
 
   auto stopIdSources = relationManager.getStopIdsFromStopName("St. Gallen, Vonwil");
   ASSERT_TRUE(!stopIdSources.empty());

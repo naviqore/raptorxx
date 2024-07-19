@@ -23,7 +23,7 @@ namespace raptor::utils {
 
     [[nodiscard]] bool contains(int element) const;
 
-  private:
+  protected:
     std::vector<bool> visited{};
     std::vector<int> elements{};
   };

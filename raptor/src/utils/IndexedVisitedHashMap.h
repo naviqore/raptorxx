@@ -3,6 +3,9 @@
 //
 
 #pragma once
+#include "IndexedVisitedSet.h"
+
+
 #include <algorithm>
 #include <unordered_map>
 #include <vector>
@@ -10,14 +13,14 @@
 
 namespace raptor::utils {
 
-  class IndexedVisitedHashMap
+  class IndexedVisitedHashMap : public IndexedVisitedSet
   {
   public:
     explicit IndexedVisitedHashMap(int size);
 
     void clear();
 
-    void insert(int element, int addElement);
+    void insert(int routeIndex, int stopIndex);
 
     [[nodiscard]] int getAdditionalElement(int element) const;
 
@@ -26,7 +29,6 @@ namespace raptor::utils {
     [[nodiscard]] std::vector<std::pair<int, int>> getElements() const;
 
   private:
-    std::vector<bool> visited{};
     std::unordered_map<int, int> elements{};
   };
 

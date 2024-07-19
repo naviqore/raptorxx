@@ -11,8 +11,8 @@
 namespace raptor::utils {
   static constexpr auto INFINITY_VALUE = std::numeric_limits<unsigned int>::max();
 
-  using stopId = std::string;
-  using routeId = std::string;
+  using stop_id = std::string;
+  using route_id = std::string;
 
   struct ConnectionRequest
   {

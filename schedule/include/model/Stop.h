@@ -34,6 +34,19 @@ namespace schedule::gtfs {
     std::string stopName;
     geometry::CoordinateComponent<geometry::Coordinate<double>> stopPoint;
     std::string parentStation;
+
+    //TODO in future create another class to handle the raptor specific stuff - keep this class clean for GTFS
+    bool visited = false;
+    std::vector<std::string> routesServedByStop{};
+
+    // This vector, arrTimesKTrips, tracks the minimum arrival times at this stop for varying numbers of allowed trips.
+    // Specifically, the element at index k (0-based) stores the earliest time one can arrive at this stop by using up to k+1 trips.
+    // It enables efficient computation of optimal arrival times under increasing trip constraints, facilitating dynamic routing optimizations.
+    std::vector<size_t> arrivalTimesKTrips;
+    unsigned int earliestArrivalTime = std::numeric_limits<unsigned int>::max();
+    std::string earliestTripId{};
+    std::string transferFromStopId{};
+    std::unordered_map<size_t, std::string> earliestTripIdKTrips{};
   };
 
   inline auto stopHash = [](const Stop& stop) {

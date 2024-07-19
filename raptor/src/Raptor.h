@@ -9,7 +9,7 @@
 
 
 #include <IConnection.h>
-#include <gtfs/RelationManager.h>
+#include <TimetableManager.h>
 #include <IRaptorAlgorithmStrategy.h>
 #include <memory>
 #include <raptor_export.h>

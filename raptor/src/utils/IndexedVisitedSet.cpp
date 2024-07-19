@@ -7,7 +7,7 @@
 
 namespace raptor::utils {
 
-  IndexedVisitedSet::IndexedVisitedSet(int size)
+  IndexedVisitedSet::IndexedVisitedSet(const int size)
     : visited(size, false) {}
 
   bool IndexedVisitedSet::isEmpty() const {

@@ -40,7 +40,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/utils/scopedTimer.h
         src/gtfs/GtfsReader.cpp
         src/utils/DataContainer.h
-        src/gtfs/RelationManager.cpp
+        src/gtfs/TimetableManager.cpp
         src/Types.h
         src/utils/ServiceDayTime.cpp
         src/gtfs/GtfsTxtReaderStrategyFactory.cpp
@@ -98,7 +98,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         include/model/Transfer.h
         include/GtfsReaderStrategyFactory.h
         include/IGtfsReaderStrategyFactory.h
-        src/gtfs/RelationManager.h
+        include/TimetableManager.h
         src/utils/ServiceDayTime.h
         include/GtfsReader.h
 )

@@ -31,7 +31,7 @@ namespace schedule::gtfs {
     std::unordered_map<std::string, std::vector<StopTime>> stopTimes;
     std::unordered_map<std::string, std::vector<Transfer>> transferFrom;
     std::unordered_map<std::string, std::vector<Transfer>> transferTo;
-    std::unordered_map<std::string, std::vector<Trip>> trips;
+    std::unordered_map<std::string, Trip> trips;
   };
 
 } // gtfs

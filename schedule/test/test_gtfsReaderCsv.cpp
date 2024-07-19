@@ -5,7 +5,7 @@
 #include "LoggerFactory.h"
 #include "../include/GtfsReader.h"
 #include "gtfs/GtfsTxtReaderStrategyFactory.h"
-#include "gtfs/RelationManager.h"
+#include "../include/TimetableManager.h"
 #include "model/CalendarDate.h"
 #include "utils/DataContainer.h"
 
@@ -196,7 +196,7 @@ TEST_F(GtfsCsvReaderStrategiesTest, testRelationManagerCsv) {
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
 
-  ASSERT_THROW(schedule::gtfs::RelationManager(std::move(reader->getData().get())), std::out_of_range);
+  ASSERT_THROW(schedule::gtfs::TimetableManager(std::move(reader->getData().get())), std::out_of_range);
   // try
   // {
   //   const auto relationManager = schedule::gtfs::RelationManager(std::move(reader->getData().get()));

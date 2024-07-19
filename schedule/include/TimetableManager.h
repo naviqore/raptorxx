@@ -5,7 +5,7 @@
 #ifndef RELATIONMANAGER_H
 #define RELATIONMANAGER_H
 
-#include "GtfsData.h"
+#include "../src/gtfs/GtfsData.h"
 #include <vector>
 #include "model/StopTime.h"
 #include "model/Trip.h"
@@ -18,12 +18,12 @@
 
 namespace schedule::gtfs {
 
-  class SCHEDULE_API RelationManager
+  class SCHEDULE_API TimetableManager
   {
     GtfsData data;
 
   public:
-    explicit RelationManager(GtfsData&& data);
+    explicit TimetableManager(GtfsData&& data);
 
     [[nodiscard]] const GtfsData& getData() const;
 
@@ -39,16 +39,20 @@ namespace schedule::gtfs {
 
     [[nodiscard]] const std::vector<StopTime>& getStopTimesFromStopId(std::string const& aStopId) const;
 
-    [[nodiscard]] std::vector<Route> getRouteFromTripId(std::string const& aTripId) const;
+    [[nodiscard]] Route getRouteFromTripId(std::string const& aTripId) const;
 
     [[nodiscard]] std::vector<StopTime> getStopTimesFromStopIdStartingFromSpecificTime(std::string const& aStopId, unsigned int secondsGreaterThan) const;
 
     [[nodiscard]] bool isServiceActiveOnDay(std::string const& aServiceId, std::chrono::weekday aDay) const;
 
-    [[nodiscard]] const std::vector<Trip>& getTripsFromStopTimeTripId(std::string const& aTripId) const;
+    [[nodiscard]] const Trip& getTripsFromStopTimeTripId(std::string const& aTripId) const;
+
+    std::vector<std::string> getVisitedStopIds();
 
   private:
     void createRelations();
+    void buildTripsToRoutesRelations();
+    void buildStopTimesToTripsAndRoutesRelations();
   };
 } // gtfs
 

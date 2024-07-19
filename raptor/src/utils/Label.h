@@ -13,12 +13,14 @@
 
 namespace raptor::utils {
 
+
   struct LabelEarliestArrival
   {
     unsigned int arrivalTime = INFINITY_VALUE;
     unsigned int parentDepartureTime = INFINITY_VALUE;
-    stopId stopId{};
-    routeId routeId{};
+    stop_id stopId{};
+    stop_id parentStopId{};
+    route_id routeId{};
     bool useRoute{false};
   };
 

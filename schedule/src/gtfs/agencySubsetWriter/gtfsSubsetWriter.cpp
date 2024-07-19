@@ -8,7 +8,7 @@
 #include "LoggerFactory.h"
 #include "gtfs/GtfsData.h"
 #include "gtfs/GtfsTxtReaderStrategyFactory.h"
-#include "gtfs/RelationManager.h"
+#include "../../../include/TimetableManager.h"
 #include "utils/DataContainer.h"
 
 
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
 
   const std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategies));
   reader->readData();
-  auto relationManager = schedule::gtfs::RelationManager(std::move(reader->getData().get()));
+  auto relationManager = schedule::gtfs::TimetableManager(std::move(reader->getData().get()));
 
   const auto& agency = relationManager.getData().agencies.at(agencyName);
   getLogger(Target::CONSOLE, LoggerName::GTFS)->info(agency.name);

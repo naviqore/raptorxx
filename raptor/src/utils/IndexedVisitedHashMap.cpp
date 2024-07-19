@@ -8,17 +8,17 @@
 namespace raptor::utils {
 
   IndexedVisitedHashMap::IndexedVisitedHashMap(const int size)
-    : visited(size, false) {}
+    : IndexedVisitedSet(size) {}
 
   void IndexedVisitedHashMap::clear() {
     std::ranges::fill(visited, false);
     elements.clear();
   }
-  void IndexedVisitedHashMap::insert(const int element, const int addElement) {
-    if (!visited[element])
+  void IndexedVisitedHashMap::insert(const int routeIndex, const int stopIndex) {
+    if (!visited[routeIndex])
     {
-      visited[element] = true;
-      elements[element] = addElement;
+      visited[routeIndex] = true;
+      elements[routeIndex] = stopIndex;
     }
   }
 

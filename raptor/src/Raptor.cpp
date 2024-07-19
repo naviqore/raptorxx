@@ -21,7 +21,7 @@ namespace raptor {
   }
 
   std::shared_ptr<IConnection> Raptor::getConnections(utils::ConnectionRequest const& request) const {
-    return strategy->execute(request);
+    return strategy->execute(request.arrivalStopId.front(), request.departureStopId.front(), request.earliestDepartureTime);
   }
   void Raptor::testFunction() {
     getLogger(Target::CONSOLE, LoggerName::RAPTOR)->info("Test function called");
