@@ -19,7 +19,7 @@ namespace raptor::strategy {
     virtual ~IRaptorAlgorithmStrategy() = default;
 
     // virtual std::shared_ptr<IConnection> execute(utils::ConnectionRequest const& request) = 0;
-    virtual  std::shared_ptr<IConnection> execute(const std::string& sourceStop, const std::string& targetStop, int departureTime) = 0;
+    virtual std::shared_ptr<IConnection> execute(const std::string& sourceStop, const std::string& targetStop, unsigned int departureTime) = 0;
   };
 }
 

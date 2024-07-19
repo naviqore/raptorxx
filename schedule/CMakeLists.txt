@@ -18,7 +18,8 @@ add_library(${PROJECT_NAME} SHARED)
 
 find_path(P_RANAV_CSV2_INCLUDE_DIRS "csv2/mio.hpp")
 
-target_sources(${PROJECT_NAME} PRIVATE
+target_sources(${PROJECT_NAME}
+        PRIVATE
         src/DataReader.h
         src/gtfs/strategies/txt_reader/GtfsAgencyReader.cpp
         src/gtfs/strategies/txt_reader/GtfsAgencyReader.h
@@ -86,8 +87,9 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/gtfs/GtfsCsvParserReaderStrategyFactory.cpp
         src/gtfs/GtfsCsvParserReaderStrategyFactory.h
         src/gtfs/strategies/csv_reader_fast/csv_wrapper.h
+        src/gtfs/RoutePartitioner.cpp
         PUBLIC
-        src/gtfs/GtfsData.h
+        include/GtfsData.h
         include/model/Agency.h
         include/model/Stop.h
         include/model/Route.h
@@ -101,6 +103,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         include/TimetableManager.h
         src/utils/ServiceDayTime.h
         include/GtfsReader.h
+        include/RoutePartitioner.h
 )
 
 

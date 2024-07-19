@@ -5,7 +5,9 @@
 #ifndef RELATIONMANAGER_H
 #define RELATIONMANAGER_H
 
-#include "../src/gtfs/GtfsData.h"
+#include "GtfsData.h"
+#include "RoutePartitioner.h"
+
 #include <vector>
 #include "model/StopTime.h"
 #include "model/Trip.h"
@@ -20,12 +22,19 @@ namespace schedule::gtfs {
 
   class SCHEDULE_API TimetableManager
   {
-    GtfsData data;
+    std::unique_ptr<GtfsData> data;
+    std::unique_ptr<RoutePartitioner> routePartitioner;
 
   public:
     explicit TimetableManager(GtfsData&& data);
 
     [[nodiscard]] const GtfsData& getData() const;
+
+    [[nodiscard]] GtfsData& getData();
+
+    [[nodiscard]] RoutePartitioner& getRoutePartitioner();
+
+    [[nodiscard]] const RoutePartitioner& getRoutePartitioner() const ;
 
     [[nodiscard]] const std::string& getStopNameFromStopId(std::string const& aStopId) const;
 
@@ -47,12 +56,12 @@ namespace schedule::gtfs {
 
     [[nodiscard]] const Trip& getTripsFromStopTimeTripId(std::string const& aTripId) const;
 
-    std::vector<std::string> getVisitedStopIds();
+    std::vector<std::string> getVisitedStopIds() const;
 
   private:
-    void createRelations();
-    void buildTripsToRoutesRelations();
-    void buildStopTimesToTripsAndRoutesRelations();
+    void createRelations() const;
+    void buildTripsToRoutesRelations() const;
+    void buildStopTimesToTripsAndRoutesRelations() const;
   };
 } // gtfs
 

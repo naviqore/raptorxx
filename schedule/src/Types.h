@@ -5,7 +5,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#include "gtfs/GtfsData.h"
+#include "../include/GtfsData.h"
 #include "utils/DataContainer.h"
 
 using gtfsDataContainer = schedule::DataContainer<schedule::gtfs::GtfsData>;

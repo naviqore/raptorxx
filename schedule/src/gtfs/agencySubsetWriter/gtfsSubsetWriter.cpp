@@ -6,7 +6,7 @@
 #include "DataReader.h"
 #include "GtfsReaderStrategyFactory.h"
 #include "LoggerFactory.h"
-#include "gtfs/GtfsData.h"
+#include "../../../include/GtfsData.h"
 #include "gtfs/GtfsTxtReaderStrategyFactory.h"
 #include "../../../include/TimetableManager.h"
 #include "utils/DataContainer.h"

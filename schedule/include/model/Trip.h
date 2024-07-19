@@ -33,6 +33,8 @@ namespace schedule::gtfs {
     std::string serviceId;
     std::string tripId;
     std::optional<std::string> boardingStopId{};
+    // TODO dangling pointer dangerous.... but shared is not performant
+    std::vector<const StopTime*> stopTimes{};
 
     // arrival times at the stops of this trip
     std::vector<size_t> arrivalTimesAtStops{};

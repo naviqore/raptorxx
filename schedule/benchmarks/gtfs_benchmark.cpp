@@ -6,7 +6,7 @@
 
 
 #include <GtfsReader.h>
-#include "gtfs/GtfsData.h"
+#include "../include/GtfsData.h"
 #include "model/Agency.h"
 
 #include <benchmark/benchmark.h>
