@@ -9,7 +9,19 @@ add_library(${PROJECT_NAME} SHARED
         src/utils/RaptorDataBuilder.h
         src/utils/RouteBuilder.cpp
         src/utils/RouteBuilder.h
-        src/utils/OrderedHashMap.h)
+        src/utils/OrderedHashMap.h
+        include/RaptorAlgorithm.h
+        include/QueryConfig.h
+        src/RaptorRouter.cpp
+        src/RaptorRouter.h
+        src/Query.cpp
+        src/Query.h
+        src/StopLabelsAndTimes.cpp
+        src/StopLabelsAndTimes.h
+        src/FootpathRelaxer.cpp
+        src/FootpathRelaxer.h
+        src/RouteScanner.cpp
+        src/RouteScanner.h)
 
 target_sources(${PROJECT_NAME} PRIVATE
         src/Raptor.cpp

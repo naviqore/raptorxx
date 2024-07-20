@@ -7,7 +7,9 @@ enable_testing()
 
 add_executable(${PROJECT_NAME}
         test_routeBuilder.cpp
-        test_raptorDataBuilder.cpp)
+        test_raptorDataBuilder.cpp
+        test_raptorAlgorithm.cpp
+        RaptorRouterTestBuilder.h)
 
 target_sources(${PROJECT_NAME} PRIVATE
         test_raptor.cpp
