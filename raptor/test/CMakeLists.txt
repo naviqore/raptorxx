@@ -5,7 +5,9 @@ project("raptor_test"
 
 enable_testing()
 
-add_executable(${PROJECT_NAME})
+add_executable(${PROJECT_NAME}
+        test_routeBuilder.cpp
+        test_raptorDataBuilder.cpp)
 
 target_sources(${PROJECT_NAME} PRIVATE
         test_raptor.cpp

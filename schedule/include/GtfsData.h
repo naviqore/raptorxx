@@ -2,8 +2,7 @@
 // Created by MichaelBrunner on 01/06/2024.
 //
 
-#ifndef GTFSDATA_H
-#define GTFSDATA_H
+#pragma once
 
 #include "model/Agency.h"
 #include "model/Calendar.h"
@@ -14,10 +13,8 @@
 #include "model/Trip.h"
 #include "model/StopTime.h"
 
-
 #include <vector>
 #include <schedule_export.h>
-#include <unordered_set>
 
 namespace schedule::gtfs {
 
@@ -35,5 +32,3 @@ namespace schedule::gtfs {
   };
 
 } // gtfs
-
-#endif //GTFSDATA_H

@@ -167,12 +167,12 @@ TEST_F(RaptorTest, RaptorAlgorithm) {
   const auto reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategies));
   reader->readData();
 
-  auto relationManager = schedule::gtfs::TimetableManager(std::move(reader->getData().get()));
+  auto timeTableManager = schedule::gtfs::TimetableManager(std::move(reader->getData().get()));
 
-  auto stopIdSources = relationManager.getStopIdsFromStopName("St. Gallen, Vonwil");
+  auto stopIdSources = timeTableManager.getStopIdsFromStopName("St. Gallen, Vonwil");
   ASSERT_TRUE(!stopIdSources.empty());
 
-  auto stopIdTargets = relationManager.getStopIdsFromStopName("St. Gallen,Klinik Stephanshorn");
+  auto stopIdTargets = timeTableManager.getStopIdsFromStopName("St. Gallen,Klinik Stephanshorn");
   ASSERT_TRUE(!stopIdTargets.empty());
   std::unordered_map<std::string, std::vector<std::string>> routeStops;
 
@@ -182,7 +182,7 @@ TEST_F(RaptorTest, RaptorAlgorithm) {
   const auto factory = std::make_unique<raptor::strategy::factory::RaptorAlgorithmFactory>();
   ASSERT_TRUE(factory);
 
-  auto strategy = factory->create(raptor::strategy::factory::IRaptorAlgorithmFactory::RAPTOR, std::move(relationManager));
+  auto strategy = factory->create(raptor::strategy::factory::IRaptorAlgorithmFactory::RAPTOR, std::move(timeTableManager));
   std::unique_ptr<raptor::IRaptor> raptor = std::make_unique<raptor::Raptor>(std::move(strategy));
   ASSERT_TRUE(raptor);
 
