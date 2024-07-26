@@ -34,10 +34,10 @@ namespace raptor {
 
   private:
     int defaultSameStopTransferTime;
-    std::unordered_map<std::string, int> stops;
+    std::unordered_map<std::string, types::raptorIdx> stops;
     std::unordered_map<std::string, std::shared_ptr<RouteBuilder>> routeBuilders;
     std::unordered_map<std::string, std::vector<Transfer>> transfers;
-    std::unordered_map<std::string, int> sameStopTransfers;
+    std::unordered_map<std::string, types::raptorIdx> sameStopTransfers;
     std::unordered_map<std::string, std::unordered_set<std::string>> stopRoutes;
 
     int stopTimeSize = 0;
@@ -46,9 +46,9 @@ namespace raptor {
     int NO_INDEX{-1};
 
     std::vector<RouteContainer> buildAndSortRouteContainers();
-    Lookup buildLookup(const std::vector<RouteContainer>& routeContainers);
+    Lookup buildLookup(const std::vector<RouteContainer>& routeContainers) const;
     StopContext buildStopContext(const Lookup& lookup);
-    RouteTraversal buildRouteTraversal(const std::vector<RouteContainer>& routeContainers);
+    RouteTraversal buildRouteTraversal(const std::vector<RouteContainer>& routeContainers) const;
     RouteBuilder* getRouteBuilder(const std::string& routeId);
   };
 

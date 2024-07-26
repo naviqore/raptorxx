@@ -54,7 +54,7 @@ namespace raptor {
     [[nodiscard]] std::shared_ptr<ActiveTrip> findPossibleTrip(types::raptorIdx stopIdx, const Stop& stop, types::raptorInt stopOffset, const Route& route, types::raptorInt lastRound) const;
 
     const std::vector<Stop>& stops;
-    const std::vector<int>& stopRoutes;
+    const std::vector<types::raptorIdx>& stopRoutes;
     const std::vector<StopTime>& stopTimes;
     const std::vector<Route>& routes;
     const std::vector<RouteStop>& routeStops;

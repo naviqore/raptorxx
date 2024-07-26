@@ -31,11 +31,11 @@ namespace raptor {
     return newlyMarkedStops;
   }
 
-  std::unordered_set<types::raptorIdx> FootpathRelaxer::relax(const int round, const std::unordered_set<types::raptorIdx>& stopIndices) const {
+  std::unordered_set<types::raptorIdx> FootpathRelaxer::relax(const types::raptorInt round, const std::unordered_set<types::raptorIdx>& stopIndices) const {
     std::unordered_set<types::raptorIdx> newlyMarkedStops;
     std::cout << "Relaxing footpaths for round " << round << std::endl;
 
-    for (const int sourceStopIdx : stopIndices)
+    for (const auto sourceStopIdx : stopIndices)
     {
       expandFootpathsFromStop(sourceStopIdx, round, newlyMarkedStops);
     }
@@ -43,7 +43,7 @@ namespace raptor {
     return newlyMarkedStops;
   }
 
-  void FootpathRelaxer::expandFootpathsFromStop(const types::raptorIdx stopIdx, const int round, std::unordered_set<types::raptorInt>& markedStops) const {
+  void FootpathRelaxer::expandFootpathsFromStop(const types::raptorIdx stopIdx, const types::raptorInt round, std::unordered_set<types::raptorInt>& markedStops) const {
     if (stops[stopIdx].numberOfTransfers == 0)
     {
       return;
@@ -57,9 +57,9 @@ namespace raptor {
       return;
     }
 
-    int sourceTime = previousLabel->targetTime;
+    auto sourceTime = previousLabel->targetTime;
 
-    for (auto i = sourceStop.transferIndex; i < sourceStop.transferIndex + sourceStop.numberOfTransfers; ++i)
+    for (auto i = sourceStop.transferIndex; i < sourceStop.transferIndex + static_cast<int>(sourceStop.numberOfTransfers); ++i)
     {
       const Transfer& transfer = transfers[i];
       const Stop& targetStop = stops[transfer.targetStopIndex];

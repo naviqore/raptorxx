@@ -25,17 +25,17 @@ namespace raptor {
     : raptorData(raptorData)
     , validator(raptorData.getLookup().stops) {}
 
-  std::vector<Connection> RaptorRouter::routeEarliestArrival(const std::map<std::string, int>& departureStops, const std::map<std::string, int>& arrivalStops, const config::QueryConfig& config) const {
+  std::vector<Connection> RaptorRouter::routeEarliestArrival(const std::map<std::string, types::raptorIdx>& departureStops, const std::map<std::string, types::raptorIdx>& arrivalStops, const config::QueryConfig& config) const {
     validator.checkNonNullOrEmptyStops(departureStops, "Departure");
     validator.checkNonNullOrEmptyStops(arrivalStops, "Arrival");
 
     std::cout << "Routing earliest arrival from ";
-    for (const auto& [id, time] : departureStops)
+    for (const auto& id : departureStops | std::views::keys)
     {
       std::cout << id << " ";
     }
     std::cout << "to ";
-    for (const auto& [id, time] : arrivalStops)
+    for (const auto& id : arrivalStops | std::views::keys)
     {
       std::cout << id << " ";
     }
@@ -68,7 +68,7 @@ namespace raptor {
 
     return {};
   }
-  std::vector<Connection> RaptorRouter::routeLatestDeparture(const std::map<std::string, int>& departureStops, const std::map<std::string, std::chrono::system_clock::time_point>& arrivalStops, const config::QueryConfig& config) const {
+  std::vector<Connection> RaptorRouter::routeLatestDeparture(const std::map<std::string, types::raptorIdx>& departureStops, const std::map<std::string, std::chrono::system_clock::time_point>& arrivalStops, const config::QueryConfig& config) const {
     throw std::runtime_error("Not implemented");
   }
   std::map<std::string, Connection> RaptorRouter::routeIsolines(const std::map<std::string, std::chrono::system_clock::time_point>& sourceStops, const config::QueryConfig& config) const {
@@ -76,7 +76,7 @@ namespace raptor {
   }
 
 
-  std::vector<Connection> RaptorRouter::getConnections(const std::map<std::string, int>& sourceStops, const std::map<std::string, int>& targetStops, const config::QueryConfig& config) const {
+  std::vector<Connection> RaptorRouter::getConnections(const std::map<std::string, types::raptorIdx>& sourceStops, const std::map<std::string, types::raptorIdx>& targetStops, const config::QueryConfig& config) const {
     validator.validateSourceStopTimes(sourceStops);
 
     // Mocked implementation for processing
@@ -85,34 +85,32 @@ namespace raptor {
     return connections;
   }
   // InputValidator implementation
-  RaptorRouter::InputValidator::InputValidator(const std::unordered_map<std::string, int>& stopsToIdx)
+  RaptorRouter::InputValidator::InputValidator(const std::unordered_map<std::string, types::raptorIdx>& stopsToIdx)
     : stopsToIdx(stopsToIdx) {}
 
-  void RaptorRouter::InputValidator::checkNonNullOrEmptyStops(
-    const std::map<std::string, int>& stops, const std::string& labelSource) const {
+  void RaptorRouter::InputValidator::checkNonNullOrEmptyStops(const std::map<std::string, types::raptorIdx>& stops, const std::string& labelSource) const {
     if (stops.empty())
     {
       throw std::invalid_argument(labelSource + " stops must not be empty.");
     }
   }
 
-  void RaptorRouter::InputValidator::validateSourceStopTimes(
-    const std::map<std::string, int>& sourceStops) const {
+  void RaptorRouter::InputValidator::validateSourceStopTimes(const std::map<std::string, types::raptorIdx>& sourceStops) const {
     // Implementation to validate stop times
     // Example: Check for null values and time difference
   }
-  void RaptorRouter::InputValidator::validateStopPermutations(const std::map<std::string, int>& sourceStops, const std::map<std::string, int>& targetStops) {
+  void RaptorRouter::InputValidator::validateStopPermutations(const std::map<std::string, types::raptorIdx>& sourceStops, const std::map<std::string, types::raptorIdx>& targetStops) {
   }
 
 
 
-  std::map<int, int> RaptorRouter::InputValidator::validateStopsAndGetIndices(
-    const std::map<std::string, int>& stops) const {
-    std::map<int, int> validStopIds;
+  std::map<types::raptorIdx, types::raptorIdx> RaptorRouter::InputValidator::validateStopsAndGetIndices(
+    const std::map<std::string, types::raptorIdx>& stops) const {
+    std::map<types::raptorIdx, types::raptorIdx> validStopIds;
     for (const auto& [stopId, time] : stops)
     {
-      auto it = stopsToIdx.find(stopId);
-      if (it != stopsToIdx.end())
+      if (auto it = stopsToIdx.find(stopId);
+        it != stopsToIdx.end())
       {
         validStopIds[it->second] = time;
       }
@@ -129,7 +127,7 @@ namespace raptor {
   }
 
 
-  int secondsOfDay(const std::chrono::system_clock::time_point& timePoint) {
+  raptor::types::raptorInt secondsOfDay(const std::chrono::system_clock::time_point& timePoint) {
     std::time_t time = std::chrono::system_clock::to_time_t(timePoint);
     std::tm localTime{};
     // Use localtime_s for thread safety on Windows

@@ -112,12 +112,12 @@ namespace raptor {
     return containers;
   }
 
-  Lookup RaptorRouterBuilder::buildLookup(const std::vector<RouteContainer>& routeContainers) {
+  Lookup RaptorRouterBuilder::buildLookup(const std::vector<RouteContainer>& routeContainers) const {
     std::cout << "Building lookup with " << stops.size() << " stops and " << routeContainers.size() << " routes" << std::endl;
-    std::unordered_map<std::string, int> routes;
-    for (size_t i = 0; i < routeContainers.size(); ++i)
+    std::unordered_map<std::string, types::raptorIdx> routes;
+    for (auto i = 0; i < routeContainers.size(); ++i)
     {
-      routes[routeContainers[i].id()] = static_cast<int>(i);
+      routes[routeContainers[i].id()] = i;
     }
     return Lookup(stops, routes);
   }
@@ -132,8 +132,7 @@ namespace raptor {
 
     const auto stopRouteSize = std::accumulate(stopRouteSizeView.begin(), stopRouteSizeView.end(), 0);
 
-    std::vector<int>
-      stopRouteArr(stopRouteSize);
+    std::vector<types::raptorIdx> stopRouteArr(stopRouteSize);
     std::vector<Transfer> transferArr(transferSize);
 
     int transferIdx = 0;
@@ -141,7 +140,7 @@ namespace raptor {
     for (const auto& entry : stops)
     {
       const auto& stopId = entry.first;
-      int stopIdx = entry.second;
+      const auto stopIdx = entry.second;
 
       const auto& currentStopRoutes = stopRoutes[stopId];
       if (currentStopRoutes.empty())
@@ -150,11 +149,11 @@ namespace raptor {
       }
 
       auto currentTransfers = transfers.find(stopId);
-      auto numberOfTransfers = currentTransfers == transfers.end() ? 0 : currentTransfers->second.size();
+      const auto numberOfTransfers = currentTransfers == transfers.end() ? 0 : currentTransfers->second.size();
 
-      auto sameStopTransferTime = sameStopTransfers.count(stopId) ? sameStopTransfers[stopId] : defaultSameStopTransferTime;
+      const auto sameStopTransferTime = sameStopTransfers.contains(stopId) ? sameStopTransfers[stopId] : defaultSameStopTransferTime;
 
-      stopArr[stopIdx] = Stop(stopId, stopRouteIdx, static_cast<int>(currentStopRoutes.size()), sameStopTransferTime, numberOfTransfers == 0 ? NO_INDEX : transferIdx, static_cast<int>(numberOfTransfers));
+      stopArr[stopIdx] = Stop(stopId, stopRouteIdx, static_cast<int>(currentStopRoutes.size()), sameStopTransferTime, static_cast<int>(numberOfTransfers) == 0 ? NO_INDEX : transferIdx, static_cast<int>(numberOfTransfers));
 
       if (currentTransfers != transfers.end())
       {
@@ -173,28 +172,28 @@ namespace raptor {
     return StopContext(transferArr, stopArr, stopRouteArr);
   }
 
-  RouteTraversal RaptorRouterBuilder::buildRouteTraversal(const std::vector<RouteContainer>& routeContainers) {
+  RouteTraversal RaptorRouterBuilder::buildRouteTraversal(const std::vector<RouteContainer>& routeContainers) const {
     std::cout << "Building route traversal with " << routeContainers.size() << " routes, " << routeStopSize << " route stops, " << stopTimeSize << " stop times" << std::endl;
 
     std::vector<Route> routeArr(routeContainers.size());
-    std::vector<RouteStop> routeStopArr(routeStopSize);
-    std::vector<StopTime> stopTimeArr(stopTimeSize);
+    std::vector<RouteStop> routeStopArr(static_cast<types::raptorIdx>(routeStopSize));
+    std::vector<StopTime> stopTimeArr(static_cast<types::raptorIdx>(stopTimeSize));
 
-    int routeStopCnt = 0;
-    int stopTimeCnt = 0;
+    types::raptorIdx routeStopCnt = 0;
+    types::raptorIdx stopTimeCnt = 0;
     for (size_t routeIdx = 0; routeIdx < routeContainers.size(); ++routeIdx)
     {
       const auto& routeContainer = routeContainers[routeIdx];
 
-      auto numberOfStops = routeContainer.stopSequence().size();
-      auto numberOfTrips = routeContainer.trips().size();
-      auto tripIdsArray = routeContainer.trips() | std::views::keys | std::ranges::to<std::vector<std::string>>();
+      const auto numberOfStops = routeContainer.stopSequence().size();
+      const auto numberOfTrips = routeContainer.trips().size();
+      const auto tripIdsArray = routeContainer.trips() | std::views::keys | std::ranges::to<std::vector<std::string>>();
       routeArr[routeIdx] = Route(routeContainer.id(), routeStopCnt, static_cast<int>(numberOfStops), stopTimeCnt, static_cast<int>(numberOfTrips), tripIdsArray);
 
       for (int position = 0; position < numberOfStops; ++position)
       {
-        int stopIdx = stops.at(routeContainer.stopSequence().at(position));
-        routeStopArr[routeStopCnt++] = RouteStop(stopIdx, static_cast<int>(routeIdx));
+        const auto stopIdx = stops.at(routeContainer.stopSequence().at(position));
+        routeStopArr[routeStopCnt++] = RouteStop(stopIdx, static_cast<types::raptorIdx>(routeIdx));
       }
 
       for (const auto& tripEntry : routeContainer.trips())
@@ -210,7 +209,7 @@ namespace raptor {
   }
 
   RouteBuilder* RaptorRouterBuilder::getRouteBuilder(const std::string& routeId) {
-    auto it = routeBuilders.find(routeId);
+    const auto it = routeBuilders.find(routeId);
     if (it == routeBuilders.end())
     {
       throw std::invalid_argument("Route " + routeId + " does not exist");

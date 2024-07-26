@@ -41,7 +41,7 @@ namespace raptor {
     types::raptorIdx stopRouteIndex;
     types::raptorInt numberOfRoutes;
     types::raptorInt sameStopTransferTime;
-    types::raptorIdx transferIndex;
+    int transferIndex;
     types::raptorInt numberOfTransfers;
   };
 
@@ -53,15 +53,15 @@ namespace raptor {
 
   struct Lookup
   {
-    std::unordered_map<std::string, int> stops;
-    std::unordered_map<std::string, int> routes;
+    std::unordered_map<std::string, types::raptorIdx> stops;
+    std::unordered_map<std::string, types::raptorIdx> routes;
   };
 
   struct StopContext
   {
     std::vector<Transfer> transfers;
     std::vector<Stop> stops;
-    std::vector<int> stopRoutes;
+    std::vector<types::raptorIdx> stopRoutes;
   };
 
   struct RouteTraversal

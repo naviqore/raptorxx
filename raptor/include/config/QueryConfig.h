@@ -9,9 +9,10 @@
 
 #include <TransferConfig.h>
 #include <WalkingConfig.h>
+#include <raptor_export.h>
 
 namespace raptor::config {
-  class QueryConfig
+  class RAPTOR_API QueryConfig
   {
   public:
     QueryConfig();
