@@ -38,7 +38,7 @@ namespace raptor {
     cutoffTime = determineCutoffTime();
   }
 
-  std::vector<std::vector<std::shared_ptr<StopLabelsAndTimes::Label>>> Query::run() {
+  const std::vector<std::vector<std::unique_ptr<StopLabelsAndTimes::Label>>>& Query::run() {
 
     const FootpathRelaxer footpathRelaxer(stopLabelsAndTimes, raptorData, config.getMinimumTransferDuration(), config.getMaximumWalkingDuration());
 
@@ -80,8 +80,8 @@ namespace raptor {
       auto currentStopIdx = sourceStopIndices[i];
       auto targetTime = sourceTimes[i];
 
-      const auto label = std::make_shared<StopLabelsAndTimes::Label>(0, targetTime, StopLabelsAndTimes::LabelType::INITIAL, types::NO_INDEX, types::NO_INDEX, currentStopIdx, nullptr);
-      stopLabelsAndTimes.setLabel(0, currentStopIdx, label);
+      auto label = std::make_unique<StopLabelsAndTimes::Label>(0, targetTime, StopLabelsAndTimes::LabelType::INITIAL, types::NO_INDEX, types::NO_INDEX, currentStopIdx, nullptr);
+      stopLabelsAndTimes.setLabel(0, currentStopIdx, std::move(label));
       stopLabelsAndTimes.setBestTime(currentStopIdx, targetTime);
 
       markedStops.insert(currentStopIdx);
@@ -90,7 +90,7 @@ namespace raptor {
     return markedStops;
   }
 
-  std::unordered_set<types::raptorIdx> Query::removeSuboptimalLabelsForRound(int round, const std::unordered_set<types::raptorIdx>& markedStops) {
+  std::unordered_set<types::raptorIdx> Query::removeSuboptimalLabelsForRound(types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops) {
     const auto bestTime = getBestTimeForAllTargetStops();
     if (bestTime == types::INFINITY_VALUE_MAX || bestTime == types::INFINITY_VALUE_MIN)
     {

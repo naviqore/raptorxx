@@ -16,28 +16,33 @@ namespace raptor {
     // Set empty labels for first round
     addNewRound();
   }
+  StopLabelsAndTimes::~StopLabelsAndTimes() = default;
 
   void StopLabelsAndTimes::addNewRound() {
-    bestLabelsPerRound.emplace_back(stopSize, nullptr);
-  }
-
-  std::shared_ptr<StopLabelsAndTimes::Label> StopLabelsAndTimes::getLabel(types::raptorInt const round, types::raptorIdx const  stopIdx) const {
-    if (round >=bestLabelsPerRound.size())
+    bestLabelsPerRound.emplace_back(stopSize);
+    for (auto& label : bestLabelsPerRound.back())
     {
-      throw std::out_of_range("Round index out of range");
+      label = nullptr;
     }
-    return bestLabelsPerRound[round][stopIdx];
   }
 
-  void StopLabelsAndTimes::setLabel(types::raptorInt const round, types::raptorIdx const stopIdx, const std::shared_ptr<Label>& label) {
+  const StopLabelsAndTimes::Label* StopLabelsAndTimes::getLabel(types::raptorInt const round, types::raptorIdx const stopIdx) const {
     if (round >= bestLabelsPerRound.size())
     {
       throw std::out_of_range("Round index out of range");
     }
-    bestLabelsPerRound[round][stopIdx] = label;
+    return bestLabelsPerRound[round][stopIdx].get();
   }
 
-  types::raptorInt StopLabelsAndTimes::getComparableBestTime(types::raptorInt const  stopIdx) const {
+  void StopLabelsAndTimes::setLabel(types::raptorInt const round, types::raptorIdx const stopIdx, std::unique_ptr<Label>&& label) {
+    if (round >= bestLabelsPerRound.size())
+    {
+      throw std::out_of_range("Round index out of range");
+    }
+    bestLabelsPerRound[round][stopIdx] = std::move(label);
+  }
+
+  types::raptorInt StopLabelsAndTimes::getComparableBestTime(types::raptorInt const stopIdx) const {
     if (stopIdx >= bestTimeForStops.size())
     {
       throw std::out_of_range("Stop index out of range");
@@ -53,7 +58,7 @@ namespace raptor {
 
     for (auto it = bestLabelsPerRound.rbegin(); it != bestLabelsPerRound.rend(); ++it)
     {
-      if (const auto label = (*it)[stopIdx])
+      if (const auto label = (*it)[stopIdx].get())
       {
         return label->targetTime;
       }
@@ -70,7 +75,7 @@ namespace raptor {
     bestTimeForStops[stopIdx] = time;
   }
 
-  const std::vector<std::vector<std::shared_ptr<StopLabelsAndTimes::Label>>>& StopLabelsAndTimes::getBestLabelsPerRound() const {
+  const std::vector<std::vector<std::unique_ptr<StopLabelsAndTimes::Label>>>& StopLabelsAndTimes::getBestLabelsPerRound() const {
     return bestLabelsPerRound;
   }
 } // raptor

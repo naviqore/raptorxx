@@ -82,9 +82,9 @@ namespace raptor {
 
       stopLabelsAndTimes.setBestTime(transfer.targetStopIndex, comparableTargetTime);
 
-      auto label = std::make_shared<StopLabelsAndTimes::Label>(sourceTime, targetTime, StopLabelsAndTimes::LabelType::TRANSFER, i, types::NO_INDEX, transfer.targetStopIndex, stopLabelsAndTimes.getLabel(round, stopIdx));
+      auto label = std::make_unique<StopLabelsAndTimes::Label>(sourceTime, targetTime, StopLabelsAndTimes::LabelType::TRANSFER, i, types::NO_INDEX, transfer.targetStopIndex, stopLabelsAndTimes.getLabel(round, stopIdx));
 
-      stopLabelsAndTimes.setLabel(round, transfer.targetStopIndex, label);
+      stopLabelsAndTimes.setLabel(round, transfer.targetStopIndex, std::move(label));
       markedStops.insert(transfer.targetStopIndex);
     }
   }

@@ -123,7 +123,7 @@ namespace raptor {
       std::cout << "Stop " << stop.id << " was improved" << std::endl;
       stopLabelsAndTimes.setBestTime(stopIdx, stopTime.arrival);
 
-      const auto label = std::make_shared<StopLabelsAndTimes::Label>(activeTrip->entryTime,
+      auto label = std::make_unique<StopLabelsAndTimes::Label>(activeTrip->entryTime,
                                                                      stopTime.arrival,
                                                                      StopLabelsAndTimes::LabelType::ROUTE,
                                                                      currentRouteIdx,
@@ -131,7 +131,7 @@ namespace raptor {
                                                                      stopIdx,
                                                                      activeTrip->previousLabel);
 
-      stopLabelsAndTimes.setLabel(thisRound, stopIdx, label);
+      stopLabelsAndTimes.setLabel(thisRound, stopIdx, std::move(label));
       markedStopsNext.insert(stopIdx);
 
       return false;
@@ -170,7 +170,7 @@ namespace raptor {
       {
         std::cout << "Found active trip (" << tripOffset << ") on route " << route.id << std::endl;
         types::raptorInt entryTime = currentStopTime.departure;
-        return std::make_shared<ActiveTrip>(tripOffset, entryTime, std::move(previousLabel));
+        return std::make_shared<ActiveTrip>(tripOffset, entryTime, previousLabel);
       }
       if (tripOffset < numberOfTrips - 1)
       {

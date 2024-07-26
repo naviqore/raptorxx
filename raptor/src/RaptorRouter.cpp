@@ -64,7 +64,7 @@ namespace raptor {
       .config = config};
 
     auto query = Query(queryParams);
-    auto labels = query.run();
+    const auto& labels = query.run();
 
     return {};
   }

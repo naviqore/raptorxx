@@ -34,7 +34,7 @@ namespace raptor {
 
     explicit Query(const QueryParams& params);
 
-    std::vector<std::vector<std::shared_ptr<StopLabelsAndTimes::Label>>> run();
+    const std::vector<std::vector<std::unique_ptr<StopLabelsAndTimes::Label>>>& run();
 
   private:
     std::vector<types::raptorIdx> sourceStopIndices;
@@ -50,9 +50,9 @@ namespace raptor {
     StopLabelsAndTimes stopLabelsAndTimes;
 
     std::unordered_set<types::raptorIdx> initialize();
-    std::unordered_set<types::raptorIdx> removeSuboptimalLabelsForRound(int round, const std::unordered_set<types::raptorIdx>& markedStops);
-    types::raptorInt getBestTimeForAllTargetStops() const;
-    types::raptorInt determineCutoffTime() const;
+    std::unordered_set<types::raptorIdx> removeSuboptimalLabelsForRound(types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops);
+    [[nodiscard]] types::raptorInt getBestTimeForAllTargetStops() const;
+    [[nodiscard]] types::raptorInt determineCutoffTime() const;
   };
 
 } // raptor

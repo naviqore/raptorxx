@@ -13,12 +13,12 @@ namespace raptor {
   {
     int tripOffset;
     int entryTime;
-    std::shared_ptr<StopLabelsAndTimes::Label> previousLabel;
+    const StopLabelsAndTimes::Label* previousLabel;
 
-    ActiveTrip(const int tripOffset, const int entryTime, std::shared_ptr<StopLabelsAndTimes::Label>&& previousLabel)
+    ActiveTrip(const int tripOffset, const int entryTime, const StopLabelsAndTimes::Label* previousLabel)
       : tripOffset(tripOffset)
       , entryTime(entryTime)
-      , previousLabel(std::move(previousLabel)) {}
+      , previousLabel(previousLabel) {}
   };
 
 }
