@@ -5,10 +5,12 @@
 #ifndef ROUTESCANNER_H
 #define ROUTESCANNER_H
 
+#include "ActiveTrip.h"
 #include "StopLabelsAndTimes.h"
 #include "utils/RaptorData.h"
 
 #include <unordered_set>
+#include <utility>
 #include <vector>
 #include <memory>
 #include <stdexcept>
@@ -17,25 +19,9 @@
 namespace raptor {
 
 
-  struct ActiveTrip
-  {
-    int tripOffset;
-    int entryTime;
-    std::shared_ptr<StopLabelsAndTimes::Label> previousLabel;
-  };
-
   class RouteScanner {
 
   public:
-
-    struct ActiveTrip {
-      int tripOffset;
-      int entryTime;
-      std::shared_ptr<StopLabelsAndTimes::Label> previousLabel;
-
-      ActiveTrip(const int tripOffset, const int entryTime, std::shared_ptr<StopLabelsAndTimes::Label> previousLabel)
-          : tripOffset(tripOffset), entryTime(entryTime), previousLabel(previousLabel) {}
-    };
 
     RouteScanner(const StopLabelsAndTimes& stopLabelsAndTimes, const RaptorData& raptorData,
                  types::raptorInt minimumTransferDuration);
@@ -49,7 +35,8 @@ namespace raptor {
     bool canEnterAtStop(const Stop& stop, types::raptorInt stopTime, const std::unordered_set<types::raptorIdx>& markedStops,
                         types::raptorIdx stopIdx, types::raptorInt stopOffset, types::raptorInt numberOfStops);
 
-    bool checkIfTripIsPossibleAndUpdateMarks(const StopTime& stopTime, const std::shared_ptr<ActiveTrip>& activeTrip, const Stop& stop, types::raptorInt bestStopTime, types::raptorIdx stopIdx, types::raptorInt thisRound, types::raptorInt lastRound, std::unordered_set<types::raptorIdx>& markedStopsNext, types::raptorIdx currentRouteIdx) const;
+    bool checkIfTripIsPossibleAndUpdateMarks(const StopTime& stopTime, const std::shared_ptr<ActiveTrip>& activeTrip, const Stop& stop, types::raptorInt bestStopTime,
+      types::raptorIdx stopIdx, types::raptorInt thisRound, types::raptorInt lastRound, std::unordered_set<types::raptorIdx>& markedStopsNext, types::raptorIdx currentRouteIdx) const;
 
     [[nodiscard]] std::shared_ptr<ActiveTrip> findPossibleTrip(types::raptorIdx stopIdx, const Stop& stop, types::raptorInt stopOffset, const Route& route, types::raptorInt lastRound) const;
 

@@ -3,6 +3,9 @@
 //
 
 #include "RouteScanner.h"
+
+#include "ActiveTrip.h"
+
 #include <iostream>
 
 namespace raptor {
@@ -146,7 +149,7 @@ namespace raptor {
     return true;
   }
 
-  std::shared_ptr<RouteScanner::ActiveTrip> RouteScanner::findPossibleTrip(const types::raptorIdx stopIdx, const Stop& stop, const types::raptorInt stopOffset, const Route& route, const types::raptorInt lastRound) const {
+  std::shared_ptr<ActiveTrip> RouteScanner::findPossibleTrip(const types::raptorIdx stopIdx, const Stop& stop, const types::raptorInt stopOffset, const Route& route, const types::raptorInt lastRound) const {
     const auto firstStopTimeIdx = route.firstStopTimeIndex;
     const auto numberOfStops = route.numberOfStops;
     const auto numberOfTrips = route.numberOfTrips;
@@ -167,7 +170,7 @@ namespace raptor {
       {
         std::cout << "Found active trip (" << tripOffset << ") on route " << route.id << std::endl;
         types::raptorInt entryTime = currentStopTime.departure;
-        return std::make_shared<ActiveTrip>(tripOffset, entryTime, previousLabel);
+        return std::make_shared<ActiveTrip>(tripOffset, entryTime, std::move(previousLabel));
       }
       if (tripOffset < numberOfTrips - 1)
       {

@@ -3,7 +3,8 @@ project("raptor"
 )
 
 add_library(${PROJECT_NAME} SHARED
-        include/config/TravelConfig.h)
+        include/config/TravelConfig.h
+        src/ActiveTrip.h)
 
 target_sources(${PROJECT_NAME} PRIVATE
         src/Raptor.cpp
