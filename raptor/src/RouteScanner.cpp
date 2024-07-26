@@ -4,7 +4,8 @@
 
 #include "RouteScanner.h"
 
-#include "ActiveTrip.h"
+#include "LoggerFactory.h"
+#include "data/ActiveTrip.h"
 
 #include <iostream>
 
@@ -23,6 +24,7 @@ namespace raptor {
   std::unordered_set<types::raptorIdx> RouteScanner::scan(const types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops) {
     const std::unordered_set<types::raptorIdx> routesToScan = getRoutesToScan(markedStops);
     std::cout << "Scanning routes for round " << round << " (" << routesToScan.size() << " routes)" << std::endl;
+    getConsoleLogger(LoggerName::RAPTOR)->info("Scanning routes for round {} ({} routes)", round, routesToScan.size());
 
     std::unordered_set<types::raptorIdx> markedStopsNext;
 

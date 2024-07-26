@@ -8,9 +8,6 @@
 #include "IConnection.h"
 #include "IRaptorAlgorithmStrategy.h"
 #include "Raptor.h"
-#include "utils/IndexedVisitedHashMap.h"
-#include "utils/IndexedVisitedSet.h"
-#include "utils/Label.h"
 
 namespace raptor::strategy {
 

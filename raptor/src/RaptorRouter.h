@@ -5,7 +5,7 @@
 #ifndef RAPTOR_ROUTER_H
 #define RAPTOR_ROUTER_H
 
-#include "../include/config/QueryConfig.h"
+#include "QueryConfig.h"
 #include "RaptorAlgorithm.h"
 #include "utils/RaptorData.h"
 
@@ -23,6 +23,7 @@ namespace raptor {
 
   class Connection
   {
+    //TODO implement Connection class
   };
 
   class RAPTOR_API RaptorRouter final : public RaptorAlgorithm

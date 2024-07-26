@@ -5,6 +5,7 @@
 #include "GtfsTransferReaderCsv.h"
 
 #include "GtfsCsvHelpers.h"
+#include "src/utils/utils.h"
 
 
 namespace schedule::gtfs {

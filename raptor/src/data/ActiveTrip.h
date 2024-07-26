@@ -4,8 +4,7 @@
 
 #pragma once
 
-#include "StopLabelsAndTimes.h"
-#include <memory>
+#include "../utils/StopLabelsAndTimes.h"
 
 namespace raptor {
 

@@ -2,18 +2,6 @@
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
-#set(CSV_PARSER_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/src/gtfs/strategies/csv_reader_fast/csv.h")
-#
-#if(MSVC)
-#    set_source_files_properties(${GTFS_CALENDAR_READER_CSV_PARSER_CPP} PROPERTIES COMPILE_FLAGS "/wd2220 /wd4996 /wd4267 /wd4244")
-#else()
-#    set_source_files_properties(${CSV_PARSER_HEADER} PROPERTIES COMPILE_FLAGS "-Wno-error")
-#endif()
-
-add_executable(gtfsSubsetWriter
-        src/gtfs/agencySubsetWriter/gtfsSubsetWriter.cpp
-)
-
 add_library(${PROJECT_NAME} SHARED)
 
 find_path(P_RANAV_CSV2_INCLUDE_DIRS "csv2/mio.hpp")
@@ -41,7 +29,6 @@ target_sources(${PROJECT_NAME}
         src/utils/scopedTimer.h
         src/gtfs/GtfsReader.cpp
         src/utils/DataContainer.h
-        src/gtfs/TimetableManager.cpp
         src/Types.h
         src/utils/ServiceDayTime.cpp
         src/gtfs/GtfsTxtReaderStrategyFactory.cpp
@@ -87,7 +74,7 @@ target_sources(${PROJECT_NAME}
         src/gtfs/GtfsCsvParserReaderStrategyFactory.cpp
         src/gtfs/GtfsCsvParserReaderStrategyFactory.h
         src/gtfs/strategies/csv_reader_fast/csv_wrapper.h
-        src/gtfs/RoutePartitioner.cpp
+        src/utils/helperFunctions.cpp
         PUBLIC
         include/GtfsData.h
         include/model/Agency.h
@@ -100,10 +87,9 @@ target_sources(${PROJECT_NAME}
         include/model/Transfer.h
         include/GtfsReaderStrategyFactory.h
         include/IGtfsReaderStrategyFactory.h
-        include/TimetableManager.h
         src/utils/ServiceDayTime.h
         include/GtfsReader.h
-        include/RoutePartitioner.h
+        include/model/helperFunctions.h
 )
 
 
@@ -118,28 +104,12 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 target_include_directories(${PROJECT_NAME} PRIVATE ${P_RANAV_CSV2_INCLUDE_DIRS})
 
-target_include_directories(gtfsSubsetWriter PRIVATE ${CMAKE_SOURCE_DIR}/logging/include)
-target_include_directories(gtfsSubsetWriter PRIVATE ${CMAKE_SOURCE_DIR}/schedule/src)
-target_include_directories(gtfsSubsetWriter PUBLIC ${CMAKE_SOURCE_DIR}/geometry/include)
-target_include_directories(gtfsSubsetWriter PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-)
-
-find_package(spdlog CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         logging
         geometry
-        spdlog::spdlog
 )
 
-target_link_libraries(gtfsSubsetWriter PRIVATE
-        logging
-        geometry
-        spdlog::spdlog
-        ${PROJECT_NAME}
-)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE GTFS_DLL_EXPORTS)
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -161,7 +131,8 @@ generate_export_header(${PROJECT_NAME}
 set(INCLUDE_INSTALL_DIR include)
 
 install(FILES
-        ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_export.h DESTINATION ${INCLUDE_INSTALL_DIR}
+        ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_export.h
+        DESTINATION ${INCLUDE_INSTALL_DIR}
 )
 
 message(BINARY_DIR: ${CMAKE_BINARY_DIR}/${PROJECT_NAME})

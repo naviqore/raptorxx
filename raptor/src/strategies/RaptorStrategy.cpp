@@ -18,7 +18,6 @@
 #include <tuple>
 #include <ranges>
 #include <optional>
-#include <utils/Label.h>
 
 namespace raptor::strategy {
   RaptorStrategy::RaptorStrategy(schedule::gtfs::TimetableManager&& relationManager)

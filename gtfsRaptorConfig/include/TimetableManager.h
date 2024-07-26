@@ -15,22 +15,22 @@
 #include "model/Route.h"
 
 #include <iostream>
-#include <schedule_export.h>
+#include <gtfsRaptorConfig_export.h>
 #include <ranges>
 
-namespace schedule::gtfs {
+namespace converter {
 
-  class SCHEDULE_API TimetableManager
+  class GTFS_RAPTOR_API TimetableManager
   {
-    std::unique_ptr<GtfsData> data;
+    std::unique_ptr<schedule::gtfs::GtfsData> data;
     std::unique_ptr<RoutePartitioner> routePartitioner;
 
   public:
-    explicit TimetableManager(GtfsData&& data);
+    explicit TimetableManager(schedule::gtfs::GtfsData&& data);
 
-    [[nodiscard]] const GtfsData& getData() const;
+    [[nodiscard]] const schedule::gtfs::GtfsData& getData() const;
 
-    [[nodiscard]] GtfsData& getData();
+    [[nodiscard]] schedule::gtfs::GtfsData& getData();
 
     [[nodiscard]] RoutePartitioner& getRoutePartitioner();
 
@@ -42,19 +42,19 @@ namespace schedule::gtfs {
 
     [[nodiscard]] std::vector<std::string> getStopIdsFromStopName(std::string const& aStopName) const;
 
-    [[nodiscard]] const StopTime& getStopTimeFromStopId(std::string const& aStopId) const;
+    [[nodiscard]] const schedule::gtfs::StopTime& getStopTimeFromStopId(std::string const& aStopId) const;
 
-    [[nodiscard]] std::vector<Stop> getAllStopsOnTrip(std::string const& aTripId) const;
+    [[nodiscard]] std::vector<schedule::gtfs::Stop> getAllStopsOnTrip(std::string const& aTripId) const;
 
-    [[nodiscard]] const std::vector<StopTime>& getStopTimesFromStopId(std::string const& aStopId) const;
+    [[nodiscard]] const std::vector<schedule::gtfs::StopTime>& getStopTimesFromStopId(std::string const& aStopId) const;
 
-    [[nodiscard]] Route getRouteFromTripId(std::string const& aTripId) const;
+    [[nodiscard]] schedule::gtfs::Route getRouteFromTripId(std::string const& aTripId) const;
 
-    [[nodiscard]] std::vector<StopTime> getStopTimesFromStopIdStartingFromSpecificTime(std::string const& aStopId, unsigned int secondsGreaterThan) const;
+    [[nodiscard]] std::vector<schedule::gtfs::StopTime> getStopTimesFromStopIdStartingFromSpecificTime(std::string const& aStopId, unsigned int secondsGreaterThan) const;
 
     [[nodiscard]] bool isServiceActiveOnDay(std::string const& aServiceId, std::chrono::weekday aDay) const;
 
-    [[nodiscard]] const Trip& getTripsFromStopTimeTripId(std::string const& aTripId) const;
+    [[nodiscard]] const schedule::gtfs::Trip& getTripsFromStopTimeTripId(std::string const& aTripId) const;
 
     [[nodiscard]] std::vector<std::string> getVisitedStopIds() const;
 

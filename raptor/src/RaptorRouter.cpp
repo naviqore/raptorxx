@@ -127,8 +127,8 @@ namespace raptor {
   }
 
 
-  raptor::types::raptorInt secondsOfDay(const std::chrono::system_clock::time_point& timePoint) {
-    std::time_t time = std::chrono::system_clock::to_time_t(timePoint);
+  types::raptorInt secondsOfDay(const std::chrono::system_clock::time_point& timePoint) {
+    const std::time_t time = std::chrono::system_clock::to_time_t(timePoint);
     std::tm localTime{};
     // Use localtime_s for thread safety on Windows
     if (localtime_s(&localTime, &time) != 0)

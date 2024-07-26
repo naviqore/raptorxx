@@ -24,3 +24,5 @@ enum class LOGGER_API Target
 };
 
 LOGGER_API std::shared_ptr<LoggerBridge> getLogger(Target target, LoggerName name);
+
+LOGGER_API std::shared_ptr<LoggerBridge> getConsoleLogger(LoggerName name);

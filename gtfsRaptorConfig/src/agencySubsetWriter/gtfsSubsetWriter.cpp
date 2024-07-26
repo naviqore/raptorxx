@@ -6,9 +6,9 @@
 #include "DataReader.h"
 #include "GtfsReaderStrategyFactory.h"
 #include "LoggerFactory.h"
-#include "../../../include/GtfsData.h"
+#include "GtfsData.h"
 #include "gtfs/GtfsTxtReaderStrategyFactory.h"
-#include "../../../include/TimetableManager.h"
+#include "TimetableManager.h"
 #include "utils/DataContainer.h"
 
 
@@ -41,8 +41,9 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < argc; ++i)
     {
       std::cerr << "argv[" << i << "] = " << argv[i] << '\n';
+      getConsoleLogger(LoggerName::GTFS)->error(std::format("argv[{}] = {}", i, argv[i]));
     }
-    std::cerr << "Usage: " << argv[0] << " <data_directory_path> <agency_name>" << '\n';
+    getConsoleLogger(LoggerName::GTFS)->error("Usage: " + std::string(argv[0]) + " <data_directory_path> <agency_name>");
     return EXIT_FAILURE;
   }
 
@@ -100,9 +101,10 @@ int main(int argc, char* argv[]) {
 
     for (const auto& trip : route.trips)
     {
-      trips.push_back(trip);
+      const auto& currentTrip = data.trips.at(trip);
+      trips.push_back(currentTrip);
 
-      auto calendarIterator = allCalendars.find(trip.serviceId);
+      auto calendarIterator = allCalendars.find(currentTrip.serviceId);
       if (calendarIterator != allCalendars.end())
       {
         const auto& calendar = calendarIterator->second;
@@ -123,10 +125,14 @@ int main(int argc, char* argv[]) {
       }
       else
       {
-        getLogger(Target::CONSOLE, LoggerName::GTFS)->warn("No calendar found for service id: " + trip.serviceId);
+        getLogger(Target::CONSOLE, LoggerName::GTFS)->warn("No calendar found for service id: " + currentTrip.serviceId);
       }
 
-      for (const auto& stopTime : trip.stopTimes)
+      auto stopTimesForTrip = data.stopTimes | std::views::values | std::views::join | std::views::filter([&trip](const auto& stopTime) {
+                                return stopTime.tripId == trip;
+                              });
+
+      for (const auto& stopTime : stopTimesForTrip)
       {
         stopTimes.push_back(stopTime);
 
@@ -163,8 +169,8 @@ int main(int argc, char* argv[]) {
   std::vector<std::string> routesHeader = {"route_id", "agency_id", "route_short_name", "route_long_name", "route_desc", "route_type"};
   std::vector<std::string> calendarHeader = {"service_id", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "start_date", "end_date"};
   std::vector<std::string> calendarDatesHeader = {"service_id", "date", "exception_type"};
-  std::vector<std::string> stopsHeader = {"stop_id","stop_name","stop_lat","stop_lon","location_type","parent_station"};
-  std::vector<std::string> stopTimesHeader = {"trip_id","arrival_time","departure_time","stop_id","stop_sequence","pickup_type","drop_off_type"};
+  std::vector<std::string> stopsHeader = {"stop_id", "stop_name", "stop_lat", "stop_lon", "location_type", "parent_station"};
+  std::vector<std::string> stopTimesHeader = {"trip_id", "arrival_time", "departure_time", "stop_id", "stop_sequence", "pickup_type", "drop_off_type"};
   std::vector<std::string> tripsHeader = {"route_id", "service_id", "trip_id", "trip_headsign", "trip_short_name", "direction_id", "block_id"};
   std::vector<std::string> transfersHeader = {"from_stop_id", "to_stop_id", "transfer_type", "min_transfer_time"};
 
@@ -173,7 +179,7 @@ int main(int argc, char* argv[]) {
   // create a subfolder for the agency
   if (false == std::filesystem::create_directory(gtfsDirectoryForDataSubset))
   {
-    getLogger(Target::CONSOLE, LoggerName::GTFS)->info("Error creating directory: " + gtfsDirectoryForDataSubset + " ,it may already exists");
+    getLogger(Target::CONSOLE, LoggerName::GTFS)->info("Could not create directory: " + gtfsDirectoryForDataSubset + " ,it may already exists");
   }
 
   // write gtfs files in parallel
@@ -339,9 +345,9 @@ int main(int argc, char* argv[]) {
     future.get();
   }
 
-  getLogger(Target::CONSOLE, LoggerName::GTFS)->info("GTFS files written successfully");
+  getConsoleLogger(LoggerName::GTFS)->info("GTFS files written successfully");
 
-  getLogger(Target::CONSOLE, LoggerName::GTFS)->info("GTFS files written to directory: " + gtfsDirectoryForDataSubset);
+  getConsoleLogger(LoggerName::GTFS)->info("GTFS files written to directory: " + gtfsDirectoryForDataSubset);
 
 
 

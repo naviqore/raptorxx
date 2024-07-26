@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "RaptorData.h"
-#include "RouteBuilder.h"
+#include <utils/RaptorData.h>
+#include <RouteBuilder.h>
 
 
 #include <string>
@@ -45,10 +45,10 @@ namespace raptor {
     int transferSize = 0;
     int NO_INDEX{-1};
 
-    std::vector<RouteContainer> buildAndSortRouteContainers();
-    Lookup buildLookup(const std::vector<RouteContainer>& routeContainers) const;
-    StopContext buildStopContext(const Lookup& lookup);
-    RouteTraversal buildRouteTraversal(const std::vector<RouteContainer>& routeContainers) const;
+    std::vector<RouteContainer> buildAndSortRouteContainers() const;
+    [[nodiscard]] StopRoutesIndexLookup buildLookup(const std::vector<RouteContainer>& routeContainers) const;
+    StopContext buildStopContext(const StopRoutesIndexLookup& lookup);
+    [[nodiscard]] RouteTraversal buildRouteTraversal(const std::vector<RouteContainer>& routeContainers) const;
     RouteBuilder* getRouteBuilder(const std::string& routeId);
   };
 

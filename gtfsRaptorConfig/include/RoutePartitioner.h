@@ -11,21 +11,21 @@
 #include <functional>
 #include <map>
 #include <utility>
-#include <schedule_export.h>
+#include <gtfsRaptorConfig_export.h>
 
-namespace schedule::gtfs {
+namespace converter {
 
   //TODO  header file and source file
-  class SCHEDULE_API SubRoute
+  class GTFS_RAPTOR_API SubRoute
   {
     std::string SubRouteId{};
     std::string routeId{};
     std::string stopSequenceKey{};
-    std::vector<Stop> stopsSequence{};
-    std::vector<Trip> trips{};
+    std::vector<schedule::gtfs::Stop> stopsSequence{};
+    std::vector<schedule::gtfs::Trip> trips{};
 
   public:
-    explicit SubRoute(std::string&& subRouteId, std::string const& routeId, std::string const& stopSequenceKey, std::vector<Stop>&& stopsSequence)
+    explicit SubRoute(std::string&& subRouteId, std::string const& routeId, std::string const& stopSequenceKey, std::vector<schedule::gtfs::Stop>&& stopsSequence)
       : SubRouteId(std::move(subRouteId))
       , routeId(routeId)
       , stopSequenceKey(stopSequenceKey)
@@ -43,7 +43,7 @@ namespace schedule::gtfs {
     SubRoute& operator=(const SubRoute& aSubRoute) = default;
     SubRoute& operator=(SubRoute&& aSubRoute) noexcept = default;
 
-    void addTrip(Trip const& trip) {
+    void addTrip(schedule::gtfs::Trip const& trip) {
       trips.push_back(trip);
     }
 
@@ -59,7 +59,7 @@ namespace schedule::gtfs {
       return stopSequenceKey;
     }
 
-    [[nodiscard]] const std::vector<Stop>& getStopsSequence() const {
+    [[nodiscard]] const std::vector<schedule::gtfs::Stop>& getStopsSequence() const {
       return stopsSequence;
     }
 
@@ -74,7 +74,7 @@ namespace schedule::gtfs {
       return stopsSequence.size();
     }
 
-    [[nodiscard]] const std::vector<Trip>& getTrips() const {
+    [[nodiscard]] const std::vector<schedule::gtfs::Trip>& getTrips() const {
       return trips;
     }
 
@@ -92,11 +92,11 @@ namespace schedule::gtfs {
   };
 
 
-  class SCHEDULE_API RoutePartitioner
+  class GTFS_RAPTOR_API RoutePartitioner
   {
 
   public:
-    explicit RoutePartitioner(GtfsData* data);
+    explicit RoutePartitioner(schedule::gtfs::GtfsData* data);
 
     [[nodiscard]] std::vector<SubRoute> getSubRoutes(std::string const& routeId) const;
 
@@ -105,13 +105,13 @@ namespace schedule::gtfs {
 
   private:
     std::unordered_map<std::string, std::unordered_map<std::string, SubRoute> /*, decltype(routeHash), decltype(routeEqual)*/> subRoutes{};
-    GtfsData* data;
+    schedule::gtfs::GtfsData* data;
 
-    void processRoute(Route const& route);
+    void processRoute(schedule::gtfs::Route const& route);
 
     [[nodiscard]] std::string generateStopSequenceKey(const std::string& tripId) const;
 
-    [[nodiscard]] std::vector<Stop> extractStopSequence(Trip const& aTrip) const;
+    [[nodiscard]] std::vector<schedule::gtfs::Stop> extractStopSequence(schedule::gtfs::Trip const& aTrip) const;
   };
 
 } // gtfs

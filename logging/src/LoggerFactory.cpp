@@ -18,3 +18,7 @@ std::shared_ptr<LoggerBridge> getLogger(Target const target, LoggerName const na
 
   return LoggingPool::getInstance().getLogger(target, loggerNames[name]);
 }
+
+std::shared_ptr<LoggerBridge> getConsoleLogger(const LoggerName name) {
+  return getLogger(Target::CONSOLE, name);
+}

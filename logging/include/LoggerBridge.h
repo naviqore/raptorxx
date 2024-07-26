@@ -25,4 +25,3 @@ public:
   virtual void setLevel(Level level) = 0;
   [[nodiscard]] virtual Level getLevel() const = 0;
 };
-

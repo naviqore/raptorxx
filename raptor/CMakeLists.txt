@@ -2,9 +2,7 @@ project("raptor"
         DESCRIPTION "C++ implementation of raptor algorithm"
 )
 
-add_library(${PROJECT_NAME} SHARED
-        include/config/TravelConfig.h
-        src/ActiveTrip.h)
+add_library(${PROJECT_NAME} SHARED)
 
 target_sources(${PROJECT_NAME} PRIVATE
         src/Raptor.cpp
@@ -18,11 +16,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/strategies/RaptorStrategy.h
         src/ConnectionImpl.cpp
         src/ConnectionImpl.h
-        src/utils/Label.h
-        src/utils/IndexedVisitedHashMap.cpp
-        src/utils/IndexedVisitedHashMap.h
-        src/utils/IndexedVisitedSet.cpp
-        src/utils/IndexedVisitedSet.h
         src/strategies/StandardRaptorStrategy.cpp
         src/strategies/StandardRaptorStrategy.h
         src/utils/RaptorData.cpp
@@ -30,19 +23,21 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/utils/RaptorDataBuilder.cpp
         src/utils/RaptorDataBuilder.h
         src/utils/RouteBuilder.cpp
-        src/utils/RouteBuilder.h
-        src/utils/OrderedHashMap.h
         src/RaptorRouter.cpp
         src/RaptorRouter.h
         src/Query.cpp
         src/Query.h
-        src/StopLabelsAndTimes.cpp
-        src/StopLabelsAndTimes.h
+        src/utils/StopLabelsAndTimes.cpp
+        src/utils/StopLabelsAndTimes.h
         src/FootpathRelaxer.cpp
         src/FootpathRelaxer.h
         src/RouteScanner.cpp
         src/RouteScanner.h
         src/QueryConfig.cpp
+        src/data/ActiveTrip.h
+        src/data/raptorRouteStructures.h
+        src/utils/RouteContainer.cpp
+        src/utils/RouteContainer.h
         PUBLIC
         include/RaptorAlgorithm.h
         include/config/QueryConfig.h
@@ -54,6 +49,8 @@ target_sources(${PROJECT_NAME} PRIVATE
         include/config/WalkingConfig.h
         include/config/TransferConfig.h
         include/usingTypes.h
+        include/config/TravelConfig.h
+        include/RouteBuilder.h
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -65,6 +62,7 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/include/config
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/data
 )
 target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>

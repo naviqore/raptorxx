@@ -5,7 +5,7 @@
 #ifndef FOOTPATHRELAXER_H
 #define FOOTPATHRELAXER_H
 
-#include "StopLabelsAndTimes.h"
+#include "utils/StopLabelsAndTimes.h"
 #include "usingTypes.h"
 #include "utils/RaptorData.h"
 

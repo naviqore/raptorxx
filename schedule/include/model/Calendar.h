@@ -5,14 +5,12 @@
 #ifndef CALENDAR_H
 #define CALENDAR_H
 
-#include "src/utils/utils.h"
-
 
 #include <string>
 #include <stdexcept>
 #include <chrono>
 #include <unordered_map>
-
+#include <model/helperFunctions.h>
 
 
 inline auto weekdayHash = [](const std::chrono::weekday& wd) {
@@ -27,8 +25,8 @@ namespace schedule::gtfs {
     Calendar(std::string&& aServiceId, WeekdayServiceHashMap&& aWeekdayService, std::string&& aStartDate, std::string&& aEndDate)
       : serviceId(std::move(aServiceId))
       , weekdayService(std::move(aWeekdayService))
-      , startDate(utils::parseDate(aStartDate))
-      , endDate(utils::parseDate(aEndDate)) {
+      , startDate(schedule::utils::parseDate(aStartDate))
+      , endDate(schedule::utils::parseDate(aEndDate)) {
       if (serviceId.empty()
           || aStartDate.empty()
           || aEndDate.empty())

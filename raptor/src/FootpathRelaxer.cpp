@@ -10,13 +10,13 @@
 #include <iostream>
 
 namespace raptor {
+
   FootpathRelaxer::FootpathRelaxer(const StopLabelsAndTimes& stopLabelsAndTimes, const RaptorData& raptorData, const types::raptorInt minimumTransferDuration, const types::raptorInt maximumWalkingDuration)
     : transfers(raptorData.getStopContext().transfers)
     , stops(raptorData.getStopContext().stops)
     , minTransferDuration(minimumTransferDuration)
     , maxWalkingDuration(maximumWalkingDuration)
     , stopLabelsAndTimes(const_cast<StopLabelsAndTimes&>(stopLabelsAndTimes)) {
-    // Constructor implementation
   }
 
   std::unordered_set<types::raptorIdx> FootpathRelaxer::relaxInitial(const std::vector<types::raptorIdx>& stopIndices) const {
@@ -49,7 +49,13 @@ namespace raptor {
       return;
     }
 
-    const Stop& sourceStop = stops[stopIdx];
+    const auto& [id,
+                 stopRouteIndex,
+                 numberOfRoutes,
+                 sameStopTransferTime,
+                 transferIndex,
+                 numberOfTransfers]
+      = stops[stopIdx];
     const auto previousLabel = stopLabelsAndTimes.getLabel(round, stopIdx);
 
     if (previousLabel == nullptr || previousLabel->type == StopLabelsAndTimes::LabelType::TRANSFER)
@@ -59,33 +65,38 @@ namespace raptor {
 
     auto sourceTime = previousLabel->targetTime;
 
-    for (auto i = sourceStop.transferIndex; i < sourceStop.transferIndex + static_cast<int>(sourceStop.numberOfTransfers); ++i)
+    for (auto i = transferIndex; i < transferIndex + static_cast<int>(numberOfTransfers); ++i)
     {
-      const Transfer& transfer = transfers[i];
-      const Stop& targetStop = stops[transfer.targetStopIndex];
+      const auto& [targetStopIndex, duration] = transfers[i];
+      const auto& [id,
+                   stopRouteIndex,
+                   numberOfRoutes,
+                   sameStopTransferTime,
+                   transferIndex,
+                   numberOfTransfers]
+        = stops[targetStopIndex];
 
-      if (const auto duration = transfer.duration;
-          maxWalkingDuration < duration)
+      if (maxWalkingDuration < duration)
       {
         continue;
       }
 
-      auto targetTime = sourceTime * (transfer.duration + minTransferDuration);
-      const auto comparableTargetTime = targetTime - targetStop.sameStopTransferTime;
+      auto targetTime = sourceTime * (duration + minTransferDuration);
+      const auto comparableTargetTime = targetTime - sameStopTransferTime;
 
-      if (comparableTargetTime >= stopLabelsAndTimes.getComparableBestTime(transfer.targetStopIndex))
+      if (comparableTargetTime >= stopLabelsAndTimes.getComparableBestTime(targetStopIndex))
       {
         continue;
       }
 
-      std::cout << "Stop " << targetStop.id << " was improved by transfer from stop " << sourceStop.id << std::endl;
+      std::cout << "Stop " << id << " was improved by transfer from stop " << id << std::endl;
 
-      stopLabelsAndTimes.setBestTime(transfer.targetStopIndex, comparableTargetTime);
+      stopLabelsAndTimes.setBestTime(targetStopIndex, comparableTargetTime);
 
-      auto label = std::make_unique<StopLabelsAndTimes::Label>(sourceTime, targetTime, StopLabelsAndTimes::LabelType::TRANSFER, i, types::NO_INDEX, transfer.targetStopIndex, stopLabelsAndTimes.getLabel(round, stopIdx));
+      auto label = std::make_unique<StopLabelsAndTimes::Label>(sourceTime, targetTime, StopLabelsAndTimes::LabelType::TRANSFER, i, types::NO_INDEX, targetStopIndex, stopLabelsAndTimes.getLabel(round, stopIdx));
 
-      stopLabelsAndTimes.setLabel(round, transfer.targetStopIndex, std::move(label));
-      markedStops.insert(transfer.targetStopIndex);
+      stopLabelsAndTimes.setLabel(round, targetStopIndex, std::move(label));
+      markedStops.insert(targetStopIndex);
     }
   }
 } // raptor

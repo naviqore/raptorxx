@@ -32,28 +32,8 @@ namespace schedule::gtfs {
     std::string routeId;
     std::string serviceId;
     std::string tripId;
-    std::optional<std::string> boardingStopId{};
-    // TODO dangling pointer dangerous.... but shared is not performant
-    std::vector<const StopTime*> stopTimes{};
 
-    // arrival times at the stops of this trip
-    std::vector<size_t> arrivalTimesAtStops{};
-    std::vector<size_t> departureTimesAtStops{};
-
-    void addTimesAtStop(size_t const arrivalTime, size_t const departureTime) {
-      arrivalTimesAtStops.push_back(arrivalTime);
-      departureTimesAtStops.push_back(departureTime);
-    }
-
-    // std::set<StopTime, decltype(stopTimeLessByStopSequence)> stopTimes{}; // maybe use set and order by stopSequence
-
-    // [[nodiscard]] std::vector<StopTime> getStopTimesSorted() const {
-    //   auto items = std::vector<StopTime>(stopTimes.begin(), stopTimes.end());
-    //   std::ranges::sort(items, [](const StopTime& a, const StopTime& b) {
-    //     return a.departureTime < b.departureTime;
-    //   });
-    //   return items;
-    // }
+    std::vector<StopTime> stopTimes{};
   };
 
   inline auto tripHash = [](const Trip& trip) {

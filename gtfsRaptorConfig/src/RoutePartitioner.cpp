@@ -9,8 +9,9 @@
 #include <ranges>
 
 
-namespace schedule::gtfs {
-  RoutePartitioner::RoutePartitioner(GtfsData* data)
+namespace converter {
+
+  RoutePartitioner::RoutePartitioner(schedule::gtfs::GtfsData* data)
     : data(data) {
 
     // auto routes = data->routes | std::views::values;
@@ -19,7 +20,7 @@ namespace schedule::gtfs {
     //   this->processRoute(route);
     // });
 
-    std::ranges::for_each(data->routes | std::views::values, [this](Route const& route) {
+    std::ranges::for_each(data->routes | std::views::values, [this](schedule::gtfs::Route const& route) {
       this->processRoute(route);
     });
   }
@@ -36,13 +37,13 @@ namespace schedule::gtfs {
     return subRoutesForRoute.at(key);
   }
 
-  void RoutePartitioner::processRoute(Route const& route) {
+  void RoutePartitioner::processRoute(schedule::gtfs::Route const& route) {
     std::unordered_map<std::string, SubRoute> sequenceKeyToSubRoute;
     sequenceKeyToSubRoute.reserve(data->routes.at(route.routeId).trips.size());
 
     for (const auto& tripId : data->routes.at(route.routeId).trips)
     {
-      const Trip& trip = data->trips.at(tripId);
+      const schedule::gtfs::Trip& trip = data->trips.at(tripId);
       auto key = this->generateStopSequenceKey(tripId);
 
       auto [it, inserted] = sequenceKeyToSubRoute.try_emplace(key,
@@ -91,7 +92,7 @@ namespace schedule::gtfs {
       {
         first = false;
       }
-      sequenceKey += (*it)->stopId;
+      sequenceKey += it->stopId;
     }
     return sequenceKey;
   }
@@ -118,14 +119,14 @@ namespace schedule::gtfs {
   //   return sequenceKey;
   // }
 
-  std::vector<Stop> RoutePartitioner::extractStopSequence(Trip const& aTrip) const {
-    std::vector<Stop> stops;
+  std::vector<schedule::gtfs::Stop> RoutePartitioner::extractStopSequence(schedule::gtfs::Trip const& aTrip) const {
+    std::vector<schedule::gtfs::Stop> stops;
     const auto range = data->trips.at(aTrip.tripId).stopTimes;
     stops.reserve(std::distance(range.begin(), range.end()));
 
-    for (auto it = range.begin(); it != range.end(); ++it)
+    for (const auto& it : range)
     {
-      stops.push_back(data->stops.at((*it)->stopId));
+      stops.push_back(data->stops.at(it.stopId));
     }
     return stops;
   }

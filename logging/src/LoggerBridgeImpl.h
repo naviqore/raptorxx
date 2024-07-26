@@ -22,7 +22,7 @@ public:
 
   [[nodiscard]] Level getLevel() const override;
 
-
 private:
+
   std::shared_ptr<spdlog::logger> logger;
 };

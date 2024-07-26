@@ -5,8 +5,8 @@
 #ifndef QUERY_H
 #define QUERY_H
 
-#include "../include/config/QueryConfig.h"
-#include "StopLabelsAndTimes.h"
+#include "QueryConfig.h"
+#include "utils/StopLabelsAndTimes.h"
 #include "utils/RaptorData.h"
 
 #include <vector>

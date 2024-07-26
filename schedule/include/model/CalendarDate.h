@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include <chrono>
 #include <cstdint>
+#include <model/helperFunctions.h>
 
 // https://gtfs.org/schedule/reference/#calendar_datestxt
 
@@ -26,7 +27,7 @@ namespace schedule::gtfs {
 
     CalendarDate(std::string&& aServiceId, std::string&& aDate, ExceptionType const aExceptionType)
       : serviceId(std::move(aServiceId))
-      , date(utils::parseDate(aDate))
+      , date(schedule::utils::parseDate(aDate))
       , exceptionType(aExceptionType) {
       if (serviceId.empty()
           || aDate.empty())

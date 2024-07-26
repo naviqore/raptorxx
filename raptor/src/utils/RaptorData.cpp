@@ -8,13 +8,13 @@
 
 namespace raptor {
 
-  RaptorData::RaptorData(Lookup  lookup, StopContext  stopContext, RouteTraversal  routeTraversal)
+  RaptorData::RaptorData(StopRoutesIndexLookup  lookup, StopContext  stopContext, RouteTraversal  routeTraversal)
     : lookup(std::move(lookup))
     , stopContext(std::move(stopContext))
     , routeTraversal(std::move(routeTraversal)) {
   }
 
-  const Lookup& RaptorData::getLookup() const {
+  const StopRoutesIndexLookup& RaptorData::getLookup() const {
     return this->lookup;
   }
 

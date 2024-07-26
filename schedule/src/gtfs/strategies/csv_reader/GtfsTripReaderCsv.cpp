@@ -5,6 +5,7 @@
 #include "GtfsTripReaderCsv.h"
 
 #include "GtfsCsvHelpers.h"
+#include "src/utils/utils.h"
 
 #include <csv2/reader.hpp>
 

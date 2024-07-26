@@ -3,20 +3,20 @@
 //
 
 #include "RaptorDataBuilder.h"
-#include "RouteBuilder.h" // Assuming RouteBuilder is also converted and available
+#include "RouteBuilder.h"
 #include <algorithm>
 #include <stdexcept>
-#include <iostream> // For logging, replacing @Slf4j
+#include <iostream>
 #include <numeric>
 #include <ranges>
 
 namespace raptor {
 
-  RaptorRouterBuilder::RaptorRouterBuilder(int defaultSameStopTransferTime)
+  RaptorRouterBuilder::RaptorRouterBuilder(const int defaultSameStopTransferTime)
     : defaultSameStopTransferTime(defaultSameStopTransferTime) {}
 
   RaptorRouterBuilder& RaptorRouterBuilder::addStop(const std::string& id) {
-    if (stops.find(id) != stops.end())
+    if (stops.contains(id))
     {
       throw std::invalid_argument("Stop " + id + " already exists");
     }
@@ -35,7 +35,7 @@ namespace raptor {
 
     for (const auto& stopId : stopIds)
     {
-      if (stops.find(stopId) == stops.end())
+      if (!stops.contains(stopId))
       {
         throw std::invalid_argument("Stop " + stopId + " does not exist");
       }
@@ -60,8 +60,8 @@ namespace raptor {
     return *this;
   }
 
-  RaptorRouterBuilder& RaptorRouterBuilder::addStopTime(const std::string& routeId, const std::string& tripId, int position, const std::string& stopId, int arrival, int departure) {
-    StopTime stopTime(arrival, departure);
+  RaptorRouterBuilder& RaptorRouterBuilder::addStopTime(const std::string& routeId, const std::string& tripId, const int position, const std::string& stopId, const int arrival, const int departure) {
+    const StopTime stopTime(arrival, departure);
     getRouteBuilder(routeId)->addStopTime(tripId, position, stopId, stopTime);
     stopTimeSize++;
     return *this;
@@ -70,12 +70,12 @@ namespace raptor {
   RaptorRouterBuilder& RaptorRouterBuilder::addTransfer(const std::string& sourceStopId, const std::string& targetStopId, int duration) {
     std::cout << "Adding transfer: sourceStopId=" << sourceStopId << ", targetStopId=" << targetStopId << ", duration=" << duration << std::endl;
 
-    if (stops.find(sourceStopId) == stops.end())
+    if (!stops.contains(sourceStopId))
     {
       throw std::invalid_argument("Source stop " + sourceStopId + " does not exist");
     }
 
-    if (stops.find(targetStopId) == stops.end())
+    if (!stops.contains(targetStopId))
     {
       throw std::invalid_argument("Target stop " + targetStopId + " does not exist");
     }
@@ -94,7 +94,7 @@ namespace raptor {
   std::shared_ptr<RaptorData> RaptorRouterBuilder::build() {
     std::cout << "Initialize Raptor with " << stops.size() << " stops, " << routeBuilders.size() << " routes, " << routeStopSize << " route stops, " << stopTimeSize << " stop times, " << transferSize << " transfers" << std::endl;
 
-    auto routeContainers = buildAndSortRouteContainers();
+    const auto routeContainers = buildAndSortRouteContainers();
     auto lookup = buildLookup(routeContainers);
     auto stopContext = buildStopContext(lookup);
     auto routeTraversal = buildRouteTraversal(routeContainers);
@@ -102,27 +102,27 @@ namespace raptor {
     return std::make_shared<RaptorData>(lookup, stopContext, routeTraversal);
   }
 
-  std::vector<RouteContainer> RaptorRouterBuilder::buildAndSortRouteContainers() {
+  std::vector<RouteContainer> RaptorRouterBuilder::buildAndSortRouteContainers() const {
     std::vector<RouteContainer> containers;
-    for (auto& entry : routeBuilders)
+    for (const auto& [id, routeBuilder] : routeBuilders)
     {
-      containers.push_back(entry.second->build());
+      containers.push_back(routeBuilder->build());
     }
     std::sort(containers.begin(), containers.end());
     return containers;
   }
 
-  Lookup RaptorRouterBuilder::buildLookup(const std::vector<RouteContainer>& routeContainers) const {
+  StopRoutesIndexLookup RaptorRouterBuilder::buildLookup(const std::vector<RouteContainer>& routeContainers) const {
     std::cout << "Building lookup with " << stops.size() << " stops and " << routeContainers.size() << " routes" << std::endl;
     std::unordered_map<std::string, types::raptorIdx> routes;
     for (auto i = 0; i < routeContainers.size(); ++i)
     {
       routes[routeContainers[i].id()] = i;
     }
-    return Lookup(stops, routes);
+    return StopRoutesIndexLookup(stops, routes);
   }
 
-  StopContext RaptorRouterBuilder::buildStopContext(const Lookup& lookup) {
+  StopContext RaptorRouterBuilder::buildStopContext(const StopRoutesIndexLookup& lookup) {
     std::cout << "Building stop context with " << stops.size() << " stops and " << transferSize << " transfers" << std::endl;
 
     std::vector<Stop> stopArr(stops.size());
