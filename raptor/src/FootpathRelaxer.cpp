@@ -3,11 +3,14 @@
 //
 
 #include "FootpathRelaxer.h"
+
+#include "usingTypes.h"
+
 #include <algorithm>
 #include <iostream>
 
 namespace raptor {
-  FootpathRelaxer::FootpathRelaxer(const StopLabelsAndTimes& stopLabelsAndTimes, const RaptorData& raptorData, int minimumTransferDuration, int maximumWalkingDuration)
+  FootpathRelaxer::FootpathRelaxer(const StopLabelsAndTimes& stopLabelsAndTimes, const RaptorData& raptorData, const types::raptorInt minimumTransferDuration, const types::raptorInt maximumWalkingDuration)
     : transfers(raptorData.getStopContext().transfers)
     , stops(raptorData.getStopContext().stops)
     , minTransferDuration(minimumTransferDuration)
@@ -16,11 +19,11 @@ namespace raptor {
     // Constructor implementation
   }
 
-  std::unordered_set<int> FootpathRelaxer::relaxInitial(const std::vector<int>& stopIndices) {
-    std::unordered_set<int> newlyMarkedStops;
+  std::unordered_set<types::raptorIdx> FootpathRelaxer::relaxInitial(const std::vector<types::raptorIdx>& stopIndices) const {
+    std::unordered_set<types::raptorIdx> newlyMarkedStops;
     std::cout << "Initial relaxing of footpaths for source stops" << std::endl;
 
-    for (int sourceStopIdx : stopIndices)
+    for (const auto sourceStopIdx : stopIndices)
     {
       expandFootpathsFromStop(sourceStopIdx, 0, newlyMarkedStops);
     }
@@ -28,11 +31,11 @@ namespace raptor {
     return newlyMarkedStops;
   }
 
-  std::unordered_set<int> FootpathRelaxer::relax(int round, const std::unordered_set<int>& stopIndices) {
-    std::unordered_set<int> newlyMarkedStops;
+  std::unordered_set<types::raptorIdx> FootpathRelaxer::relax(const int round, const std::unordered_set<types::raptorIdx>& stopIndices) const {
+    std::unordered_set<types::raptorIdx> newlyMarkedStops;
     std::cout << "Relaxing footpaths for round " << round << std::endl;
 
-    for (int sourceStopIdx : stopIndices)
+    for (const int sourceStopIdx : stopIndices)
     {
       expandFootpathsFromStop(sourceStopIdx, round, newlyMarkedStops);
     }
@@ -40,14 +43,14 @@ namespace raptor {
     return newlyMarkedStops;
   }
 
-  void FootpathRelaxer::expandFootpathsFromStop(int stopIdx, int round, std::unordered_set<int>& markedStops) {
+  void FootpathRelaxer::expandFootpathsFromStop(const types::raptorIdx stopIdx, const int round, std::unordered_set<types::raptorInt>& markedStops) const {
     if (stops[stopIdx].numberOfTransfers == 0)
     {
       return;
     }
 
     const Stop& sourceStop = stops[stopIdx];
-    auto previousLabel = stopLabelsAndTimes.getLabel(round, stopIdx);
+    const auto previousLabel = stopLabelsAndTimes.getLabel(round, stopIdx);
 
     if (previousLabel == nullptr || previousLabel->type == StopLabelsAndTimes::LabelType::TRANSFER)
     {
@@ -56,19 +59,19 @@ namespace raptor {
 
     int sourceTime = previousLabel->targetTime;
 
-    for (int i = sourceStop.transferIndex; i < sourceStop.transferIndex + sourceStop.numberOfTransfers; ++i)
+    for (auto i = sourceStop.transferIndex; i < sourceStop.transferIndex + sourceStop.numberOfTransfers; ++i)
     {
       const Transfer& transfer = transfers[i];
       const Stop& targetStop = stops[transfer.targetStopIndex];
-      int duration = transfer.duration;
 
-      if (maxWalkingDuration < duration)
+      if (const auto duration = transfer.duration;
+          maxWalkingDuration < duration)
       {
         continue;
       }
 
-      int targetTime = sourceTime * (transfer.duration + minTransferDuration);
-      int comparableTargetTime = targetTime - targetStop.sameStopTransferTime;
+      auto targetTime = sourceTime * (transfer.duration + minTransferDuration);
+      const auto comparableTargetTime = targetTime - targetStop.sameStopTransferTime;
 
       if (comparableTargetTime >= stopLabelsAndTimes.getComparableBestTime(transfer.targetStopIndex))
       {
@@ -79,7 +82,7 @@ namespace raptor {
 
       stopLabelsAndTimes.setBestTime(transfer.targetStopIndex, comparableTargetTime);
 
-      auto label = std::make_shared<StopLabelsAndTimes::Label>(sourceTime, targetTime, StopLabelsAndTimes::LabelType::TRANSFER, i, StopLabelsAndTimes::NO_INDEX, transfer.targetStopIndex, stopLabelsAndTimes.getLabel(round, stopIdx));
+      auto label = std::make_shared<StopLabelsAndTimes::Label>(sourceTime, targetTime, StopLabelsAndTimes::LabelType::TRANSFER, i, types::NO_INDEX, transfer.targetStopIndex, stopLabelsAndTimes.getLabel(round, stopIdx));
 
       stopLabelsAndTimes.setLabel(round, transfer.targetStopIndex, label);
       markedStops.insert(transfer.targetStopIndex);

@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include "usingTypes.h"
+
+
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -12,40 +15,40 @@ namespace raptor {
 
   struct RouteStop
   {
-    int stopIndex;
-    int routeIndex;
+    types::raptorIdx stopIndex;
+    types::raptorIdx routeIndex;
   };
 
   struct StopTime
   {
-    int arrival;
-    int departure;
+    types::raptorInt arrival;
+    types::raptorInt departure;
   };
 
   struct Route
   {
     std::string id;
-    int firstRouteStopIndex;
-    int numberOfStops;
-    int firstStopTimeIndex;
-    int numberOfTrips;
+    types::raptorIdx firstRouteStopIndex;
+    types::raptorInt numberOfStops;
+    types::raptorIdx firstStopTimeIndex;
+    types::raptorInt numberOfTrips;
     std::vector<std::string> tripIds;
   };
 
   struct Stop
   {
     std::string id;
-    int stopRouteIndex;
-    int numberOfRoutes;
-    int sameStopTransferTime;
-    int transferIndex;
-    int numberOfTransfers;
+    types::raptorIdx stopRouteIndex;
+    types::raptorInt numberOfRoutes;
+    types::raptorInt sameStopTransferTime;
+    types::raptorIdx transferIndex;
+    types::raptorInt numberOfTransfers;
   };
 
   struct Transfer
   {
-    int targetStopIndex;
-    int duration;
+    types::raptorIdx  targetStopIndex;
+    types::raptorInt duration;
   };
 
   struct Lookup
@@ -82,9 +85,9 @@ namespace raptor {
 
   public:
     explicit RaptorData(Lookup  lookup, StopContext  stopContext, RouteTraversal  routeTraversal);
-    const Lookup& getLookup() const;
-    const StopContext& getStopContext() const;
-    const RouteTraversal& getRouteTraversal() const;
+    [[nodiscard]] const Lookup& getLookup() const;
+    [[nodiscard]] const StopContext& getStopContext() const;
+    [[nodiscard]] const RouteTraversal& getRouteTraversal() const;
   };
 
 } // raptor

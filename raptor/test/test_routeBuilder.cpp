@@ -17,15 +17,15 @@ protected:
   static const std::string STOP_1;
   static const std::string STOP_2;
   static const std::string STOP_3;
-  raptor::RouteBuilder* builder;
+  std::unique_ptr<raptor::RouteBuilder> builder;
 
   void SetUp() override {
-    builder = new raptor::RouteBuilder(ROUTE_1, {STOP_1, STOP_2, STOP_3});
+    builder = std::make_unique<raptor::RouteBuilder>(ROUTE_1, std::vector{STOP_1, STOP_2, STOP_3});
     builder->addTrip(TRIP_1);
   }
 
   void TearDown() override {
-    delete builder;
+    builder.reset();
   }
 };
 
@@ -89,4 +89,3 @@ TEST_F(RouteBuilderTest, ShouldNotBuildRouteWithUnsetStopTimes) {
   builder->addStopTime(TRIP_1, 0, STOP_1, raptor::StopTime(100, 200));
   EXPECT_THROW(builder->build(), std::runtime_error);
 }
-

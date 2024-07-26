@@ -25,7 +25,7 @@ namespace raptor {
     : raptorData(raptorData)
     , validator(raptorData.getLookup().stops) {}
 
-  std::vector<Connection> RaptorRouter::routeEarliestArrival(const std::map<std::string, int>& departureStops, const std::map<std::string, int>& arrivalStops, const QueryConfig& config) const {
+  std::vector<Connection> RaptorRouter::routeEarliestArrival(const std::map<std::string, int>& departureStops, const std::map<std::string, int>& arrivalStops, const config::QueryConfig& config) const {
     validator.checkNonNullOrEmptyStops(departureStops, "Departure");
     validator.checkNonNullOrEmptyStops(arrivalStops, "Arrival");
 
@@ -50,25 +50,33 @@ namespace raptor {
     auto validatedTargetStops = validator.validateStopsAndGetIndices(arrivalStops);
     InputValidator::validateStopPermutations(departureStops, arrivalStops);
 
-    std::vector<int> sourceStopIndices = validatedSourceStops | std::views::keys | std::ranges::to<std::vector<int>>();
-    std::vector<int> targetStopIndices = validatedTargetStops | std::views::keys | std::ranges::to<std::vector<int>>();
-    std::vector<int> sourceTimes = validatedSourceStops | std::views::values | std::ranges::to<std::vector<int>>();
-    std::vector<int> walkingDurationsToTarget = validatedTargetStops | std::views::values | std::ranges::to<std::vector<int>>();
+    const auto sourceStopIndices = validatedSourceStops | std::views::keys | std::ranges::to<std::vector<types::raptorIdx>>();
+    const auto targetStopIndices = validatedTargetStops | std::views::keys | std::ranges::to<std::vector<types::raptorIdx>>();
+    const auto sourceTimes = validatedSourceStops | std::views::values | std::ranges::to<std::vector<types::raptorInt>>();
+    const auto walkingDurationsToTarget = validatedTargetStops | std::views::values | std::ranges::to<std::vector<types::raptorInt>>();
 
-    auto query = Query(raptorData, sourceStopIndices, targetStopIndices, sourceTimes, walkingDurationsToTarget, config);
+    const auto queryParams = QueryParams{
+      .raptorData = raptorData,
+      .sourceStopIndices = sourceStopIndices,
+      .targetStopIndices = targetStopIndices,
+      .sourceTimes = sourceTimes,
+      .walkingDurationsToTarget = walkingDurationsToTarget,
+      .config = config};
+
+    auto query = Query(queryParams);
     auto labels = query.run();
 
     return {};
   }
-  std::vector<Connection> RaptorRouter::routeLatestDeparture(const std::map<std::string, int>& departureStops, const std::map<std::string, std::chrono::system_clock::time_point>& arrivalStops, const QueryConfig& config) const {
+  std::vector<Connection> RaptorRouter::routeLatestDeparture(const std::map<std::string, int>& departureStops, const std::map<std::string, std::chrono::system_clock::time_point>& arrivalStops, const config::QueryConfig& config) const {
     throw std::runtime_error("Not implemented");
   }
-  std::map<std::string, Connection> RaptorRouter::routeIsolines(const std::map<std::string, std::chrono::system_clock::time_point>& sourceStops, const QueryConfig& config) const {
+  std::map<std::string, Connection> RaptorRouter::routeIsolines(const std::map<std::string, std::chrono::system_clock::time_point>& sourceStops, const config::QueryConfig& config) const {
     throw std::runtime_error("Not implemented");
   }
 
 
-  std::vector<Connection> RaptorRouter::getConnections(const std::map<std::string, int>& sourceStops, const std::map<std::string, int>& targetStops, const QueryConfig& config) {
+  std::vector<Connection> RaptorRouter::getConnections(const std::map<std::string, int>& sourceStops, const std::map<std::string, int>& targetStops, const config::QueryConfig& config) const {
     validator.validateSourceStopTimes(sourceStops);
 
     // Mocked implementation for processing
@@ -94,7 +102,6 @@ namespace raptor {
     // Example: Check for null values and time difference
   }
   void RaptorRouter::InputValidator::validateStopPermutations(const std::map<std::string, int>& sourceStops, const std::map<std::string, int>& targetStops) {
-
   }
 
 
@@ -126,7 +133,8 @@ namespace raptor {
     std::time_t time = std::chrono::system_clock::to_time_t(timePoint);
     std::tm localTime{};
     // Use localtime_s for thread safety on Windows
-    if (localtime_s(&localTime, &time) != 0) {
+    if (localtime_s(&localTime, &time) != 0)
+    {
       throw std::runtime_error("Unable to convert time_point to local time.");
     }
 

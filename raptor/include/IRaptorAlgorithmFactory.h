@@ -5,7 +5,7 @@
 #ifndef IRAPTORALGORITHMFACTORY_H
 #define IRAPTORALGORITHMFACTORY_H
 
-#include "../../schedule/include/TimetableManager.h"
+#include "TimetableManager.h"
 
 
 #include <memory>

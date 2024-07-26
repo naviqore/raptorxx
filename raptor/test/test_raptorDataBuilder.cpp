@@ -21,7 +21,7 @@
 TEST(RaptorAlgoTest, TestRaptorAlgo1) {
   // Setup the builder and build the RaptorAlgorithm instance
   RaptorRouterTestBuilder builder;
-  auto raptorData = builder.buildWithDefaults();
+  const auto raptorData = builder.buildWithDefaults();
 
   // Define constants for the test
   const std::string STOP_A = "A";
@@ -29,8 +29,8 @@ TEST(RaptorAlgoTest, TestRaptorAlgo1) {
   const int NINE_AM = 9 * 3600; // 9 AM in seconds
 
   // Get the list of connections between the stops
-  const auto queryConfig = QueryConfig();
-  auto raptorRouter = raptor::RaptorRouter(*raptorData);
+  const auto queryConfig = raptor::config::QueryConfig();
+  const auto raptorRouter = raptor::RaptorRouter(*raptorData);
   auto result = raptorRouter.routeEarliestArrival({{"A", 0}}, {{"B", 0}}, queryConfig);
   //  std::vector<Connection> connections = ConvenienceMethods::routeLatestDeparture(raptor, STOP_A, STOP_B, NINE_AM);
 
@@ -41,7 +41,7 @@ TEST(RaptorAlgoTest, TestRaptorAlgo1) {
 TEST(RaptorAlgoTest, TestRaptorAlgo2) {
   // Setup the builder and build the RaptorAlgorithm instance
   RaptorRouterTestBuilder builder;
-  auto raptorData = builder.buildWithDefaults();
+  const auto raptorData = builder.buildWithDefaults();
 
   // Define constants for the test
   const std::string STOP_A = "A";
@@ -49,8 +49,8 @@ TEST(RaptorAlgoTest, TestRaptorAlgo2) {
   const int NINE_AM = 9 * 3600; // 9 AM in seconds
 
   // Get the list of connections between the stops
-  const auto queryConfig = QueryConfig();
-  auto raptorRouter = raptor::RaptorRouter(*raptorData);
+  const auto queryConfig = raptor::config::QueryConfig();
+  const auto raptorRouter = raptor::RaptorRouter(*raptorData);
   auto result = raptorRouter.routeEarliestArrival({{"A", 0}}, {{"Q", 0}}, queryConfig);
   //  std::vector<Connection> connections = ConvenienceMethods::routeLatestDeparture(raptor, STOP_A, STOP_B, NINE_AM);
 

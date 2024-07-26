@@ -6,6 +6,7 @@
 #define FOOTPATHRELAXER_H
 
 #include "StopLabelsAndTimes.h"
+#include "usingTypes.h"
 #include "utils/RaptorData.h"
 
 #include <vector>
@@ -17,18 +18,19 @@ namespace raptor {
   class FootpathRelaxer {
   public:
     FootpathRelaxer(const StopLabelsAndTimes& stopLabelsAndTimes, const RaptorData& raptorData,
-                    int minimumTransferDuration, int maximumWalkingDuration);
+                    types::raptorInt minimumTransferDuration, types::raptorInt maximumWalkingDuration);
 
-    std::unordered_set<int> relaxInitial(const std::vector<int>& stopIndices);
-    std::unordered_set<int> relax(int round, const std::unordered_set<int>& stopIndices);
+    [[nodiscard]] std::unordered_set<types::raptorIdx> relaxInitial(const std::vector<types::raptorIdx>& stopIndices) const;
+
+    [[nodiscard]] std::unordered_set<types::raptorIdx> relax(int round, const std::unordered_set<types::raptorIdx>& stopIndices) const;
 
   private:
-    void expandFootpathsFromStop(int stopIdx, int round, std::unordered_set<int>& markedStops);
+    void expandFootpathsFromStop(types::raptorIdx stopIdx, int round, std::unordered_set<types::raptorInt>& markedStops) const;
 
     const std::vector<Transfer>& transfers;
     const std::vector<Stop>& stops;
-    const int minTransferDuration;
-    const int maxWalkingDuration;
+    const types::raptorInt minTransferDuration;
+    const types::raptorInt maxWalkingDuration;
     StopLabelsAndTimes& stopLabelsAndTimes;
   };
 

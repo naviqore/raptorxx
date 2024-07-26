@@ -5,14 +5,14 @@ project("raptor_test"
 
 enable_testing()
 
-add_executable(${PROJECT_NAME}
-        test_routeBuilder.cpp
-        test_raptorDataBuilder.cpp
-        test_raptorAlgorithm.cpp
-        RaptorRouterTestBuilder.h)
+add_executable(${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME} PRIVATE
         test_raptor.cpp
+        test_routeBuilder.cpp
+        test_raptorDataBuilder.cpp
+        RaptorRouterTestBuilder.h
+        RaptorRouterTestBuilder.cpp
 )
 
 

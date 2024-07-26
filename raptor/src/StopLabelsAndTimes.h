@@ -6,6 +6,9 @@
 #define STOPLABELSANDTIMES_H
 
 
+#include "usingTypes.h"
+
+
 #include <utility>
 #include <vector>
 #include <memory>
@@ -15,44 +18,49 @@
 
 namespace raptor {
 
-  class StopLabelsAndTimes {
+  class StopLabelsAndTimes
+  {
   public:
-    static const int NO_INDEX = -1;
-
-    enum class LabelType {
+    enum class LabelType
+    {
       INITIAL,
       ROUTE,
       TRANSFER
-  };
-
-    struct Label {
-      int sourceTime;
-      int targetTime;
-      LabelType type;
-      int routeOrTransferIdx;
-      int tripOffset;
-      int stopIdx;
-      std::shared_ptr<Label> previous;
-
-      Label(int sourceTime, int targetTime, LabelType type, int routeOrTransferIdx, int tripOffset, int stopIdx,
-            std::shared_ptr<Label> previous = nullptr)
-          : sourceTime(sourceTime), targetTime(targetTime), type(type), routeOrTransferIdx(routeOrTransferIdx),
-            tripOffset(tripOffset), stopIdx(stopIdx), previous(std::move(previous)) {}
     };
 
-    StopLabelsAndTimes(int stopSize);
+    struct Label
+    {
+      types::raptorInt sourceTime;
+      types::raptorInt targetTime;
+      LabelType type;
+      types::raptorIdx routeOrTransferIdx;
+      int tripOffset;
+      types::raptorIdx stopIdx;
+      std::shared_ptr<Label> previous;
+
+      Label(const types::raptorInt sourceTime, const types::raptorInt targetTime, const LabelType type, const types::raptorIdx routeOrTransferIdx, const int tripOffset, const types::raptorIdx stopIdx, std::shared_ptr<Label> previous = nullptr)
+        : sourceTime(sourceTime)
+        , targetTime(targetTime)
+        , type(type)
+        , routeOrTransferIdx(routeOrTransferIdx)
+        , tripOffset(tripOffset)
+        , stopIdx(stopIdx)
+        , previous(std::move(previous)) {}
+    };
+
+    explicit StopLabelsAndTimes(int stopSize);
 
     void addNewRound();
-    std::shared_ptr<Label> getLabel(int round, int stopIdx) const;
-    void setLabel(int round, int stopIdx, std::shared_ptr<Label> label);
-    int getComparableBestTime(int stopIdx) const;
-    int getActualBestTime(int stopIdx) const;
-    void setBestTime(int stopIdx, int time);
-    const std::vector<std::vector<std::shared_ptr<Label>>>& getBestLabelsPerRound() const;
+    [[nodiscard]] std::shared_ptr<Label> getLabel(types::raptorInt round, types::raptorIdx stopIdx) const;
+    void setLabel(types::raptorInt round, types::raptorIdx stopIdx, const std::shared_ptr<Label>& label);
+    [[nodiscard]] types::raptorInt getComparableBestTime(types::raptorIdx stopIdx) const;
+    [[nodiscard]] types::raptorInt getActualBestTime(types::raptorIdx stopIdx) const;
+    void setBestTime(types::raptorIdx stopIdx, types::raptorInt time);
+    [[nodiscard]] const std::vector<std::vector<std::shared_ptr<Label>>>& getBestLabelsPerRound() const;
 
   private:
     std::vector<std::vector<std::shared_ptr<Label>>> bestLabelsPerRound;
-    std::vector<int> bestTimeForStops;
+    std::vector<types::raptorInt> bestTimeForStops;
     int stopSize;
   };
 

@@ -9,7 +9,7 @@
 #include <limits>
 
 namespace raptor::utils {
-  static constexpr auto INFINITY_VALUE = std::numeric_limits<unsigned int>::max();
+  static constexpr auto INFINITY_VALUE = std::numeric_limits<int>::max();
 
   using stop_id = std::string;
   using route_id = std::string;

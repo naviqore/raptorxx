@@ -3,25 +3,7 @@ project("raptor"
 )
 
 add_library(${PROJECT_NAME} SHARED
-        src/utils/RaptorData.cpp
-        src/utils/RaptorData.h
-        src/utils/RaptorDataBuilder.cpp
-        src/utils/RaptorDataBuilder.h
-        src/utils/RouteBuilder.cpp
-        src/utils/RouteBuilder.h
-        src/utils/OrderedHashMap.h
-        include/RaptorAlgorithm.h
-        include/QueryConfig.h
-        src/RaptorRouter.cpp
-        src/RaptorRouter.h
-        src/Query.cpp
-        src/Query.h
-        src/StopLabelsAndTimes.cpp
-        src/StopLabelsAndTimes.h
-        src/FootpathRelaxer.cpp
-        src/FootpathRelaxer.h
-        src/RouteScanner.cpp
-        src/RouteScanner.h)
+        include/config/TravelConfig.h)
 
 target_sources(${PROJECT_NAME} PRIVATE
         src/Raptor.cpp
@@ -29,15 +11,10 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/Leg.h
         src/LegImpl.cpp
         src/LegImpl.h
-        include/IRaptorAlgorithmStrategy.h
-        include/IRaptorAlgorithmFactory.h
         src/RaptorAlgorithmFactory.cpp
         src/RaptorAlgorithmFactory.h
         src/strategies/RaptorStrategy.cpp
         src/strategies/RaptorStrategy.h
-        include/raptorTypes.h
-        include/IConnection.h
-        include/IRaptor.h
         src/ConnectionImpl.cpp
         src/ConnectionImpl.h
         src/utils/Label.h
@@ -47,14 +24,45 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/utils/IndexedVisitedSet.h
         src/strategies/StandardRaptorStrategy.cpp
         src/strategies/StandardRaptorStrategy.h
+        src/utils/RaptorData.cpp
+        src/utils/RaptorData.h
+        src/utils/RaptorDataBuilder.cpp
+        src/utils/RaptorDataBuilder.h
+        src/utils/RouteBuilder.cpp
+        src/utils/RouteBuilder.h
+        src/utils/OrderedHashMap.h
+        src/RaptorRouter.cpp
+        src/RaptorRouter.h
+        src/Query.cpp
+        src/Query.h
+        src/StopLabelsAndTimes.cpp
+        src/StopLabelsAndTimes.h
+        src/FootpathRelaxer.cpp
+        src/FootpathRelaxer.h
+        src/RouteScanner.cpp
+        src/RouteScanner.h
+        src/QueryConfig.cpp
+        PUBLIC
+        include/RaptorAlgorithm.h
+        include/config/QueryConfig.h
+        include/raptorTypes.h
+        include/IConnection.h
+        include/IRaptor.h
+        include/IRaptorAlgorithmStrategy.h
+        include/IRaptorAlgorithmFactory.h
+        include/config/WalkingConfig.h
+        include/config/TransferConfig.h
+        include/usingTypes.h
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC
+target_include_directories(${PROJECT_NAME}
+        PUBLIC
         ${CMAKE_SOURCE_DIR}/logging/include
         ${CMAKE_SOURCE_DIR}/logging/src
         ${CMAKE_SOURCE_DIR}/schedule/src
         ${CMAKE_SOURCE_DIR}/schedule/include
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/config
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 target_include_directories(${PROJECT_NAME} PUBLIC

@@ -5,7 +5,7 @@
 #include "StopLabelsAndTimes.h"
 
 namespace raptor {
-  StopLabelsAndTimes::StopLabelsAndTimes(int stopSize)
+  StopLabelsAndTimes::StopLabelsAndTimes(const int stopSize)
     : stopSize(stopSize)
     , bestTimeForStops(stopSize) {
 
@@ -21,50 +21,49 @@ namespace raptor {
     bestLabelsPerRound.emplace_back(stopSize, nullptr);
   }
 
-  std::shared_ptr<StopLabelsAndTimes::Label> StopLabelsAndTimes::getLabel(int round, int stopIdx) const {
-    if (round < 0 || round >= static_cast<int>(bestLabelsPerRound.size()))
+  std::shared_ptr<StopLabelsAndTimes::Label> StopLabelsAndTimes::getLabel(types::raptorInt const round, types::raptorIdx const  stopIdx) const {
+    if (round >=bestLabelsPerRound.size())
     {
       throw std::out_of_range("Round index out of range");
     }
     return bestLabelsPerRound[round][stopIdx];
   }
 
-  void StopLabelsAndTimes::setLabel(int round, int stopIdx, std::shared_ptr<Label> label) {
-    if (round < 0 || round >= static_cast<int>(bestLabelsPerRound.size()))
+  void StopLabelsAndTimes::setLabel(types::raptorInt const round, types::raptorIdx const stopIdx, const std::shared_ptr<Label>& label) {
+    if (round >= bestLabelsPerRound.size())
     {
       throw std::out_of_range("Round index out of range");
     }
     bestLabelsPerRound[round][stopIdx] = label;
   }
 
-  int StopLabelsAndTimes::getComparableBestTime(int stopIdx) const {
-    if (stopIdx < 0 || stopIdx >= static_cast<int>(bestTimeForStops.size()))
+  types::raptorInt StopLabelsAndTimes::getComparableBestTime(types::raptorInt const  stopIdx) const {
+    if (stopIdx >= bestTimeForStops.size())
     {
       throw std::out_of_range("Stop index out of range");
     }
     return bestTimeForStops[stopIdx];
   }
 
-  int StopLabelsAndTimes::getActualBestTime(int stopIdx) const {
-    if (stopIdx < 0 || stopIdx >= static_cast<int>(bestTimeForStops.size()))
+  types::raptorInt StopLabelsAndTimes::getActualBestTime(types::raptorIdx const stopIdx) const {
+    if (stopIdx >= bestTimeForStops.size())
     {
       throw std::out_of_range("Stop index out of range");
     }
 
     for (auto it = bestLabelsPerRound.rbegin(); it != bestLabelsPerRound.rend(); ++it)
     {
-      auto label = (*it)[stopIdx];
-      if (label)
+      if (const auto label = (*it)[stopIdx])
       {
         return label->targetTime;
       }
     }
 
-    return std::numeric_limits<int>::max();
+    return types::INFINITY_VALUE_MAX;
   }
 
-  void StopLabelsAndTimes::setBestTime(int stopIdx, int time) {
-    if (stopIdx < 0 || stopIdx >= static_cast<int>(bestTimeForStops.size()))
+  void StopLabelsAndTimes::setBestTime(const types::raptorIdx stopIdx, const types::raptorInt time) {
+    if (stopIdx >= bestTimeForStops.size())
     {
       throw std::out_of_range("Stop index out of range");
     }

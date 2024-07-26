@@ -30,20 +30,20 @@ namespace raptor {
     virtual std::vector<Connection> routeEarliestArrival(
       const std::map<std::string, int>& departureStops, // std::chrono::system_clock::time_point
       const std::map<std::string, int>& arrivalStops,
-      const QueryConfig& config) const
+      const config::QueryConfig& config) const
       = 0;
 
     // Method to route latest departure
     virtual std::vector<Connection> routeLatestDeparture(
       const std::map<std::string, int>& departureStops,
       const std::map<std::string, std::chrono::system_clock::time_point>& arrivalStops,
-      const QueryConfig& config) const
+      const config::QueryConfig& config) const
       = 0;
 
     // Method to route isolines
     virtual std::map<std::string, Connection> routeIsolines(
       const std::map<std::string, std::chrono::system_clock::time_point>& sourceStops,
-      const QueryConfig& config) const
+      const config::QueryConfig& config) const
       = 0;
 
   protected:
