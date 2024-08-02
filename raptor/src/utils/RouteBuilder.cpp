@@ -3,7 +3,9 @@
 //
 
 #include <ranges>
+#include <stdexcept>
 #include <include/RouteBuilder.h>
+#include <algorithm>
 
 
 namespace raptor {

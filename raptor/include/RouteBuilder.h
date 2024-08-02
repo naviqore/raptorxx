@@ -9,9 +9,6 @@
 #include <unordered_map>
 #include <vector>
 #include <map>
-#include <stdexcept>
-#include <algorithm>
-#include "RaptorData.h"
 #include "utils/RouteContainer.h"
 
 #include <raptor_export.h>

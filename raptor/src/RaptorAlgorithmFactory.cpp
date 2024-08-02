@@ -1,16 +1,16 @@
+// //
+// // Created by MichaelBrunner on 27/06/2024.
+// //
 //
-// Created by MichaelBrunner on 27/06/2024.
+// #include "RaptorAlgorithmFactory.h"
 //
-
-#include "RaptorAlgorithmFactory.h"
-
-
-namespace raptor::strategy::factory {
-
-  std::unique_ptr<IRaptorAlgorithmStrategy> RaptorAlgorithmFactory::create(const AlgorithmType type, schedule::gtfs::TimetableManager&& relationManager) {
-    return std::move(strategies[type](std::move(relationManager)));
-  }
-} // factory
-  // strategy
-  // gtfs
-  // raptor
+//
+// namespace raptor::strategy::factory {
+//
+//   std::unique_ptr<IRaptorAlgorithmStrategy> RaptorAlgorithmFactory::create(const AlgorithmType type, schedule::gtfs::TimetableManager&& relationManager) {
+//     return std::move(strategies[type](std::move(relationManager)));
+//   }
+// } // factory
+//   // strategy
+//   // gtfs
+//   // raptor

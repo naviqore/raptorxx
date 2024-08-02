@@ -45,7 +45,7 @@ namespace raptor {
     int transferSize = 0;
     int NO_INDEX{-1};
 
-    std::vector<RouteContainer> buildAndSortRouteContainers() const;
+    [[nodiscard]] std::vector<RouteContainer> buildAndSortRouteContainers() const;
     [[nodiscard]] StopRoutesIndexLookup buildLookup(const std::vector<RouteContainer>& routeContainers) const;
     StopContext buildStopContext(const StopRoutesIndexLookup& lookup);
     [[nodiscard]] RouteTraversal buildRouteTraversal(const std::vector<RouteContainer>& routeContainers) const;

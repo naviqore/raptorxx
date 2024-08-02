@@ -2,7 +2,12 @@ project("raptor"
         DESCRIPTION "C++ implementation of raptor algorithm"
 )
 
-add_library(${PROJECT_NAME} SHARED)
+add_library(${PROJECT_NAME} SHARED
+        src/LabelPostprocessor.cpp
+        src/LabelPostprocessor.h
+        include/Connection.h
+        src/RaptorConnection.cpp
+        src/RaptorConnection.h)
 
 target_sources(${PROJECT_NAME} PRIVATE
         src/Raptor.cpp

@@ -5,7 +5,7 @@
 #ifndef RAPTOR_TYPES_H
 #define RAPTOR_TYPES_H
 
-#include <model/Stop.h>
+#include <vector>
 #include <limits>
 
 namespace raptor::utils {

@@ -23,8 +23,9 @@ namespace raptor {
 
   std::unordered_set<types::raptorIdx> RouteScanner::scan(const types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops) {
     const std::unordered_set<types::raptorIdx> routesToScan = getRoutesToScan(markedStops);
+
     std::cout << "Scanning routes for round " << round << " (" << routesToScan.size() << " routes)" << std::endl;
-    getConsoleLogger(LoggerName::RAPTOR)->info("Scanning routes for round {} ({} routes)", round, routesToScan.size());
+    getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Scanning routes for round {} ({} routes)", round, routesToScan.size()));
 
     std::unordered_set<types::raptorIdx> markedStopsNext;
 
@@ -56,7 +57,7 @@ namespace raptor {
   }
 
   void RouteScanner::scanRoute(const types::raptorIdx currentRouteIdx, const types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops, std::unordered_set<types::raptorIdx>& markedStopsNext) {
-    const int lastRound = round - 1;
+    const auto lastRound = round - 1;
 
     const Route& currentRoute = routes[currentRouteIdx];
     std::cout << "Scanning route " << currentRoute.id << std::endl;

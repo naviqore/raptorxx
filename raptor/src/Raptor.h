@@ -1,3 +1,4 @@
+/*
 //
 // Created by MichaelBrunner on 23/06/2024.
 //
@@ -34,3 +35,4 @@ namespace raptor {
 } // raptor
 
 #endif //RAPTOR_H
+*/

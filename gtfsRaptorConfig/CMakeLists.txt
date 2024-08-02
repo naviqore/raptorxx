@@ -6,16 +6,18 @@ add_executable(gtfsSubsetWriter
 
 find_path(P_RANAV_CSV2_INCLUDE_DIRS "csv2/mio.hpp")
 
-add_library(${PROJECT_NAME} SHARED)
+add_library(${PROJECT_NAME} SHARED )
 
 target_sources(${PROJECT_NAME} PRIVATE
         src/GtfsToRaptorConverter.cpp
         src/RoutePartitioner.cpp
         src/TimetableManager.cpp
+        src/SubRoute.cpp
         PUBLIC
         include/GtfsToRaptorConverter.h
         include/RoutePartitioner.h
         include/TimetableManager.h
+        include/SubRoute.h
 )
 
 target_include_directories(gtfsSubsetWriter PRIVATE ${CMAKE_SOURCE_DIR}/logging/include)

@@ -6,6 +6,8 @@
 #define LEGIMPL_H
 
 #include "Leg.h"
+#include "usingTypes.h"
+
 #include <optional>
 
 namespace raptor {
@@ -17,12 +19,12 @@ namespace raptor {
     std::string tripId;
     std::string fromStopId;
     std::string toStopId;
-    int departureTime = 0;
-    int arrivalTime = 0;
+    types::raptorIdx departureTime;
+    types::raptorIdx arrivalTime;
     std::optional<Type> type = std::nullopt;
 
   public:
-    explicit LegImpl(std::string routeId, std::string tripId, std::string fromStopId, std::string toStopId, int departureTime, int arrivalTime, Type type);
+    explicit LegImpl(std::string routeId, std::string tripId, std::string fromStopId, std::string toStopId, types::raptorIdx departureTime, types::raptorIdx arrivalTime, Type type);
 
     ~LegImpl() override = default;
 

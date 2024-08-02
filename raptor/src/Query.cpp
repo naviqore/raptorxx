@@ -40,11 +40,11 @@ namespace raptor {
 
   const std::vector<std::vector<std::unique_ptr<StopLabelsAndTimes::Label>>>& Query::run() {
 
-    const FootpathRelaxer footpathRelaxer(stopLabelsAndTimes, raptorData, config.getMinimumTransferDuration(), config.getMaximumWalkingDuration());
+    const auto footpathRelaxer = FootpathRelaxer(stopLabelsAndTimes, raptorData, config.getMinimumTransferDuration(), config.getMaximumWalkingDuration());
 
-    RouteScanner routeScanner(stopLabelsAndTimes, raptorData, config.getMinimumTransferDuration());
+    auto routeScanner = RouteScanner(stopLabelsAndTimes, raptorData, config.getMinimumTransferDuration());
 
-    std::unordered_set<types::raptorIdx> markedStops = initialize();
+    auto markedStops = initialize();
     auto newStops = footpathRelaxer.relaxInitial(sourceStopIndices);
     markedStops.insert(newStops.begin(), newStops.end());
     markedStops = removeSuboptimalLabelsForRound(0, markedStops);
