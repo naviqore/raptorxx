@@ -11,7 +11,32 @@
 
 namespace raptor {
 
-  RouteScanner::RouteScanner(const StopLabelsAndTimes& stopLabelsAndTimes, const RaptorData& raptorData, const types::raptorInt minimumTransferDuration)
+  bool canEnterAtStop(const Stop& stop, const types::raptorInt stopTime, const std::unordered_set<types::raptorIdx>& markedStops, const types::raptorIdx stopIdx, const types::raptorInt stopOffset, const types::raptorInt numberOfStops) {
+
+    if (constexpr auto unreachableValue = types::INFINITY_VALUE_MAX;
+        stopTime == unreachableValue)
+    {
+      getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Stop {} cannot be reached", stop.id));
+      return false;
+    }
+
+    if (!markedStops.contains(stopIdx))
+    {
+      getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Stop {} was not improved in previous round, continue", stop.id));
+      return false;
+    }
+
+    if (stopOffset + 1 == numberOfStops)
+    {
+      getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Stop {} is last stop in route, continue", stop.id));
+      return false;
+    }
+    getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Stop {} is first stop in route, continue", stop.id));
+
+    return true;
+  }
+
+  RouteScanner::RouteScanner(StopLabelsAndTimes& stopLabelsAndTimes, const RaptorData& raptorData, const types::raptorInt minimumTransferDuration)
     : stops(raptorData.getStopContext().stops)
     , stopRoutes(raptorData.getStopContext().stopRoutes)
     , stopTimes(raptorData.getRouteTraversal().stopTimes)
@@ -23,8 +48,6 @@ namespace raptor {
 
   std::unordered_set<types::raptorIdx> RouteScanner::scan(const types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops) {
     const std::unordered_set<types::raptorIdx> routesToScan = getRoutesToScan(markedStops);
-
-    std::cout << "Scanning routes for round " << round << " (" << routesToScan.size() << " routes)" << std::endl;
     getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Scanning routes for round {} ({} routes)", round, routesToScan.size()));
 
     std::unordered_set<types::raptorIdx> markedStopsNext;
@@ -60,7 +83,7 @@ namespace raptor {
     const auto lastRound = round - 1;
 
     const Route& currentRoute = routes[currentRouteIdx];
-    std::cout << "Scanning route " << currentRoute.id << std::endl;
+    getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Scanning route {}", currentRoute.id));
 
     const auto firstRouteStopIdx = currentRoute.firstRouteStopIndex;
     const auto firstStopTimeIdx = currentRoute.firstStopTimeIndex;
@@ -94,45 +117,20 @@ namespace raptor {
     }
   }
 
-  bool RouteScanner::canEnterAtStop(const Stop& stop, const types::raptorInt stopTime, const std::unordered_set<types::raptorIdx>& markedStops, const types::raptorIdx stopIdx, const types::raptorInt stopOffset, const types::raptorInt numberOfStops) {
-
-    if (constexpr auto unreachableValue = types::INFINITY_VALUE_MAX;
-        stopTime == unreachableValue)
-    {
-      std::cout << "Stop " << stop.id << " cannot be reached, continue" << std::endl;
-      return false;
-    }
-
-    if (!markedStops.contains(stopIdx))
-    {
-      std::cout << "Stop " << stop.id << " was not improved in previous round, continue" << std::endl;
-      return false;
-    }
-
-    if (stopOffset + 1 == numberOfStops)
-    {
-      std::cout << "Stop " << stop.id << " is last stop in route, continue" << std::endl;
-      return false;
-    }
-    std::cout << "Got first entry point at stop " << stop.id << " at " << stopTime << std::endl;
-
-    return true;
-  }
-
   bool RouteScanner::checkIfTripIsPossibleAndUpdateMarks(const StopTime& stopTime, const std::shared_ptr<ActiveTrip>& activeTrip, const Stop& stop, const types::raptorInt bestStopTime, types::raptorIdx stopIdx, const types::raptorInt thisRound, const types::raptorInt lastRound, std::unordered_set<types::raptorIdx>& markedStopsNext, types::raptorIdx currentRouteIdx) const {
 
     if (const bool isImproved = stopTime.arrival < bestStopTime)
     {
-      std::cout << "Stop " << stop.id << " was improved" << std::endl;
+      getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Stop {} was improved", stop.id));
       stopLabelsAndTimes.setBestTime(stopIdx, stopTime.arrival);
 
       auto label = std::make_unique<StopLabelsAndTimes::Label>(activeTrip->entryTime,
-                                                                     stopTime.arrival,
-                                                                     StopLabelsAndTimes::LabelType::ROUTE,
-                                                                     currentRouteIdx,
-                                                                     activeTrip->tripOffset,
-                                                                     stopIdx,
-                                                                     activeTrip->previousLabel);
+                                                               stopTime.arrival,
+                                                               StopLabelsAndTimes::LabelType::ROUTE,
+                                                               currentRouteIdx,
+                                                               activeTrip->tripOffset,
+                                                               stopIdx,
+                                                               activeTrip->previousLabel);
 
       stopLabelsAndTimes.setLabel(thisRound, stopIdx, std::move(label));
       markedStopsNext.insert(stopIdx);
@@ -140,15 +138,15 @@ namespace raptor {
       return false;
     }
 
-    std::cout << "Stop " << stop.id << " was not improved" << std::endl;
+    getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Stop {} was not improved", stop.id));
     const auto previous = stopLabelsAndTimes.getLabel(lastRound, stopIdx);
 
     if (const bool isImprovedInSameRound = previous == nullptr || previous->targetTime >= stopTime.arrival)
     {
-      std::cout << "Stop " << stop.id << " has been improved in same round, trip not possible within this round" << std::endl;
+      getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Stop {} has been improved in same round, trip not possible within this round", stop.id));
       return false;
     }
-    std::cout << "Checking for trips at stop " << stop.id << std::endl;
+    getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Stop {} has not been improved in same round, checking for trips", stop.id));
     return true;
   }
 
@@ -171,7 +169,7 @@ namespace raptor {
       const StopTime& currentStopTime = stopTimes[firstStopTimeIdx + tripOffset * numberOfStops + stopOffset];
       if (currentStopTime.departure >= referenceTime)
       {
-        std::cout << "Found active trip (" << tripOffset << ") on route " << route.id << std::endl;
+        getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Found active trip ({}) on route {}", tripOffset, route.id));
         types::raptorInt entryTime = currentStopTime.departure;
         return std::make_shared<ActiveTrip>(tripOffset, entryTime, previousLabel);
       }
@@ -181,7 +179,7 @@ namespace raptor {
       }
       else
       {
-        std::cout << "No active trip found on route " << route.id << std::endl;
+        getConsoleLogger(LoggerName::RAPTOR)->info(std::format("No active trip found on route {}", route.id));
         return nullptr;
       }
     }

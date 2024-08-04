@@ -4,6 +4,7 @@
 
 #include "FootpathRelaxer.h"
 
+#include "LoggerFactory.h"
 #include "usingTypes.h"
 
 #include <algorithm>
@@ -21,7 +22,7 @@ namespace raptor {
 
   std::unordered_set<types::raptorIdx> FootpathRelaxer::relaxInitial(const std::vector<types::raptorIdx>& stopIndices) const {
     std::unordered_set<types::raptorIdx> newlyMarkedStops;
-    std::cout << "Initial relaxing of footpaths for source stops" << std::endl;
+    getConsoleLogger(LoggerName::RAPTOR)->info("Initial relaxing of footpaths for source stops");
 
     for (const auto sourceStopIdx : stopIndices)
     {
@@ -33,7 +34,7 @@ namespace raptor {
 
   std::unordered_set<types::raptorIdx> FootpathRelaxer::relax(const types::raptorInt round, const std::unordered_set<types::raptorIdx>& stopIndices) const {
     std::unordered_set<types::raptorIdx> newlyMarkedStops;
-    std::cout << "Relaxing footpaths for round " << round << std::endl;
+    getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Relaxing footpaths for round {}", round));
 
     for (const auto sourceStopIdx : stopIndices)
     {
@@ -88,8 +89,7 @@ namespace raptor {
       {
         continue;
       }
-
-      std::cout << "Stop " << id << " was improved by transfer from stop " << id << std::endl;
+      getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Stop {} was improved by transfer from stop {}", id, id));
 
       stopLabelsAndTimes.setBestTime(targetStopIndex, comparableTargetTime);
 

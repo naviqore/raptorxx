@@ -3,7 +3,11 @@
 //
 
 #include "RaptorDataBuilder.h"
+
+#include "LoggerFactory.h"
 #include "RouteBuilder.h"
+#include "helperFunctions.h"
+
 #include <algorithm>
 #include <stdexcept>
 #include <iostream>
@@ -20,8 +24,8 @@ namespace raptor {
     {
       throw std::invalid_argument("Stop " + id + " already exists");
     }
-    std::cout << "Adding stop: id=" << id << std::endl;
-    stops[id] = static_cast<int>(stops.size());
+    getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Adding stop: id={}", id));
+    stops[id] = static_cast<raptor::types::raptorIdx>(stops.size());
     stopRoutes[id] = std::unordered_set<std::string>();
 
     return *this;
@@ -42,12 +46,8 @@ namespace raptor {
       stopRoutes[stopId].insert(id);
     }
 
-    std::cout << "Adding route: id=" << id << ", stopSequence=[";
-    for (const auto& stopId : stopIds)
-    {
-      std::cout << stopId << " ";
-    }
-    std::cout << "]" << std::endl;
+    const auto joinedStopIds = stopIds | std::views::join;
+    getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Adding route: id={} stopSequence=[{}] ", id, utils::joinToString(joinedStopIds)));
 
     routeBuilders[id] = std::make_shared<RouteBuilder>(id, stopIds);
     routeStopSize += static_cast<int>(stopIds.size());
@@ -68,7 +68,7 @@ namespace raptor {
   }
 
   RaptorRouterBuilder& RaptorRouterBuilder::addTransfer(const std::string& sourceStopId, const std::string& targetStopId, int duration) {
-    std::cout << "Adding transfer: sourceStopId=" << sourceStopId << ", targetStopId=" << targetStopId << ", duration=" << duration << std::endl;
+    getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Adding transfer: sourceStopId={} targetStopId={} duration={}", sourceStopId, targetStopId, duration));
 
     if (!stops.contains(sourceStopId))
     {
@@ -92,7 +92,7 @@ namespace raptor {
   }
 
   std::shared_ptr<RaptorData> RaptorRouterBuilder::build() {
-    std::cout << "Initialize Raptor with " << stops.size() << " stops, " << routeBuilders.size() << " routes, " << routeStopSize << " route stops, " << stopTimeSize << " stop times, " << transferSize << " transfers" << std::endl;
+    getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Initialize Raptor with {} stops, {} routes, {} route stops, {} stop times, {} transfers", stops.size(), routeBuilders.size(), routeStopSize, stopTimeSize, transferSize));
 
     const auto routeContainers = buildAndSortRouteContainers();
     auto lookup = buildLookup(routeContainers);
@@ -113,7 +113,7 @@ namespace raptor {
   }
 
   StopRoutesIndexLookup RaptorRouterBuilder::buildLookup(const std::vector<RouteContainer>& routeContainers) const {
-    std::cout << "Building lookup with " << stops.size() << " stops and " << routeContainers.size() << " routes" << std::endl;
+    getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Building lookup with {} stops and {} routes", stops.size(), routeContainers.size()));
     std::unordered_map<std::string, types::raptorIdx> routes;
     for (auto i = 0; i < routeContainers.size(); ++i)
     {
@@ -123,8 +123,7 @@ namespace raptor {
   }
 
   StopContext RaptorRouterBuilder::buildStopContext(const StopRoutesIndexLookup& lookup) {
-    std::cout << "Building stop context with " << stops.size() << " stops and " << transferSize << " transfers" << std::endl;
-
+    getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Building stop context with {} stops and {} transfers", stops.size(), transferSize));
     std::vector<Stop> stopArr(stops.size());
     auto stopRouteSizeView = stopRoutes
                              | std::views::values
@@ -173,8 +172,7 @@ namespace raptor {
   }
 
   RouteTraversal RaptorRouterBuilder::buildRouteTraversal(const std::vector<RouteContainer>& routeContainers) const {
-    std::cout << "Building route traversal with " << routeContainers.size() << " routes, " << routeStopSize << " route stops, " << stopTimeSize << " stop times" << std::endl;
-
+    getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Building route traversal with {} routes, {} route stops, {} stop times", routeContainers.size(), routeStopSize, stopTimeSize));
     std::vector<Route> routeArr(routeContainers.size());
     std::vector<RouteStop> routeStopArr(static_cast<types::raptorIdx>(routeStopSize));
     std::vector<StopTime> stopTimeArr(static_cast<types::raptorIdx>(stopTimeSize));

@@ -17,8 +17,6 @@
 #include <chrono>
 #include <raptor_export.h>
 
-raptor::types::raptorInt secondsOfDay(const std::chrono::system_clock::time_point& timePoint);
-
 namespace raptor {
 
   class RAPTOR_API RaptorRouter final : public RaptorAlgorithm

@@ -5,6 +5,7 @@
 #include "Query.h"
 
 #include "FootpathRelaxer.h"
+#include "LoggerFactory.h"
 #include "RouteScanner.h"
 
 #include <stdexcept>
@@ -41,7 +42,6 @@ namespace raptor {
   const std::vector<std::vector<std::unique_ptr<StopLabelsAndTimes::Label>>>& Query::run() {
 
     const auto footpathRelaxer = FootpathRelaxer(stopLabelsAndTimes, raptorData, config.getMinimumTransferDuration(), config.getMaximumWalkingDuration());
-
     auto routeScanner = RouteScanner(stopLabelsAndTimes, raptorData, config.getMinimumTransferDuration());
 
     auto markedStops = initialize();
@@ -66,7 +66,7 @@ namespace raptor {
   }
 
   std::unordered_set<types::raptorIdx> Query::initialize() {
-    std::cout << "Initializing global best times per stop and best labels per round" << std::endl;
+    getConsoleLogger(LoggerName::RAPTOR)->info("Initializing global best times per stop and best labels per round");
 
     for (size_t i = 0; i < targetStopIndices.size(); ++i)
     {
@@ -74,7 +74,7 @@ namespace raptor {
       targetStops[i * 2 + 1] = walkingDurationsToTarget[i];
     }
 
-    std::unordered_set<types::raptorIdx> markedStops;
+    std::unordered_set<types::raptorIdx> markedStops{};
     for (size_t i = 0; i < sourceStopIndices.size(); ++i)
     {
       auto currentStopIdx = sourceStopIndices[i];

@@ -3,6 +3,8 @@
 //
 
 
+#include "Leg.h"
+#include "LocalDateTime.h"
 #include "LoggerFactory.h"
 #include "RaptorRouter.h"
 #include "RaptorRouterTestBuilder.h"
@@ -49,20 +51,11 @@ TEST(RaptorAlgoTest, TestRaptorAlgo1) {
 
 TEST(RaptorAlgoTest, TestRaptorAlgo2) {
 
-  using namespace std::chrono_literals;
-  auto specific_time = std::chrono::local_days{2024y / 8 / 2d} + 12h + 30min; // 2024-08-02 12:30:00
+  const raptor::utils::LocalDateTime START_OF_DAY{2021y, std::chrono::January, 1d, 0h, 0min, 0s};
+  const raptor::utils::LocalDateTime FIVE_AM = START_OF_DAY.addHours(std::chrono::hours(5));
+  const raptor::utils::LocalDateTime EIGHT_AM = START_OF_DAY.addHours(std::chrono::hours(8));
+  const raptor::utils::LocalDateTime NINE_AM = START_OF_DAY.addHours(std::chrono::hours(9));
 
-  // TODO investigate chrono library
-  auto later = specific_time + std::chrono::hours(2) + std::chrono::minutes(45); // 2024-08-02 15:15:00
-
-  auto tp1 = std::chrono::local_days{std::chrono::year{2024} / std::chrono::August / 2} + 10h + 30min;
-  auto tp2 = std::chrono::local_days{std::chrono::year{2024} / std::chrono::August / 2} + 12h + 45min;
-
-
-  constexpr int START_OF_DAY = 0;                   // 00:00 in seconds
-  constexpr int FIVE_AM = START_OF_DAY + 5 * 3600;  // 5 AM in seconds
-  constexpr int EIGHT_AM = START_OF_DAY + 8 * 3600; // 8 AM in seconds
-  constexpr int NINE_AM = START_OF_DAY + 9 * 3600;  // 9 AM in seconds
   // Setup the builder and build the RaptorAlgorithm instance
   RaptorRouterTestBuilder builder;
   const auto raptorData = builder.buildWithDefaults();
@@ -74,7 +67,18 @@ TEST(RaptorAlgoTest, TestRaptorAlgo2) {
   // Get the list of connections between the stops
   const auto queryConfig = raptor::config::QueryConfig();
   const auto raptorRouter = raptor::RaptorRouter(*raptorData);
-  auto result = raptorRouter.routeEarliestArrival({{"A", NINE_AM}}, {{"Q", 0}}, queryConfig);
+  auto NINE_AM_SECONDS = static_cast<raptor::types::raptorInt>(EIGHT_AM.secondsOfDay());
+  auto results = raptorRouter.routeEarliestArrival({{"A", NINE_AM_SECONDS}}, {{"Q", 0}}, queryConfig);
+
+  for (const auto& connection : results)
+  {
+    for (const auto legs = connection->getLegs();
+      const auto& leg : legs)
+    {
+      getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Route id {}", leg->getRouteId()));
+    }
+  }
+
   //  std::vector<Connection> connections = ConvenienceMethods::routeLatestDeparture(raptor, STOP_A, STOP_B, NINE_AM);
 
   // Assert the size of the connections list

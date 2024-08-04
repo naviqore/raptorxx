@@ -30,27 +30,11 @@ namespace raptor {
     , routeStops(raptorData.getRaptorData().getRouteTraversal().routeStops) {
   }
 
-  std::map<std::string, std::unique_ptr<Connection>> LabelPostprocessor::reconstructIsolines(const std::vector<std::vector<StopLabelsAndTimes::Label>>& bestLabelsPerRound, const types::raptorInt& referenceDate) const {
-    std::map<std::string, std::unique_ptr<Connection>> isolines;
-    for (auto i = 0; i < stops.size(); ++i)
-    {
-      Stop stop = stops[i];
-      // if (auto bestLabelForStop = getBestLabelForStop(bestLabelsPerRound, i);
-      //     bestLabelForStop && bestLabelForStop->type() != StopLabelsAndTimes::LabelType::INITIAL)
-      // {
-      //   if (auto connection = reconstructConnectionFromLabel(*bestLabelForStop, referenceDate))
-      //   {
-      //     isolines[stop.id] = std::move(std::make_unique<Connection>(connection.value()));
-      //   }
-      // }
-    }
-    return isolines;
-  }
 
   std::vector<std::unique_ptr<Connection>> LabelPostprocessor::reconstructParetoOptimalSolutions(const std::vector<std::vector<std::unique_ptr<StopLabelsAndTimes::Label>>>& bestLabelsPerRound,
                                                                                                  const std::map<types::raptorIdx, types::raptorIdx>& targetStops,
                                                                                                  const types::raptorInt& referenceDate) {
-    std::vector<std::unique_ptr<Connection>> connections;
+    std::vector<std::unique_ptr<Connection>> connections{};
     for (const auto& labels : bestLabelsPerRound)
     {
       const StopLabelsAndTimes::Label* bestLabel = nullptr;
@@ -59,21 +43,20 @@ namespace raptor {
       for (const auto& [targetStopIdx, targetStopWalkingTime] : targetStops)
       {
         const auto currentLabel = labels[targetStopIdx].get();
-        if (currentLabel == nullptr)
+        if (nullptr == currentLabel)
         {
           continue;
         }
 
-
-        auto actualArrivalTime = currentLabel->targetTime + targetStopWalkingTime;
-        if (actualArrivalTime < bestTime)
+        if (const auto actualArrivalTime = currentLabel->targetTime + targetStopWalkingTime;
+            actualArrivalTime < bestTime)
         {
           bestLabel = currentLabel;
           bestTime = actualArrivalTime;
         }
       }
 
-      if (bestLabel == nullptr)
+      if (nullptr == bestLabel)
       {
         continue;
       }
@@ -97,9 +80,6 @@ namespace raptor {
       labels.push_back(label);
       label = label->previous;
     }
-
-    maybeCombineFirstTwoLabels(labels);
-    maybeCombineLastTwoLabels(labels);
 
     for (const auto& currentLabel : labels)
     {
@@ -147,88 +127,6 @@ namespace raptor {
       return connection;
     }
     return nullptr;
-  }
-
-  void LabelPostprocessor::maybeCombineFirstTwoLabels(std::vector<const StopLabelsAndTimes::Label*>& labels) {
-    maybeCombineLabels(labels, true);
-  }
-
-  void LabelPostprocessor::maybeCombineLastTwoLabels(std::vector<const StopLabelsAndTimes::Label*>& labels) {
-    maybeCombineLabels(labels, false);
-  }
-
-  void LabelPostprocessor::maybeCombineLabels(std::vector<const StopLabelsAndTimes::Label*>& labels, const bool fromTarget) {
-    if (labels.size() < 2)
-    {
-      return;
-    }
-
-    auto transferLabelIndex = fromTarget ? 0 : labels.size() - 1;
-    const auto routeLabelIndex = fromTarget ? 1 : labels.size() - 2;
-
-    auto& transferLabel = labels[transferLabelIndex];
-    auto& routeLabel = labels[routeLabelIndex];
-
-    if (transferLabel->type != StopLabelsAndTimes::LabelType::TRANSFER || routeLabel->type != StopLabelsAndTimes::LabelType::ROUTE)
-    {
-      return;
-    }
-
-    const int stopIdx = fromTarget ? transferLabel->stopIdx : transferLabel->previous->stopIdx;
-
-    auto stopTime = getTripStopTimeForStopInTrip(stopIdx, routeLabel->routeOrTransferIdx, routeLabel->tripOffset);
-
-    // if (!stopTime || (fromTarget ? !canStopTimeBeTarget(*stopTime, routeLabel->targetTime(), TimeType::DEPARTURE) : !canStopTimeBeSource(*stopTime, routeLabel->sourceTime(), TimeType::ARRIVAL)))
-    // {
-    //   if (!fromTarget)
-    //   {
-    //     maybeShiftSourceTransferCloserToFirstRoute(labels, transferLabel, routeLabel, transferLabelIndex);
-    //   }
-    //   return;
-    // }
-    //
-    // bool isDeparture = timeType == TimeType::DEPARTURE;
-    //
-    // if (isDeparture)
-    // {
-    //   transferLabel->setTargetTime(stopTime->arrivalTime());
-    // }
-    // else
-    // {
-    //   transferLabel->setSourceTime(stopTime->departureTime());
-    // }
-    //
-    // labels.erase(labels.begin() + routeLabelIndex);
-  }
-
-  void LabelPostprocessor::maybeShiftSourceTransferCloserToFirstRoute(std::vector<const StopLabelsAndTimes::Label*>& labels,
-                                                                      const StopLabelsAndTimes::Label& transferLabel,
-                                                                      const StopLabelsAndTimes::Label& routeLabel,
-                                                                      int transferLabelIndex) {
-    if (labels.size() < 3)
-    {
-      return;
-    }
-
-    auto& nextLabel = labels[transferLabelIndex + 1];
-    if (nextLabel->type != StopLabelsAndTimes::LabelType::TRANSFER)
-    {
-      return;
-    }
-
-    auto transferStartTime = transferLabel.sourceTime;
-    auto routeStartTime = routeLabel.sourceTime;
-    auto timeDifference = transferStartTime - routeStartTime;
-
-    if (timeDifference > 0 && timeDifference < nextLabel->sourceTime - transferStartTime)
-    {
-      labels.erase(labels.begin() + transferLabelIndex);
-    }
-  }
-
-  std::optional<StopTime> LabelPostprocessor::getTripStopTimeForStopInTrip(int stopIdx, int routeIdx, int tripOffset) {
-
-    return std::nullopt;
   }
 
 

@@ -12,7 +12,6 @@ namespace raptor {
     // Initialize best times to initial value
     std::ranges::fill(bestTimeForStops, std::numeric_limits<int>::max());
 
-
     // Set empty labels for first round
     addNewRound();
   }

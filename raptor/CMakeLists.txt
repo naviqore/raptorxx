@@ -3,11 +3,8 @@ project("raptor"
 )
 
 add_library(${PROJECT_NAME} SHARED
-        src/LabelPostprocessor.cpp
-        src/LabelPostprocessor.h
-        include/Connection.h
-        src/RaptorConnection.cpp
-        src/RaptorConnection.h)
+        src/utils/helperFunctions.h
+)
 
 target_sources(${PROJECT_NAME} PRIVATE
         src/Raptor.cpp
@@ -43,6 +40,11 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/data/raptorRouteStructures.h
         src/utils/RouteContainer.cpp
         src/utils/RouteContainer.h
+        src/LabelPostprocessor.cpp
+        src/LabelPostprocessor.h
+        src/RaptorConnection.cpp
+        src/RaptorConnection.h
+        src/utils/LocalDateTime.cpp
         PUBLIC
         include/RaptorAlgorithm.h
         include/config/QueryConfig.h
@@ -56,6 +58,8 @@ target_sources(${PROJECT_NAME} PRIVATE
         include/usingTypes.h
         include/config/TravelConfig.h
         include/RouteBuilder.h
+        include/LocalDateTime.h
+        include/Connection.h
 )
 
 target_include_directories(${PROJECT_NAME}

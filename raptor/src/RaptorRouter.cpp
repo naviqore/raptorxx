@@ -7,6 +7,7 @@
 #include "LabelPostprocessor.h"
 #include "LoggerFactory.h"
 #include "Query.h"
+#include "utils/helperFunctions.h"
 
 #include <algorithm>
 #include <stdexcept>
@@ -18,7 +19,6 @@
 #include <map>
 #include <ranges>
 #include <sstream>
-
 
 namespace raptor {
 
@@ -34,18 +34,15 @@ namespace raptor {
     }
 
     void validateSourceStopTimes(const std::map<std::string, types::raptorIdx>& sourceStops) {
-      // Check that no null values are present
       for (const auto& entry : sourceStops)
       {
         if (entry.second == 0)
-        { // Assuming '0' is used as a placeholder for null
+        {
           throw std::invalid_argument("Source stop times must not be null.");
         }
       }
 
-      // Get min and max values
-      auto minMaxPair = std::minmax_element(sourceStops.begin(), sourceStops.end(), [](const auto& a, const auto& b) { return a.second < b.second; });
-      if (minMaxPair.second->second - minMaxPair.first->second > MAX_DIFFERENCE_IN_SOURCE_STOP_TIMES)
+      if (const auto minMaxPair = std::minmax_element(sourceStops.begin(), sourceStops.end(), [](const auto& a, const auto& b) { return a.second < b.second; }); minMaxPair.second->second - minMaxPair.first->second > MAX_DIFFERENCE_IN_SOURCE_STOP_TIMES)
       {
         throw std::invalid_argument("Difference between source stop times must be less than 24 hours.");
       }
@@ -87,7 +84,7 @@ namespace raptor {
         }
         else
         {
-          std::cerr << "Stop ID " << stopId << " not found in lookup, removing from query." << std::endl;
+          getConsoleLogger(LoggerName::RAPTOR)->error(std::format("Stop ID {} not found in lookup, removing from query.", stopId));
         }
       }
 
@@ -101,32 +98,22 @@ namespace raptor {
 
   }
 
-  // Constructor
   RaptorRouter::RaptorRouter(RaptorData raptorData)
-    : raptorData(std::move(raptorData))
-  // , validator(raptorData.getLookup().stops)
-  {}
+    : raptorData(std::move(raptorData)) {}
 
   std::vector<std::unique_ptr<Connection>> RaptorRouter::routeEarliestArrival(const std::map<std::string, types::raptorInt>& departureStops, const std::map<std::string, types::raptorInt>& arrivalStops, const config::QueryConfig& config) const {
     validation::checkNonNullOrEmptyStops(departureStops, "Departure");
     validation::checkNonNullOrEmptyStops(arrivalStops, "Arrival");
 
-    std::cout << "Routing earliest arrival from ";
-    for (const auto& id : departureStops | std::views::keys)
-    {
-      std::cout << id << " ";
-    }
-    std::cout << "to ";
-    for (const auto& id : arrivalStops | std::views::keys)
-    {
-      std::cout << id << " ";
-    }
-    std::cout << "departing at ";
-    for (const auto& [id, time] : departureStops)
-    {
-      std::cout << time << " ";
-    }
-    std::cout << std::endl;
+    auto departureStopIds = departureStops | std::views::keys;
+    auto arrivalStopIds = arrivalStops | std::views::keys;
+    auto departureAt = departureStops | std::views::values;
+
+    std::string departureStopIdsStr = utils::joinToString(departureStopIds);
+    std::string arrivalStopIdsStr = utils::joinToString(arrivalStopIds);
+    std::string departureAtStr = utils::joinToString(departureAt);
+
+    getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Routing earliest arrival from {} to {} departing at {}", departureStopIdsStr, arrivalStopIdsStr, departureAtStr));
 
     auto validatedSourceStops = validation::validateStopsAndGetIndices(departureStops, raptorData.getLookup().stops);
     auto validatedTargetStops = validation::validateStopsAndGetIndices(arrivalStops, raptorData.getLookup().stops);
@@ -147,11 +134,9 @@ namespace raptor {
     auto query = Query(queryParams);
     const auto& bestLabelsPerRound = query.run();
 
-    auto connection = LabelPostprocessor(*this);
-
     auto referenceDate = std::ranges::min(validatedSourceStops | std::views::values);
 
-    // validatedSourceStops = std::map<types::raptorInt, types::raptorInt>{{1, 0}};
+    auto connection = LabelPostprocessor(*this);
     return connection.reconstructParetoOptimalSolutions(bestLabelsPerRound, validatedTargetStops, referenceDate);
   }
 
@@ -175,18 +160,5 @@ namespace raptor {
     std::vector<std::shared_ptr<Connection>> connections;
     // Implement actual logic using DateTimeUtils, Query, LabelPostprocessor, etc.
     return connections;
-  }
-
-
-  types::raptorInt secondsOfDay(const std::chrono::system_clock::time_point& timePoint) {
-    const std::time_t time = std::chrono::system_clock::to_time_t(timePoint);
-    std::tm localTime{};
-    // Use localtime_s for thread safety on Windows
-    if (localtime_s(&localTime, &time) != 0)
-    {
-      throw std::runtime_error("Unable to convert time_point to local time.");
-    }
-
-    return localTime.tm_hour * 3600 + localTime.tm_min * 60 + localTime.tm_sec;
   }
 }
