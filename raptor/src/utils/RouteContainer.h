@@ -17,7 +17,7 @@ namespace raptor {
   class RouteContainer
   {
   public:
-    RouteContainer(const std::string& id, const std::map<int, std::string>& stopSequence, const std::map<std::string, std::vector<StopTime>>& trips);
+    RouteContainer(std::string  id, const std::map<int, std::string>& stopSequence, const std::map<std::string, std::vector<StopTime>>& trips);
 
     [[nodiscard]] const std::string& id() const;
 

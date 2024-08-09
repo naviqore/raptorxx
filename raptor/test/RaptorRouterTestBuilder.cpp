@@ -111,13 +111,10 @@ std::shared_ptr<raptor::RaptorData> RaptorRouterTestBuilder::build(const std::ve
     std::string routeIdF = route.id + "-F";
     std::string routeIdR = route.id + "-R";
 
-    for (const auto& stop : route.stops)
+    for (const auto& stop : route.stops | std::views::filter([&addedStops](const auto& aStop) { return !addedStops.contains(aStop); }))
     {
-      if (!addedStops.contains(stop))
-      {
-        builder.addStop(stop);
-        addedStops.insert(stop);
-      }
+      builder.addStop(stop);
+      addedStops.insert(stop);
     }
 
     builder.addRoute(routeIdF, route.stops);

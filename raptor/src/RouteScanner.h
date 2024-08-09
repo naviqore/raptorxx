@@ -23,12 +23,12 @@ namespace raptor {
   public:
     RouteScanner(StopLabelsAndTimes& stopLabelsAndTimes, const RaptorData& raptorData, types::raptorInt minimumTransferDuration);
 
-    std::unordered_set<types::raptorIdx> scan(types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops);
+    std::unordered_set<types::raptorIdx> scan(types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops) const;
 
   private:
     [[nodiscard]] std::unordered_set<types::raptorIdx> getRoutesToScan(const std::unordered_set<types::raptorIdx>& markedStops) const;
 
-    void scanRoute(types::raptorIdx currentRouteIdx, types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops, std::unordered_set<types::raptorIdx>& markedStopsNext);
+    void scanRoute(types::raptorIdx currentRouteIdx, types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops, std::unordered_set<types::raptorIdx>& markedStopsNext) const;
 
     bool checkIfTripIsPossibleAndUpdateMarks(const StopTime& stopTime, const std::shared_ptr<ActiveTrip>& activeTrip, const Stop& stop, types::raptorInt bestStopTime, types::raptorIdx stopIdx, types::raptorInt thisRound, types::raptorInt lastRound, std::unordered_set<types::raptorIdx>& markedStopsNext, types::raptorIdx currentRouteIdx) const;
 

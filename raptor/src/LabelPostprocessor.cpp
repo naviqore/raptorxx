@@ -7,20 +7,13 @@
 #include "LegImpl.h"
 #include "RaptorConnection.h"
 #include "RaptorRouter.h"
+#include "RouteScanner.h"
 
 #include <algorithm>
 #include <cassert>
 #include <stdexcept>
 
 namespace raptor {
-
-  bool canStopTimeBeSource(const StopTime& stopTime, types::raptorInt routeTargetTime, TimeType timeType) {
-    return stopTime.arrival <= routeTargetTime;
-  }
-
-  bool canStopTimeBeTarget(const StopTime& stopTime, types::raptorInt routeSourceTime, TimeType timeType) {
-    return stopTime.departure >= routeSourceTime;
-  }
 
 
   LabelPostprocessor::LabelPostprocessor(const RaptorRouter& raptorData)
@@ -33,7 +26,7 @@ namespace raptor {
 
   std::vector<std::unique_ptr<Connection>> LabelPostprocessor::reconstructParetoOptimalSolutions(const std::vector<std::vector<std::unique_ptr<StopLabelsAndTimes::Label>>>& bestLabelsPerRound,
                                                                                                  const std::map<types::raptorIdx, types::raptorIdx>& targetStops,
-                                                                                                 const types::raptorInt& referenceDate) {
+                                                                                                 const types::raptorInt& referenceDate) const {
     std::vector<std::unique_ptr<Connection>> connections{};
     for (const auto& labels : bestLabelsPerRound)
     {
@@ -48,8 +41,8 @@ namespace raptor {
           continue;
         }
 
-        if (const auto actualArrivalTime = currentLabel->targetTime + targetStopWalkingTime;
-            actualArrivalTime < bestTime)
+        const auto actualArrivalTime = currentLabel->targetTime + targetStopWalkingTime;
+        if (actualArrivalTime < bestTime)
         {
           bestLabel = currentLabel;
           bestTime = actualArrivalTime;
@@ -69,7 +62,7 @@ namespace raptor {
     return connections;
   }
 
-  std::unique_ptr<Connection> LabelPostprocessor::reconstructConnectionFromLabel(const StopLabelsAndTimes::Label* label, const types::raptorInt& referenceDate) {
+  std::unique_ptr<Connection> LabelPostprocessor::reconstructConnectionFromLabel(const StopLabelsAndTimes::Label* label, const types::raptorInt& referenceDate) const {
 
     auto connection = std::make_unique<RaptorConnection>();
     std::vector<const StopLabelsAndTimes::Label*> labels;
@@ -100,8 +93,9 @@ namespace raptor {
 
       if (currentLabel->type == StopLabelsAndTimes::LabelType::ROUTE)
       {
-        auto& [routeId, firstRouteStopIndex, numberOfStops, firstStopTimeIndex, numberOfTrips, tripIds] = routes[currentLabel->routeOrTransferIdx];
-        tripId = tripIds[currentLabel->tripOffset];
+        const auto& route = routes[currentLabel->routeOrTransferIdx];
+        tripId = route.tripIds[currentLabel->tripOffset];
+        routeId = route.id;
         type = Leg::Type::ROUTE;
       }
       else if (currentLabel->type == StopLabelsAndTimes::LabelType::TRANSFER)

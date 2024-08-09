@@ -67,10 +67,10 @@ TEST(RaptorAlgoTest, TestRaptorAlgo2) {
   // Get the list of connections between the stops
   const auto queryConfig = raptor::config::QueryConfig();
   const auto raptorRouter = raptor::RaptorRouter(*raptorData);
-  auto NINE_AM_SECONDS = static_cast<raptor::types::raptorInt>(EIGHT_AM.secondsOfDay());
-  auto results = raptorRouter.routeEarliestArrival({{"A", NINE_AM_SECONDS}}, {{"Q", 0}}, queryConfig);
+  auto EIGHT_AM_SECONDS = static_cast<raptor::types::raptorInt>(EIGHT_AM.secondsOfDay());
 
-  for (const auto& connection : results)
+  for (auto results = raptorRouter.routeEarliestArrival({{"A", EIGHT_AM_SECONDS}}, {{"Q", 0}}, queryConfig);
+    const auto& connection : results)
   {
     for (const auto legs = connection->getLegs();
       const auto& leg : legs)

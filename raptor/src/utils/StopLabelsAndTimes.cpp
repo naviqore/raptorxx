@@ -6,8 +6,8 @@
 
 namespace raptor {
   StopLabelsAndTimes::StopLabelsAndTimes(const int stopSize)
-    : stopSize(stopSize)
-    , bestTimeForStops(stopSize) {
+    : bestTimeForStops(stopSize)
+    , stopSize(stopSize) {
 
     // Initialize best times to initial value
     std::ranges::fill(bestTimeForStops, std::numeric_limits<int>::max());

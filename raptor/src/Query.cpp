@@ -42,7 +42,7 @@ namespace raptor {
   const std::vector<std::vector<std::unique_ptr<StopLabelsAndTimes::Label>>>& Query::run() {
 
     const auto footpathRelaxer = FootpathRelaxer(stopLabelsAndTimes, raptorData, config.getMinimumTransferDuration(), config.getMaximumWalkingDuration());
-    auto routeScanner = RouteScanner(stopLabelsAndTimes, raptorData, config.getMinimumTransferDuration());
+    const auto routeScanner = RouteScanner(stopLabelsAndTimes, raptorData, config.getMinimumTransferDuration());
 
     auto markedStops = initialize();
     auto newStops = footpathRelaxer.relaxInitial(sourceStopIndices);
@@ -90,9 +90,9 @@ namespace raptor {
     return markedStops;
   }
 
-  std::unordered_set<types::raptorIdx> Query::removeSuboptimalLabelsForRound(types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops) {
+  std::unordered_set<types::raptorIdx> Query::removeSuboptimalLabelsForRound(const types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops) {
     const auto bestTime = getBestTimeForAllTargetStops();
-    if (bestTime == types::INFINITY_VALUE_MAX || bestTime == types::INFINITY_VALUE_MIN)
+    if (bestTime == types::INFINITY_VALUE_MAX)
     {
       return markedStops;
     }
@@ -102,7 +102,7 @@ namespace raptor {
     {
       if (const auto label = stopLabelsAndTimes.getLabel(round, stopIdx))
       {
-        if ((label->targetTime > bestTime) || (label->targetTime < bestTime))
+        if (label->targetTime > bestTime)
         {
           stopLabelsAndTimes.setLabel(round, stopIdx, nullptr);
         }
@@ -125,7 +125,7 @@ namespace raptor {
       const auto walkDurationToTarget = targetStops[i + 1];
 
       if (auto bestTimeForStop = stopLabelsAndTimes.getActualBestTime(targetStopIdx);
-          bestTimeForStop != std::numeric_limits<int>::max())
+          bestTimeForStop != types::INFINITY_VALUE_MAX)
       {
         bestTimeForStop += walkDurationToTarget;
         bestTime = std::min(bestTime, bestTimeForStop);

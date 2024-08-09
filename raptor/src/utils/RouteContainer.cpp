@@ -4,10 +4,12 @@
 
 #include "RouteContainer.h"
 
+#include <utility>
+
 namespace raptor {
 
-  RouteContainer::RouteContainer(const std::string& id, const std::map<int, std::string>& stopSequence, const std::map<std::string, std::vector<StopTime>>& trips)
-    : routeContainerId(id)
+  RouteContainer::RouteContainer(std::string id, const std::map<int, std::string>& stopSequence, const std::map<std::string, std::vector<StopTime>>& trips)
+    : routeContainerId(std::move(id))
     , StopSequenceMap(stopSequence)
     , idTripsMap(trips) {}
 
@@ -26,7 +28,7 @@ namespace raptor {
     return StopSequenceMap;
   }
 
-  const std::map<std::string, std::vector<StopTime>>& RouteContainer::trips() const{
+  const std::map<std::string, std::vector<StopTime>>& RouteContainer::trips() const {
     return idTripsMap;
   }
 } // raptor

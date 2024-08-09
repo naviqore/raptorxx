@@ -17,7 +17,7 @@ namespace raptor {
   class FootpathRelaxer
   {
   public:
-    FootpathRelaxer(const StopLabelsAndTimes& stopLabelsAndTimes, const RaptorData& raptorData, types::raptorInt minimumTransferDuration, types::raptorInt maximumWalkingDuration);
+    FootpathRelaxer(StopLabelsAndTimes& stopLabelsAndTimes, const RaptorData& raptorData, types::raptorInt minimumTransferDuration, types::raptorInt maximumWalkingDuration);
 
     [[nodiscard]] std::unordered_set<types::raptorIdx> relaxInitial(const std::vector<types::raptorIdx>& stopIndices) const;
 

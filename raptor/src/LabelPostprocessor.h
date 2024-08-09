@@ -13,12 +13,6 @@
 #include <map>
 #include <vector>
 
-enum class TimeType
-{
-  DEPARTURE,
-  ARRIVAL
-};
-
 namespace raptor {
   class RaptorRouter;
 
@@ -29,13 +23,13 @@ namespace raptor {
     std::vector<Route> routes;
     std::vector<RouteStop> routeStops;
 
-    std::unique_ptr<Connection> reconstructConnectionFromLabel(const StopLabelsAndTimes::Label* label, const types::raptorInt& referenceDate);
+    std::unique_ptr<Connection> reconstructConnectionFromLabel(const StopLabelsAndTimes::Label* label, const types::raptorInt& referenceDate) const;
 
   public:
     explicit LabelPostprocessor(const RaptorRouter& raptorData);
     std::vector<std::unique_ptr<Connection>> reconstructParetoOptimalSolutions(const std::vector<std::vector<std::unique_ptr<StopLabelsAndTimes::Label>>>& bestLabelsPerRound,
                                                                                const std::map<types::raptorIdx, types::raptorIdx>& targetStops,
-                                                                               const types::raptorInt& referenceDate);
+                                                                               const types::raptorInt& referenceDate) const;
   };
 
 } // raptor

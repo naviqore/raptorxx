@@ -109,6 +109,7 @@ namespace raptor {
       containers.push_back(routeBuilder->build());
     }
     std::sort(containers.begin(), containers.end());
+
     return containers;
   }
 

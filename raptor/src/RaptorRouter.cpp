@@ -101,7 +101,9 @@ namespace raptor {
   RaptorRouter::RaptorRouter(RaptorData raptorData)
     : raptorData(std::move(raptorData)) {}
 
-  std::vector<std::unique_ptr<Connection>> RaptorRouter::routeEarliestArrival(const std::map<std::string, types::raptorInt>& departureStops, const std::map<std::string, types::raptorInt>& arrivalStops, const config::QueryConfig& config) const {
+  std::vector<std::unique_ptr<Connection>> RaptorRouter::routeEarliestArrival(const std::map<std::string, types::raptorInt>& departureStops,
+                                                                              const std::map<std::string, types::raptorInt>& arrivalStops,
+                                                                              const config::QueryConfig& config) const {
     validation::checkNonNullOrEmptyStops(departureStops, "Departure");
     validation::checkNonNullOrEmptyStops(arrivalStops, "Arrival");
 
