@@ -7,28 +7,34 @@
 #include <cstdarg>
 
 LoggerBridgeImpl::LoggerBridgeImpl(std::shared_ptr<spdlog::logger> logger)
-  : logger(std::move(logger)) {}
+  : logger(std::move(logger))
+{
+}
 
-void LoggerBridgeImpl::info(const std::string& message) {
+void LoggerBridgeImpl::info(const std::string& message)
+{
   logger->info(message);
 }
 
-void LoggerBridgeImpl::warn(const std::string& message) {
+void LoggerBridgeImpl::warn(const std::string& message)
+{
   logger->warn(message);
 }
 
-void LoggerBridgeImpl::error(const std::string& message) {
+void LoggerBridgeImpl::error(const std::string& message)
+{
   logger->error(message);
 }
 
-void LoggerBridgeImpl::debug(const std::string& message) {
+void LoggerBridgeImpl::debug(const std::string& message)
+{
   logger->debug(message);
 }
 
-void LoggerBridgeImpl::setLevel(const Level level) {
+void LoggerBridgeImpl::setLevel(const Level level)
+{
   spdlog::level::level_enum spdLevel = spdlog::level::info;
-  switch (level)
-  {
+  switch (level) {
     case INFO:
       spdLevel = spdlog::level::info;
       break;
@@ -46,9 +52,9 @@ void LoggerBridgeImpl::setLevel(const Level level) {
   logger->set_level(spdLevel);
 }
 
-LoggerBridge::Level LoggerBridgeImpl::getLevel() const {
-  switch (const auto spdLevel = logger->level())
-  {
+LoggerBridge::Level LoggerBridgeImpl::getLevel() const
+{
+  switch (logger->level()) {
     case spdlog::level::info:
       return INFO;
     case spdlog::level::warn:
