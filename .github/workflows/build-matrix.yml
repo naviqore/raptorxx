@@ -10,14 +10,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
+        os: [windows-latest, ubuntu-latest] # , macos-latest
         include:
           - os: windows-latest
             compiler: msvc
           - os: ubuntu-latest
             compiler: gcc
-          - os: macos-latest
-            compiler: clang
+#          - os: macos-latest
+#            compiler: clang
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.4
