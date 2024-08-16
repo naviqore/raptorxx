@@ -1,4 +1,4 @@
-project("geometry_test"
+project("geometry_tests"
         DESCRIPTION "Tests for the geometry library"
 )
 
