@@ -54,4 +54,5 @@ add_subdirectory(schedule/test)
 add_subdirectory(schedule/benchmarks)
 add_subdirectory(raptor)
 add_subdirectory(raptor/test)
-add_subdirectory(gtfsRaptorConfig)
+#TODO set up project in a new branch JIRA story
+# add_subdirectory(gtfsRaptorConfig)
