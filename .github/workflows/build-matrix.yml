@@ -16,8 +16,8 @@ jobs:
             compiler: msvc
           - os: ubuntu-latest
             compiler: gcc
-#          - os: macos-latest
-#            compiler: clang
+    #          - os: macos-latest
+    #            compiler: clang
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.4
