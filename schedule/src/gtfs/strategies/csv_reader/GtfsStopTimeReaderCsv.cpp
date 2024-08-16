@@ -4,6 +4,8 @@
 
 #include "GtfsStopTimeReaderCsv.h"
 #include "GtfsCsvHelpers.h"
+#include "src/utils/utils.h"
+
 #include <csv2/reader.hpp>
 #include <ranges>
 

@@ -4,6 +4,8 @@
 
 #include "LoggerBridgeImpl.h"
 
+#include <cstdarg>
+
 LoggerBridgeImpl::LoggerBridgeImpl(std::shared_ptr<spdlog::logger> logger)
   : logger(std::move(logger)) {}
 
@@ -29,13 +31,13 @@ void LoggerBridgeImpl::setLevel(const Level level) {
   {
     case INFO:
       spdLevel = spdlog::level::info;
-    break;
+      break;
     case WARN:
       spdLevel = spdlog::level::warn;
-    break;
+      break;
     case ERROR:
       spdLevel = spdlog::level::err;
-    break;
+      break;
     case DEBUG:
       [[fallthrough]];
     default:

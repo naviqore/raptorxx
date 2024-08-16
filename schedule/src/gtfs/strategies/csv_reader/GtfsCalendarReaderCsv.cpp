@@ -5,6 +5,7 @@
 #include "GtfsCalendarReaderCsv.h"
 
 #include "GtfsCsvHelpers.h"
+#include "src/utils/utils.h"
 
 #include <array>
 #include <csv2/reader.hpp>

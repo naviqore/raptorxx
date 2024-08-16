@@ -41,7 +41,7 @@ BraceWrapping:
   SplitEmptyNamespace: true
   AfterCaseLabel: true
 BreakBeforeBinaryOperators: All
-BreakBeforeBraces: Custom
+BreakBeforeBraces: Stroustrup
 BreakBeforeInheritanceComma: false
 BreakInheritanceList: BeforeComma
 BreakBeforeTernaryOperators: true

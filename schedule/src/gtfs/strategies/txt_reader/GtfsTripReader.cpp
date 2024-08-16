@@ -39,10 +39,10 @@ namespace schedule::gtfs {
         // TODO: Handle error
         continue;
       }
-      aReader.getData().get().trips[std::string(fields[headerMap["trip_id"]])].emplace_back(
-        std::string(fields[headerMap["route_id"]]),
-        std::string(fields[headerMap["service_id"]]),
-        std::string(fields[headerMap["trip_id"]]));
+      aReader.getData().get().trips.emplace(std::string(fields[headerMap["trip_id"]]),
+                                            Trip{std::string(fields[headerMap["route_id"]]),
+                                                 std::string(fields[headerMap["service_id"]]),
+                                                 std::string(fields[headerMap["trip_id"]])});
     }
   }
 } // gtfs

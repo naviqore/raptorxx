@@ -44,6 +44,7 @@ namespace schedule::gtfs {
     std::string routeLongName;
     std::string routeDesc;
     int routeType;
+
     reader.read_header(io::ignore_no_column, "route_id", "agency_id", "route_short_name", "route_long_name", "route_desc", "route_type");
     while (reader.read_row(routeId, agencyId, routeShortName, routeLongName, routeDesc, routeType))
     {

@@ -36,13 +36,14 @@ namespace schedule::gtfs {
     auto reader = io::CSVReader<7, io::trim_chars<'"'>, io::double_quote_escape<',', '\"'>>(filename); // , io::trim_chars<'"'>
     reader.set_header("route_id", "service_id", "trip_id", "trip_headsign", "trip_short_name", "direction_id", "block_id");
 
-    std::string tripId;
     std::string routeId;
     std::string serviceId;
+    std::string tripId;
     std::string tripHeadsign;
     std::string tripShortName;
     std::string directionId;
     std::string blockId;
+
     reader.read_header(io::ignore_extra_column, "route_id", "service_id", "trip_id", "trip_headsign", "trip_short_name", "direction_id", "block_id");
 
     while (reader.read_row(routeId, serviceId, tripId, tripHeadsign, tripShortName, directionId, blockId))
@@ -54,10 +55,10 @@ namespace schedule::gtfs {
 
       auto temp = tripId;
 
-      aReader.getData().get().trips[temp].emplace_back(
-        std::move(routeId),
-        std::move(serviceId),
-        std::move(tripId));
+      aReader.getData().get().trips.emplace(temp,
+                                            Trip{std::move(routeId),
+                                             std::move(serviceId),
+                                             std::move(tripId)});
     }
   }
 } // gtfs

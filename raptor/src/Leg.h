@@ -33,6 +33,14 @@ namespace raptor {
     [[nodiscard]] virtual int getArrivalTime() const = 0;
 
     [[nodiscard]] virtual std::optional<Type> getType() const = 0;
+
+    bool operator<(const Leg& other) const {
+      if (getDepartureTime() != other.getDepartureTime())
+      {
+        return getDepartureTime() < other.getDepartureTime();
+      }
+      return getArrivalTime() < other.getArrivalTime();
+    }
   };
 
 }

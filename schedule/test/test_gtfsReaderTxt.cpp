@@ -2,9 +2,8 @@
 
 #include "DataReader.h"
 #include "GtfsReaderStrategyFactory.h"
-#include "../include/GtfsReader.h"
+#include "include/GtfsReader.h"
 #include "gtfs/GtfsTxtReaderStrategyFactory.h"
-#include "gtfs/RelationManager.h"
 #include "model/CalendarDate.h"
 #include "utils/DataContainer.h"
 
@@ -16,6 +15,11 @@
 #include <functional>
 #include <string>
 #include <iostream>
+
+#include "LoggerFactory.h"
+#include <array>
+#include <chrono>
+#include <fmt/core.h>
 
 
 /////////////// TESTS ///////////////
@@ -147,11 +151,8 @@ TEST_F(GtfsCsvReaderStrategiesTest, testTransferReaderTxt) {
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
   const schedule::gtfs::GtfsData& data = reader->getData().get();
-  const auto transferFrom = data.transferFrom.at("1100079");
+  const auto transferFrom = data.transfer.at("1100079");
   ASSERT_EQ(transferFrom[0].toStopId, "8014441");
-
-  const auto transferTo = data.transferTo.at("8014441");
-  ASSERT_EQ(transferFrom[0].fromStopId, "1100079");
 }
 
 TEST_F(GtfsCsvReaderStrategiesTest, testTripReaderTxt) {
@@ -162,11 +163,13 @@ TEST_F(GtfsCsvReaderStrategiesTest, testTripReaderTxt) {
   reader->readData();
 
   const schedule::gtfs::GtfsData& data = reader->getData().get();
-  const auto trips = data.trips.at("91-10-A-j24-1");
-  ASSERT_TRUE(trips.empty() == false);
-  ASSERT_EQ(trips[0].routeId, "91-10-A-j24-1");
-  ASSERT_EQ(trips[0].serviceId, "TA+p60e0");
-  ASSERT_EQ(trips[0].tripId, "1.TA.91-10-A-j24-1.1.H");
+
+  ASSERT_TRUE(data.trips.empty() == false);
+
+  const auto trip = data.trips.at("106.TA.91-10-A-j24-1.7.H");
+
+  ASSERT_EQ(trip.routeId, "91-10-A-j24-1");
+  ASSERT_EQ(trip.serviceId, "TA+p60e0");
 }
 
 TEST_F(GtfsCsvReaderStrategiesTest, testrouteReaderTxt) {
@@ -182,19 +185,104 @@ TEST_F(GtfsCsvReaderStrategiesTest, testrouteReaderTxt) {
   ASSERT_EQ(static_cast<int>(route.routeType), 900);
 }
 
-TEST_F(GtfsCsvReaderStrategiesTest, testRelationManagerTxt) {
+namespace fmt {
+  template<>
+  struct formatter<std::chrono::year>
+  {
+    template<typename ParseContext>
+    constexpr auto parse(ParseContext& ctx) {
+      return ctx.begin();
+    }
 
-  auto strategy = std::vector<std::function<void(schedule::gtfs::GtfsReader&)>>();
-  const std::function<void(schedule::gtfs::GtfsReader&)> stopTimesStrategy =  readerFactory->getStrategy(GtfsStrategyType::STOP_TIME);;
-  const std::function<void(schedule::gtfs::GtfsReader&)> tripsStrategy =  readerFactory->getStrategy(GtfsStrategyType::TRIP);;
+    template<typename FormatContext>
+    auto format(const std::chrono::year& y, FormatContext& ctx) {
+      return fmt::format_to(ctx.out(), "{}", static_cast<int>(y));
+    }
+  };
 
-  strategy.push_back(stopTimesStrategy);
-  strategy.push_back(tripsStrategy);
+  template<>
+  struct formatter<std::chrono::month>
+  {
+    template<typename ParseContext>
+    constexpr auto parse(ParseContext& ctx) {
+      return ctx.begin();
+    }
 
-  reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
-  reader->readData();
+    template<typename FormatContext>
+    auto format(const std::chrono::month& m, FormatContext& ctx) {
+      return fmt::format_to(ctx.out(), "{}", static_cast<unsigned>(m));
+    }
+  };
 
-  const auto relationManager = schedule::gtfs::RelationManager(std::move(reader->getData().get()));
-  auto stopIds = relationManager.getStopIdsFromStopName("Bärental, Löffelschmiede");
-  ASSERT_TRUE(stopIds.empty() == false);
+  template<>
+  struct formatter<std::chrono::day>
+  {
+    template<typename ParseContext>
+    constexpr auto parse(ParseContext& ctx) {
+      return ctx.begin();
+    }
+
+    template<typename FormatContext>
+    auto format(const std::chrono::day& d, FormatContext& ctx) {
+      return fmt::format_to(ctx.out(), "{}", static_cast<unsigned>(d));
+    }
+  };
 }
+
+void printCalendar(const std::vector<schedule::gtfs::Calendar>& calendars) {
+  std::array<std::string, 7> weekday_names = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+  std::ranges::for_each(calendars, [&](const auto& calendar) {
+    getLogger(Target::CONSOLE, LoggerName::GTFS)->info(fmt::format("Service ID: {}", calendar.serviceId));
+    getLogger(Target::CONSOLE, LoggerName::GTFS)->info(fmt::format("Start Date: {}-{}-{}", calendar.startDate.year(), calendar.startDate.month(), calendar.startDate.day()));
+    getLogger(Target::CONSOLE, LoggerName::GTFS)->info(fmt::format("End Date: {}-{}-{}", calendar.endDate.year(), calendar.endDate.month(), calendar.endDate.day()));
+    getLogger(Target::CONSOLE, LoggerName::GTFS)->info(fmt::format("Weekday Service: "));
+
+    std::ranges::for_each(calendar.weekdayService, [&](const auto& dayService) {
+      auto [day, service] = dayService;
+      auto day_name = weekday_names[day.c_encoding()];
+      getLogger(Target::CONSOLE, LoggerName::GTFS)->info(fmt::format("{}: {}", day_name, (service ? "Service" : "No service")));
+    });
+  });
+}
+
+void printAgency(const std::vector<schedule::gtfs::Agency>& agencies) {
+  std::ranges::for_each(
+    agencies, [](const auto& agency) { getLogger(Target::CONSOLE, LoggerName::GTFS)->info(fmt::format("Agency: {} {} {}", agency.agencyId, agency.name, agency.timezone)); });
+}
+
+void printCalendarDates(const std::vector<schedule::gtfs::CalendarDate>& calendarDates) {
+  std::ranges::for_each(calendarDates, [](const auto& calendarDate) {
+    getLogger(Target::CONSOLE, LoggerName::GTFS)->info(fmt::format("Service ID: {} Date: {}-{}-{} Exception Type: {}", calendarDate.serviceId, calendarDate.date.year(), calendarDate.date.month(), calendarDate.date.day(), static_cast<int>(calendarDate.exceptionType)));
+  });
+}
+
+TEST(GTFS, TestStrategyReader) {
+  using namespace std::literals::string_literals;
+  std::string basePath = TEST_DATA_DIR;
+
+  const auto readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(schedule::gtfs::ReaderType::TXT, std::move(basePath));
+
+  getLogger(Target::CONSOLE, LoggerName::GTFS)->setLevel(LoggerBridge::ERROR);
+
+
+  // create strategy callable objects
+  const auto agencyStrategy = readerFactory->getStrategy(GtfsStrategyType::AGENCY);
+  const auto calendarStrategy = readerFactory->getStrategy(GtfsStrategyType::CALENDAR);
+  const auto calendarDatesStrategy = readerFactory->getStrategy(GtfsStrategyType::CALENDAR_DATE);
+  const auto routesStrategy = readerFactory->getStrategy(GtfsStrategyType::ROUTE);
+  const auto stopStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP);
+  const auto stopTimeStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP_TIME);
+  const auto transferStrategy = readerFactory->getStrategy(GtfsStrategyType::TRANSFER);
+  const auto tripStrategy = readerFactory->getStrategy(GtfsStrategyType::TRIP);
+
+  std::vector strategies = {agencyStrategy, calendarStrategy, calendarDatesStrategy, routesStrategy, stopStrategy, stopTimeStrategy, transferStrategy, tripStrategy};
+
+  const std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategies));
+  reader->readData();
+  const auto data = reader->getData().get();
+  //
+   EXPECT_FALSE(data.agencies.empty() || data.calendars.empty()
+                || data.calendarDates.empty() || data.routes.empty() || data.stops.empty()
+                || data.stopTimes.empty() || data.transfer.empty() || data.trips.empty());
+}
+

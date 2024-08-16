@@ -5,23 +5,23 @@
 #ifndef RAPTOR_TYPES_H
 #define RAPTOR_TYPES_H
 
-#include <model/Stop.h>
+#include <vector>
 #include <limits>
 
 namespace raptor::utils {
-  static constexpr auto INFINITY_VALUE = std::numeric_limits<unsigned int>::max();
+  static constexpr auto INFINITY_VALUE = std::numeric_limits<int>::max();
 
-  using stopId = std::string;
+  using stop_id = std::string;
+  using route_id = std::string;
 
   struct ConnectionRequest
   {
     explicit ConnectionRequest(std::vector<std::string>&& departureStopId,
                                std::vector<std::string>&& arrivalStopId,
                                const unsigned int earliestDepartureTime)
-      : departureStopId(std::move(departureStopId)),
-        arrivalStopId(std::move(arrivalStopId)),
-        earliestDepartureTime(earliestDepartureTime)
-    {
+      : departureStopId(std::move(departureStopId))
+      , arrivalStopId(std::move(arrivalStopId))
+      , earliestDepartureTime(earliestDepartureTime) {
       latestDepartureTime = earliestDepartureTime + 3'600;
     }
     std::vector<std::string> departureStopId{};

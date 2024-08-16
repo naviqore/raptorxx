@@ -1,3 +1,4 @@
+/*
 //
 // Created by MichaelBrunner on 23/06/2024.
 //
@@ -9,7 +10,7 @@
 
 
 #include <IConnection.h>
-#include <gtfs/RelationManager.h>
+#include <TimetableManager.h>
 #include <IRaptorAlgorithmStrategy.h>
 #include <memory>
 #include <raptor_export.h>
@@ -34,3 +35,4 @@ namespace raptor {
 } // raptor
 
 #endif //RAPTOR_H
+*/

@@ -14,7 +14,8 @@ namespace schedule::gtfs {
   enum class SCHEDULE_API ReaderType
   {
     TXT,
-    CSV
+    CSV,
+    CSV_PARALLEL
   };
 
   SCHEDULE_API std::unique_ptr<IGtfsReaderStrategyFactory> createGtfsReaderStrategyFactory(ReaderType type, std::string&& aGtfsFileDirectory);

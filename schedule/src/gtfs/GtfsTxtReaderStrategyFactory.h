@@ -7,8 +7,10 @@
 
 #include <GtfsReader.h>
 #include "IGtfsReaderStrategyFactory.h"
+#include "src/utils/utils.h"
 
 #include <functional>
+#include <map>
 #include <string>
 #include <unordered_map>
 

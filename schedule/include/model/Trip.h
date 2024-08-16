@@ -8,6 +8,7 @@
 #include "StopTime.h"
 
 
+#include <algorithm>
 #include <string>
 #include <stdexcept>
 
@@ -31,7 +32,8 @@ namespace schedule::gtfs {
     std::string routeId;
     std::string serviceId;
     std::string tripId;
-    std::set<StopTime, decltype(stopTimeLessByStopSequence)> stopTimes{}; // maybe use set and order by stopSequence
+
+    std::vector<StopTime> stopTimes{};
   };
 
   inline auto tripHash = [](const Trip& trip) {

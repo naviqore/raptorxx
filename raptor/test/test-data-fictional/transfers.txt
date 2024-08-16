@@ -1,9 +1,0 @@
-from_stop_id,to_stop_id,transfer_type,min_transfer_time
-"stopB","stopB","0","120"
-"stopC","stopC","0","120"
-"stopD","stopD","0","120"
-"stopE","stopE","0","120"
-"stopG","stopG","0","120"
-"stopF","stopF","0","120"
-"NADAV","NANAA","3","120"
-"EMSI","NANAA","2","180"
