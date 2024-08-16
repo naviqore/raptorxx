@@ -1,4 +1,4 @@
-project("raptor_test"
+project("raptor_tests"
         DESCRIPTION "Raptor test"
 )
 

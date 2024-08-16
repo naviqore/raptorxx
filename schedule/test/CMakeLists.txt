@@ -1,4 +1,4 @@
-project("test"
+project("schedule_tests"
         DESCRIPTION "C++ implementation of GTFS reader"
 )
 
