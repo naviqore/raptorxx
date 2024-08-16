@@ -5,6 +5,7 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["main"]
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -18,6 +19,7 @@ jobs:
             compiler: gcc
 #          - os: macos-latest
 #            compiler: clang
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.4
@@ -31,6 +33,15 @@ jobs:
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 60
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 60
 
+      - name: Cache Homebrew
+        if: matrix.os == 'macos-latest'
+        uses: actions/cache@v4.0.2
+        with:
+          path: /usr/local/Homebrew
+          key: ${{ runner.os }}-homebrew-${{ hashFiles('**/Brewfile') }}
+          restore-keys: |
+            ${{ runner.os }}-homebrew-
+
       - name: Install Clang 14
         if: matrix.os == 'macos-latest'
         run: |
@@ -40,6 +51,13 @@ jobs:
           echo 'export LDFLAGS="-L/usr/local/opt/llvm@14/lib"' >> ~/.zshrc
           echo 'export CPPFLAGS="-I/usr/local/opt/llvm@14/include"' >> ~/.zshrc
           source ~/.zshrc
+
+      - name: Save Homebrew Cache
+        if: matrix.os == 'macos-latest'
+        uses: actions/cache@v3
+        with:
+          path: /usr/local/Homebrew
+          key: ${{ runner.os }}-homebrew-${{ hashFiles('**/Brewfile') }}
 
       - name: vcpkg installation
         shell: bash

@@ -26,8 +26,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 set(BINARY ${PROJECT_NAME})
 
-add_test(NAME geomety COMMAND ${BINARY}_test)
-add_test(NAME TestK2dTree COMMAND ${BINARY}_test)
+add_test(NAME geomety COMMAND ${BINARY})
+add_test(NAME TestK2dTree COMMAND ${BINARY})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging/src)

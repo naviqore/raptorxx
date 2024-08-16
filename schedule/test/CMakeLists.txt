@@ -29,8 +29,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 set(BINARY ${PROJECT_NAME}_tests_test)
-add_test(NAME GtfsCsvReaderStrategiesTest COMMAND ${PROJECT_NAME}_test)
-add_test(NAME GTFS COMMAND ${PROJECT_NAME}_test)
+add_test(NAME GtfsCsvReaderStrategiesTest COMMAND ${PROJECT_NAME})
+add_test(NAME GTFS COMMAND ${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/schedule/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR})
