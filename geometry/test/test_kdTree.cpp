@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "usings.h"
 
+#include <format>
 #include <ranges>
 #include <unordered_map>
 
