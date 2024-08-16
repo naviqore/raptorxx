@@ -10,23 +10,35 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest] #  , macos-latest
+        os: [windows-latest, ubuntu-latest, macos-latest]
         include:
           - os: windows-latest
             compiler: msvc
           - os: ubuntu-latest
             compiler: gcc
-    #          - os: macos-latest
-    #            compiler: clang
+          - os: macos-latest
+            compiler: clang
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.4
 
-      - name: Install GCC latest
+      - name: Install GCC 13.1
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc g++ 
+          sudo apt-get install -y gcc-13 g++-13
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 60
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 60
+
+      - name: Install Clang 14
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew update
+          brew install llvm@14
+          echo 'export PATH="/usr/local/opt/llvm@14/bin:$PATH"' >> ~/.zshrc
+          echo 'export LDFLAGS="-L/usr/local/opt/llvm@14/lib"' >> ~/.zshrc
+          echo 'export CPPFLAGS="-I/usr/local/opt/llvm@14/include"' >> ~/.zshrc
+          source ~/.zshrc
 
       - name: vcpkg installation
         shell: bash
@@ -44,7 +56,7 @@ jobs:
       - name: Configure CMake
         run: |
           cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
-      # cmake -B build -DCMAKE_BUILD_TYPE=Release -DCPM_SOURCE_CACHE=~/cpm-cache
+
       - name: Build
         run: |
           cmake --build build --config Release
