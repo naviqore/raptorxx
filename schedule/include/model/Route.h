@@ -6,10 +6,9 @@
 #define ROUTE_H
 
 #include "Stop.h"
-
-
 #include <string>
 #include <stdexcept>
+#include <vector>
 #include <cstdint>
 #include <set>
 #include <unordered_set>
@@ -59,7 +58,7 @@ namespace schedule::gtfs {
     std::string routeLongName;
     RouteType routeType;
     std::string agencyId;
-    std::vector<std::string> trips{};
+    std::vector<std::string> trips;
   };
 
   inline auto routeHash = [](const Route& route) {

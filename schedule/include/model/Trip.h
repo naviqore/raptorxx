@@ -7,7 +7,7 @@
 
 #include "StopTime.h"
 
-
+#include <vector>
 #include <algorithm>
 #include <string>
 #include <stdexcept>
