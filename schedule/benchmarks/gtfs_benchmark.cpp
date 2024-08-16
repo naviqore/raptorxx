@@ -6,8 +6,8 @@
 
 
 #include <GtfsReader.h>
-#include "../include/GtfsData.h"
-#include "model/Agency.h"
+#include <include/GtfsData.h>
+#include <model/Agency.h>
 
 #include <benchmark/benchmark.h>
 #include <vector>
@@ -50,20 +50,23 @@ static void BM_reference(benchmark::State& state) {
   }
 }
 
-class GtfsReaderFixture : public benchmark::Fixture {
+class GtfsReaderFixture : public benchmark::Fixture
+{
 protected:
   std::unique_ptr<schedule::gtfs::IGtfsReaderStrategyFactory> readerFactory;
+
 public:
   void SetUp(::benchmark::State& state) override {
-    readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(schedule::gtfs::ReaderType::TXT, TEST_DATA_DIR);
+    readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(schedule::gtfs::ReaderType::CSV_PARALLEL, TEST_DATA_DIR);
   }
 
   void TearDown(::benchmark::State& state) override {
   }
 };
 
-BENCHMARK_F(GtfsReaderFixture, BM_read_agencies)(benchmark::State& state) {
-  auto strategy = std::vector<std::function<void(schedule::gtfs::GtfsReader&)>>();
+BENCHMARK_F(GtfsReaderFixture, BM_read_agencies)
+(benchmark::State& state) {
+  auto strategy = std::vector<std::function<void(schedule::gtfs::GtfsReader&)>>{};
   const std::function<void(schedule::gtfs::GtfsReader&)> readerStrategy = readerFactory->getStrategy(GtfsStrategyType::AGENCY);
   strategy.push_back(readerStrategy);
   const auto reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
@@ -73,9 +76,9 @@ BENCHMARK_F(GtfsReaderFixture, BM_read_agencies)(benchmark::State& state) {
   }
 }
 
-BENCHMARK_F(GtfsReaderFixture, BM_read_calendar_dates)(benchmark::State& state) {
+BENCHMARK_F(GtfsReaderFixture, BM_read_calendar_dates)
+(benchmark::State& state) {
   auto strategy = std::vector<std::function<void(schedule::gtfs::GtfsReader&)>>();
-  std::string basePath = TEST_DATA_DIR;
   const std::function<void(schedule::gtfs::GtfsReader&)> readerStrategy = readerFactory->getStrategy(GtfsStrategyType::CALENDAR_DATE);
   strategy.push_back(readerStrategy);
   const auto reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
@@ -85,9 +88,9 @@ BENCHMARK_F(GtfsReaderFixture, BM_read_calendar_dates)(benchmark::State& state) 
   }
 }
 
-BENCHMARK_F(GtfsReaderFixture, BM_read_stop_times)(benchmark::State& state) {
+BENCHMARK_F(GtfsReaderFixture, BM_read_stop_times)
+(benchmark::State& state) {
   auto strategy = std::vector<std::function<void(schedule::gtfs::GtfsReader&)>>();
-  const std::string basePath = TEST_DATA_DIR;
   const std::function<void(schedule::gtfs::GtfsReader&)> readerStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP_TIME);
   strategy.push_back(readerStrategy);
   const auto reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
@@ -99,11 +102,8 @@ BENCHMARK_F(GtfsReaderFixture, BM_read_stop_times)(benchmark::State& state) {
 
 
 
-
 BENCHMARK_REGISTER_F(GtfsReaderFixture, BM_read_agencies);
 BENCHMARK_REGISTER_F(GtfsReaderFixture, BM_read_calendar_dates);
 BENCHMARK_REGISTER_F(GtfsReaderFixture, BM_read_stop_times);
 BENCHMARK(BM_pointer);
 BENCHMARK(BM_reference);
-
-

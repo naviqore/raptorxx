@@ -2,9 +2,7 @@ project("raptor"
         DESCRIPTION "C++ implementation of raptor algorithm"
 )
 
-add_library(${PROJECT_NAME} SHARED
-        src/utils/helperFunctions.h
-)
+add_library(${PROJECT_NAME} SHARED)
 
 target_sources(${PROJECT_NAME} PRIVATE
         src/Raptor.cpp
@@ -45,6 +43,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         src/RaptorConnection.cpp
         src/RaptorConnection.h
         src/utils/LocalDateTime.cpp
+        src/utils/helperFunctions.h
         PUBLIC
         include/RaptorAlgorithm.h
         include/config/QueryConfig.h

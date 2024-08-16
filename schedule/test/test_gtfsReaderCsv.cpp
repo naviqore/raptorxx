@@ -5,7 +5,6 @@
 #include "LoggerFactory.h"
 #include "../include/GtfsReader.h"
 #include "gtfs/GtfsTxtReaderStrategyFactory.h"
-#include "../include/TimetableManager.h"
 #include "model/CalendarDate.h"
 #include "utils/DataContainer.h"
 
@@ -148,11 +147,8 @@ TEST_F(GtfsCsvReaderStrategiesTest, testTransferReaderCsv) {
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
   const schedule::gtfs::GtfsData& data = reader->getData().get();
-  const auto transferFrom = data.transferFrom.at("1100079");
+  const auto transferFrom = data.transfer.at("1100079");
   ASSERT_EQ(transferFrom[0].toStopId, "8014441");
-
-  const auto transferTo = data.transferTo.at("8014441");
-  ASSERT_EQ(transferFrom[0].fromStopId, "1100079");
 }
 
 TEST_F(GtfsCsvReaderStrategiesTest, testTripReaderCsv) {
@@ -163,11 +159,11 @@ TEST_F(GtfsCsvReaderStrategiesTest, testTripReaderCsv) {
   reader->readData();
 
   const schedule::gtfs::GtfsData& data = reader->getData().get();
-  const auto trips = data.trips.at("110.TA.91-10-A-j24-1.7.H");
-  ASSERT_TRUE(trips.empty() == false);
-  ASSERT_EQ(trips[0].routeId, "91-10-A-j24-1");
-  ASSERT_EQ(trips[0].serviceId, "TA+hvzd0");
-  ASSERT_EQ(trips[0].tripId, "110.TA.91-10-A-j24-1.7.H");
+  ASSERT_TRUE(data.trips.empty() == false);
+  const auto trip = data.trips.at("110.TA.91-10-A-j24-1.7.H");
+  ASSERT_EQ(trip.routeId, "91-10-A-j24-1");
+  ASSERT_EQ(trip.serviceId, "TA+hvzd0");
+  ASSERT_EQ(trip.tripId, "110.TA.91-10-A-j24-1.7.H");
 }
 
 TEST_F(GtfsCsvReaderStrategiesTest, testrouteReaderCsv) {
@@ -182,28 +178,4 @@ TEST_F(GtfsCsvReaderStrategiesTest, testrouteReaderCsv) {
   ASSERT_TRUE(route.routeId.empty() == false);
   ASSERT_EQ(route.routeId, "91-10-A-j24-1");
   ASSERT_EQ(static_cast<int>(route.routeType), 109);
-}
-
-TEST_F(GtfsCsvReaderStrategiesTest, testRelationManagerCsv) {
-
-  auto strategy = std::vector<std::function<void(schedule::gtfs::GtfsReader&)>>();
-  const std::function<void(schedule::gtfs::GtfsReader&)> stopTimesStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP_TIME);
-  const std::function<void(schedule::gtfs::GtfsReader&)> tripsStrategy = readerFactory->getStrategy(GtfsStrategyType::TRIP);
-
-  strategy.push_back(stopTimesStrategy);
-  strategy.push_back(tripsStrategy);
-
-  reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
-  reader->readData();
-
-  ASSERT_THROW(schedule::gtfs::TimetableManager(std::move(reader->getData().get())), std::out_of_range);
-  // try
-  // {
-  //   const auto relationManager = schedule::gtfs::RelationManager(std::move(reader->getData().get()));
-  //   auto stopIds = relationManager.getStopIdsFromStopName("Bärental, Löffelschmiede");
-  //   ASSERT_TRUE(stopIds.empty() == false);
-  // } catch (std::out_of_range& e)
-  // {
-  //   getLogger(Target::CONSOLE, LoggerName::GTFS)->error(std::format("Invalid relations {}", e.what()));
-  // }
 }

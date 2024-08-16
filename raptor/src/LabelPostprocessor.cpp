@@ -108,10 +108,6 @@ namespace raptor {
         throw std::runtime_error("Unknown label type");
       }
 
-      // Convert timestamps to LocalDateTime if necessary
-      // auto departureTime = DateTimeUtils::convertToLocalDateTime(departureTimestamp, referenceDate);
-      // auto arrivalTime = DateTimeUtils::convertToLocalDateTime(arrivalTimestamp, referenceDate);
-
       connection->addLeg(std::make_shared<LegImpl>(routeId, tripId, fromStopId, toStopId, departureTimestamp, arrivalTimestamp, type));
     }
 

@@ -2,10 +2,7 @@
 // Created by MichaelBrunner on 20/07/2024.
 //
 
-
-
-#include "../include/RouteBuilder.h"
-
+#include "include/RouteBuilder.h"
 #include <gtest/gtest.h>
 
 
@@ -17,6 +14,7 @@ protected:
   static const std::string STOP_1;
   static const std::string STOP_2;
   static const std::string STOP_3;
+
   std::unique_ptr<raptor::RouteBuilder> builder;
 
   void SetUp() override {

@@ -75,6 +75,7 @@ target_sources(${PROJECT_NAME}
         src/gtfs/GtfsCsvParserReaderStrategyFactory.h
         src/gtfs/strategies/csv_reader_fast/csv_wrapper.h
         src/utils/helperFunctions.cpp
+        src/utils/ServiceDayTime.h
         PUBLIC
         include/GtfsData.h
         include/model/Agency.h
@@ -87,7 +88,6 @@ target_sources(${PROJECT_NAME}
         include/model/Transfer.h
         include/GtfsReaderStrategyFactory.h
         include/IGtfsReaderStrategyFactory.h
-        src/utils/ServiceDayTime.h
         include/GtfsReader.h
         include/model/helperFunctions.h
 )

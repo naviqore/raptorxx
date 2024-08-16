@@ -23,7 +23,7 @@ namespace schedule::gtfs {
     }
     init();
   }
-  std::function<void(GtfsReader&)>& GtfsCsvParserReaderStrategyFactory::getStrategy(GtfsStrategyType aType) {
+  std::function<void(GtfsReader&)>& GtfsCsvParserReaderStrategyFactory::getStrategy(const GtfsStrategyType aType) {
     return strategies[aType];
   }
   void GtfsCsvParserReaderStrategyFactory::init() {

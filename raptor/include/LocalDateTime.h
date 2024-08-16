@@ -23,6 +23,8 @@ namespace raptor::utils {
       dateTime = local_days{year / month / day} + hour + minute + second;
     }
 
+    LocalDateTime() = default;
+
     [[nodiscard]] long long secondsOfDay() const {
       using namespace std::chrono;
       const auto time_since_epoch = dateTime.time_since_epoch();
@@ -54,7 +56,6 @@ namespace raptor::utils {
       const auto new_seconds = duration_cast<seconds>(time_of_day % minutes(1));
       return LocalDateTime{year{1970}, month{1}, day{1}, new_hours, new_minutes, new_seconds};
     }
-
   };
 
   inline LocalDateTime fromSecondsOfDay(const long long total_seconds, const std::chrono::year year, const std::chrono::month month, const std::chrono::day day) {

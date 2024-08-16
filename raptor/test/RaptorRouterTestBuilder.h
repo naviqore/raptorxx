@@ -2,8 +2,7 @@
 // Created by MichaelBrunner on 20/07/2024.
 //
 
-#ifndef RAPTORROUTERTESTBUILDER_H
-#define RAPTORROUTERTESTBUILDER_H
+#pragma once
 
 #include "utils/RaptorDataBuilder.h"
 #include <vector>
@@ -75,4 +74,3 @@ private:
   static std::shared_ptr<raptor::RaptorData> build(const std::vector<Route>& routes, const std::vector<Transfer>& transfers, int dayStart, int dayEnd, int sameStopTransferTime);
 };
 
-#endif //RAPTORROUTERTESTBUILDER_H
