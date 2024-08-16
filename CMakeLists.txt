@@ -56,3 +56,6 @@ add_subdirectory(raptor)
 add_subdirectory(raptor/test)
 #TODO set up project in a new branch JIRA story
 # add_subdirectory(gtfsRaptorConfig)
+
+include(CTest)
+enable_testing()
