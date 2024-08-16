@@ -24,7 +24,7 @@ enum class GtfsStrategyType
 
 namespace schedule::gtfs {
 
-  class SCHEDULE_API GtfsReader;
+  class GtfsReader;
 
   class SCHEDULE_API IGtfsReaderStrategyFactory
   {
