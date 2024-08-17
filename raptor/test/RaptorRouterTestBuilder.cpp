@@ -6,6 +6,8 @@
 #include "RaptorRouterTestBuilder.h"
 
 #include <algorithm>
+#include <ranges>
+
 
 Route::Route(std::string id, std::vector<std::string> stops, const int firstDepartureOffset, const int headWayTime, const int travelTimeBetweenStops, const int dwellTimeAtStop)
   : id(std::move(id))
