@@ -8,6 +8,7 @@
 #include "data/ActiveTrip.h"
 
 #include <iostream>
+#include <format>
 
 namespace raptor {
 
