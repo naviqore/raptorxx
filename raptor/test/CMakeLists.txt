@@ -24,9 +24,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         logging
 )
 
-set(BINARY ${PROJECT_NAME})
-add_test(NAME RaptorAlgoTest COMMAND ${BINARY})
-add_test(NAME RouteBuilderTest COMMAND ${BINARY})
+include(GoogleTest)
+gtest_discover_tests(${PROJECT_NAME})
+
+#set(BINARY ${PROJECT_NAME})
+#add_test(NAME RaptorAlgoTest COMMAND ${BINARY})
+#add_test(NAME RouteBuilderTest COMMAND ${BINARY})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging/include)

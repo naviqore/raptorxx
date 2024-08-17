@@ -188,7 +188,7 @@ namespace raptor {
 #ifdef _MSC_VER
       const auto tripIdsArray = routeContainer.trips() | std::views::keys | std::ranges::to<std::vector<std::string>>();
 #else
-      const std::vector<std::string> tripIdsArray;
+      std::vector<std::string> tripIdsArray;
       std::ranges::transform(routeContainer.trips(), std::back_inserter(tripIdsArray), [](const auto& pair) { return pair.first; });
 #endif
 
