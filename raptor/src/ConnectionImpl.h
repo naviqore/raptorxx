@@ -18,9 +18,9 @@ namespace raptor {
 
     [[nodiscard]] std::vector<std::shared_ptr<Leg>> getLegs() const override;
 
-    [[nodiscard]] std::tm getDepartureTime() const override;
+    [[nodiscard]] types::raptorInt getDepartureTime() const override;
 
-    [[nodiscard]] std::tm getArrivalTime() const override;
+    [[nodiscard]] types::raptorInt getArrivalTime() const override;
   };
 
 } // raptor
