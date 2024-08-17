@@ -3,9 +3,6 @@ project("geometry_tests"
 )
 
 
-include(CTest)
-enable_testing()
-
 add_executable(${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME} PRIVATE
@@ -32,6 +29,10 @@ add_test(NAME TestK2dTree COMMAND ${BINARY})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/logging/src)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/geometry/include)
+
+
+
+
 
 
 

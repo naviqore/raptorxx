@@ -6,9 +6,6 @@ if (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 message(STATUS "Tests should be built in Debug mode")
 endif ()
 
-include(CTest)
-enable_testing()
-
 add_executable(${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME} PRIVATE

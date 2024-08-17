@@ -13,15 +13,18 @@
 #include <iostream>
 #include <numeric>
 #include <ranges>
+#include <format>
 
 namespace raptor {
 
   RaptorRouterBuilder::RaptorRouterBuilder(const int defaultSameStopTransferTime)
-    : defaultSameStopTransferTime(defaultSameStopTransferTime) {}
+    : defaultSameStopTransferTime(defaultSameStopTransferTime)
+  {
+  }
 
-  RaptorRouterBuilder& RaptorRouterBuilder::addStop(const std::string& id) {
-    if (stops.contains(id))
-    {
+  RaptorRouterBuilder& RaptorRouterBuilder::addStop(const std::string& id)
+  {
+    if (stops.contains(id)) {
       throw std::invalid_argument("Stop " + id + " already exists");
     }
     getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Adding stop: id={}", id));
@@ -31,16 +34,14 @@ namespace raptor {
     return *this;
   }
 
-  RaptorRouterBuilder& RaptorRouterBuilder::addRoute(const std::string& id, const std::vector<std::string>& stopIds) {
-    if (routeBuilders.contains(id))
-    {
+  RaptorRouterBuilder& RaptorRouterBuilder::addRoute(const std::string& id, const std::vector<std::string>& stopIds)
+  {
+    if (routeBuilders.contains(id)) {
       throw std::invalid_argument("Route " + id + " already exists");
     }
 
-    for (const auto& stopId : stopIds)
-    {
-      if (!stops.contains(stopId))
-      {
+    for (const auto& stopId : stopIds) {
+      if (!stops.contains(stopId)) {
         throw std::invalid_argument("Stop " + stopId + " does not exist");
       }
       stopRoutes[stopId].insert(id);
@@ -55,33 +56,33 @@ namespace raptor {
     return *this;
   }
 
-  RaptorRouterBuilder& RaptorRouterBuilder::addTrip(const std::string& tripId, const std::string& routeId) {
+  RaptorRouterBuilder& RaptorRouterBuilder::addTrip(const std::string& tripId, const std::string& routeId)
+  {
     getRouteBuilder(routeId)->addTrip(tripId);
     return *this;
   }
 
-  RaptorRouterBuilder& RaptorRouterBuilder::addStopTime(const std::string& routeId, const std::string& tripId, const int position, const std::string& stopId, const int arrival, const int departure) {
+  RaptorRouterBuilder& RaptorRouterBuilder::addStopTime(const std::string& routeId, const std::string& tripId, const int position, const std::string& stopId, const int arrival, const int departure)
+  {
     const StopTime stopTime(arrival, departure);
     getRouteBuilder(routeId)->addStopTime(tripId, position, stopId, stopTime);
     stopTimeSize++;
     return *this;
   }
 
-  RaptorRouterBuilder& RaptorRouterBuilder::addTransfer(const std::string& sourceStopId, const std::string& targetStopId, int duration) {
+  RaptorRouterBuilder& RaptorRouterBuilder::addTransfer(const std::string& sourceStopId, const std::string& targetStopId, int duration)
+  {
     getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Adding transfer: sourceStopId={} targetStopId={} duration={}", sourceStopId, targetStopId, duration));
 
-    if (!stops.contains(sourceStopId))
-    {
+    if (!stops.contains(sourceStopId)) {
       throw std::invalid_argument("Source stop " + sourceStopId + " does not exist");
     }
 
-    if (!stops.contains(targetStopId))
-    {
+    if (!stops.contains(targetStopId)) {
       throw std::invalid_argument("Target stop " + targetStopId + " does not exist");
     }
 
-    if (sourceStopId == targetStopId)
-    {
+    if (sourceStopId == targetStopId) {
       sameStopTransfers[sourceStopId] = duration;
       return *this;
     }
@@ -91,7 +92,8 @@ namespace raptor {
     return *this;
   }
 
-  std::shared_ptr<RaptorData> RaptorRouterBuilder::build() {
+  std::shared_ptr<RaptorData> RaptorRouterBuilder::build()
+  {
     getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Initialize Raptor with {} stops, {} routes, {} route stops, {} stop times, {} transfers", stops.size(), routeBuilders.size(), routeStopSize, stopTimeSize, transferSize));
 
     const auto routeContainers = buildAndSortRouteContainers();
@@ -102,10 +104,10 @@ namespace raptor {
     return std::make_shared<RaptorData>(lookup, stopContext, routeTraversal);
   }
 
-  std::vector<RouteContainer> RaptorRouterBuilder::buildAndSortRouteContainers() const {
+  std::vector<RouteContainer> RaptorRouterBuilder::buildAndSortRouteContainers() const
+  {
     std::vector<RouteContainer> containers;
-    for (const auto& [id, routeBuilder] : routeBuilders)
-    {
+    for (const auto& [id, routeBuilder] : routeBuilders) {
       containers.push_back(routeBuilder->build());
     }
     std::sort(containers.begin(), containers.end());
@@ -113,17 +115,18 @@ namespace raptor {
     return containers;
   }
 
-  StopRoutesIndexLookup RaptorRouterBuilder::buildLookup(const std::vector<RouteContainer>& routeContainers) const {
+  StopRoutesIndexLookup RaptorRouterBuilder::buildLookup(const std::vector<RouteContainer>& routeContainers) const
+  {
     getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Building lookup with {} stops and {} routes", stops.size(), routeContainers.size()));
     std::unordered_map<std::string, types::raptorIdx> routes;
-    for (auto i = 0; i < routeContainers.size(); ++i)
-    {
+    for (auto i = 0; i < routeContainers.size(); ++i) {
       routes[routeContainers[i].id()] = i;
     }
     return StopRoutesIndexLookup(stops, routes);
   }
 
-  StopContext RaptorRouterBuilder::buildStopContext(const StopRoutesIndexLookup& lookup) {
+  StopContext RaptorRouterBuilder::buildStopContext(const StopRoutesIndexLookup& lookup)
+  {
     getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Building stop context with {} stops and {} transfers", stops.size(), transferSize));
     std::vector<Stop> stopArr(stops.size());
     auto stopRouteSizeView = stopRoutes
@@ -137,14 +140,12 @@ namespace raptor {
 
     int transferIdx = 0;
     int stopRouteIdx = 0;
-    for (const auto& entry : stops)
-    {
+    for (const auto& entry : stops) {
       const auto& stopId = entry.first;
       const auto stopIdx = entry.second;
 
       const auto& currentStopRoutes = stopRoutes[stopId];
-      if (currentStopRoutes.empty())
-      {
+      if (currentStopRoutes.empty()) {
         throw std::logic_error("Stop " + stopId + " has no routes");
       }
 
@@ -155,16 +156,13 @@ namespace raptor {
 
       stopArr[stopIdx] = Stop(stopId, stopRouteIdx, static_cast<int>(currentStopRoutes.size()), sameStopTransferTime, static_cast<int>(numberOfTransfers) == 0 ? NO_INDEX : transferIdx, static_cast<int>(numberOfTransfers));
 
-      if (currentTransfers != transfers.end())
-      {
-        for (const auto& transfer : currentTransfers->second)
-        {
+      if (currentTransfers != transfers.end()) {
+        for (const auto& transfer : currentTransfers->second) {
           transferArr[transferIdx++] = transfer;
         }
       }
 
-      for (const auto& routeId : currentStopRoutes)
-      {
+      for (const auto& routeId : currentStopRoutes) {
         stopRouteArr[stopRouteIdx++] = lookup.routes.at(routeId);
       }
     }
@@ -172,7 +170,8 @@ namespace raptor {
     return StopContext(transferArr, stopArr, stopRouteArr);
   }
 
-  RouteTraversal RaptorRouterBuilder::buildRouteTraversal(const std::vector<RouteContainer>& routeContainers) const {
+  RouteTraversal RaptorRouterBuilder::buildRouteTraversal(const std::vector<RouteContainer>& routeContainers) const
+  {
     getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Building route traversal with {} routes, {} route stops, {} stop times", routeContainers.size(), routeStopSize, stopTimeSize));
     std::vector<Route> routeArr(routeContainers.size());
     std::vector<RouteStop> routeStopArr(static_cast<types::raptorIdx>(routeStopSize));
@@ -180,25 +179,28 @@ namespace raptor {
 
     types::raptorIdx routeStopCnt = 0;
     types::raptorIdx stopTimeCnt = 0;
-    for (size_t routeIdx = 0; routeIdx < routeContainers.size(); ++routeIdx)
-    {
+    for (size_t routeIdx = 0; routeIdx < routeContainers.size(); ++routeIdx) {
       const auto& routeContainer = routeContainers[routeIdx];
 
       const auto numberOfStops = routeContainer.stopSequence().size();
       const auto numberOfTrips = routeContainer.trips().size();
+
+#ifdef _MSC_VER
       const auto tripIdsArray = routeContainer.trips() | std::views::keys | std::ranges::to<std::vector<std::string>>();
+#else
+      const std::vector<std::string> tripIdsArray;
+      std::ranges::transform(routeContainer.trips(), std::back_inserter(tripIdsArray), [](const auto& pair) { return pair.first; });
+#endif
+
       routeArr[routeIdx] = Route(routeContainer.id(), routeStopCnt, static_cast<int>(numberOfStops), stopTimeCnt, static_cast<int>(numberOfTrips), tripIdsArray);
 
-      for (int position = 0; position < numberOfStops; ++position)
-      {
+      for (int position = 0; position < numberOfStops; ++position) {
         const auto stopIdx = stops.at(routeContainer.stopSequence().at(position));
         routeStopArr[routeStopCnt++] = RouteStop(stopIdx, static_cast<types::raptorIdx>(routeIdx));
       }
 
-      for (const auto& tripEntry : routeContainer.trips())
-      {
-        for (const auto& stopTime : tripEntry.second)
-        {
+      for (const auto& tripEntry : routeContainer.trips()) {
+        for (const auto& stopTime : tripEntry.second) {
           stopTimeArr[stopTimeCnt++] = stopTime;
         }
       }
@@ -207,10 +209,10 @@ namespace raptor {
     return {routeStopArr, stopTimeArr, routeArr};
   }
 
-  RouteBuilder* RaptorRouterBuilder::getRouteBuilder(const std::string& routeId) {
+  RouteBuilder* RaptorRouterBuilder::getRouteBuilder(const std::string& routeId)
+  {
     const auto it = routeBuilders.find(routeId);
-    if (it == routeBuilders.end())
-    {
+    if (it == routeBuilders.end()) {
       throw std::invalid_argument("Route " + routeId + " does not exist");
     }
     return it->second.get();
