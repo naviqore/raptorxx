@@ -2,15 +2,9 @@
 // Created by MichaelBrunner on 16/06/2024.
 //
 
-#include "gtfs/GtfsReader.h"
-#include "gtfs/strategies/GtfsAgencyReader.h"
-#include "gtfs/strategies/GtfsCalendarDateReader.h"
-#include "gtfs/strategies/GtfsCalendarReader.h"
-#include "gtfs/strategies/GtfsRouteReader.h"
-#include "gtfs/strategies/GtfsStopReader.h"
-#include "gtfs/strategies/GtfsStopTimeReader.h"
-#include "gtfs/strategies/GtfsTransferReader.h"
-#include "gtfs/strategies/GtfsTripReader.h"
+#include "GtfsReaderStrategyFactory.h"
+#include "include/GtfsReader.h"
+
 
 #include <benchmark/benchmark.h>
 #include <vector>
@@ -23,31 +17,36 @@
 
 
 static void BM_read_gtfs_schedule(benchmark::State& state) {
-  auto strategy = std::vector<std::function<void(gtfs::GtfsReader&)>>();
-  const std::string basePath = TEST_DATA_DIR;
-  const std::function calendarDatesReaderStrategy = gtfs::GtfsCalendarDateReader(basePath + "calendar_dates.txt");
-  const std::function calendarReaderStrategy = gtfs::GtfsCalendarReader(basePath + "calendar.txt");
-  const std::function stopTimeReaderStrategy = gtfs::GtfsStopTimeReader(basePath + "stop_times.txt");
-  const std::function agencyReaderStrategy = gtfs::GtfsAgencyReader(basePath + "agency.txt");
-  const std::function routeReaderStrategy = gtfs::GtfsRouteReader(basePath + "routes.txt");
-  const std::function stopReaderStrategy = gtfs::GtfsStopReader(basePath + "stops.txt");
-  const std::function transferReaderStrategy = gtfs::GtfsTransferReader(basePath + "transfers.txt");
-  const std::function tripReaderStrategy = gtfs::GtfsTripReader(basePath + "trips.txt");
+  auto strategy = std::vector<std::function<void(schedule::gtfs::GtfsReader&)>>();
+  std::string basePath = TEST_DATA_DIR;
 
-  strategy.push_back(calendarDatesReaderStrategy);
-  strategy.push_back(stopTimeReaderStrategy);
-  strategy.push_back(agencyReaderStrategy);
-  strategy.push_back(routeReaderStrategy);
-  strategy.push_back(stopReaderStrategy);
-  strategy.push_back(transferReaderStrategy);
-  strategy.push_back(tripReaderStrategy);
-  strategy.push_back(calendarReaderStrategy);
+  const auto readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(schedule::gtfs::ReaderType::CSV_PARALLEL, std::move(basePath));
 
-  const auto reader = std::make_unique<gtfs::GtfsReader>(std::move(strategy));
-  for (auto _ : state)
-  {
-    reader->readData();
-  }
+
+  // create strategy callable objects
+  const auto agencyStrategy = readerFactory->getStrategy(GtfsStrategyType::AGENCY);
+  const auto calendarStrategy = readerFactory->getStrategy(GtfsStrategyType::CALENDAR);
+  const auto calendarDatesStrategy = readerFactory->getStrategy(GtfsStrategyType::CALENDAR_DATE);
+  const auto routesStrategy = readerFactory->getStrategy(GtfsStrategyType::ROUTE);
+  const auto stopStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP);
+  const auto stopTimeStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP_TIME);
+  const auto transferStrategy = readerFactory->getStrategy(GtfsStrategyType::TRANSFER);
+  const auto tripStrategy = readerFactory->getStrategy(GtfsStrategyType::TRIP);
+
+  strategy.push_back(agencyStrategy);
+  strategy.push_back(calendarStrategy);
+  strategy.push_back(calendarDatesStrategy);
+  strategy.push_back(routesStrategy);
+  strategy.push_back(stopStrategy);
+  strategy.push_back(stopTimeStrategy);
+  strategy.push_back(transferStrategy);
+  strategy.push_back(tripStrategy);
+
+   const auto reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
+   for (auto _ : state)
+   {
+     reader->readData();
+   }
 }
 
 BENCHMARK(BM_read_gtfs_schedule);

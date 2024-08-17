@@ -11,7 +11,7 @@
 namespace schedule::gtfs::utils {
 
   /// @brief std::chrono is way too slow for this purpose, so we use our own implementation
-  class GTFS_API ServiceDayTime
+  class SCHEDULE_API ServiceDayTime
   {
     unsigned int totalSeconds = 0;
 
@@ -99,7 +99,7 @@ namespace schedule::gtfs::utils {
 } // utils
 // gtfs
 
-inline schedule::gtfs::utils::ServiceDayTime::Second operator"" _sec(unsigned long long seconds) {
+inline schedule::gtfs::utils::ServiceDayTime::Second operator"" _sec(const unsigned long long seconds) {
   return schedule::gtfs::utils::ServiceDayTime::Second(static_cast<unsigned int>(seconds));
 }
 

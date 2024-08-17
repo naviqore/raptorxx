@@ -4,13 +4,22 @@ project("logging")
 
 set(SPDLOG_BUILD_SHARED OFF)
 
-add_library(${PROJECT_NAME} SHARED
-        src/LoggingPool.cpp
-        src/LoggingPool.h
-        include/LoggerBridge.h
+find_package(spdlog CONFIG REQUIRED)
+
+add_library(${PROJECT_NAME} SHARED)
+
+target_sources(${PROJECT_NAME} PRIVATE
+        "src/LoggingPool.cpp"
+        "src/LoggerBridgeImpl.h"
+        "src/LoggerBridgeImpl.cpp"
+        "src/LoggerFactory.cpp"
+        "src/LoggingPool.h"
+        PUBLIC
+        "include/LoggerBridge.h"
+        "include/LoggerFactory.h"
+
 )
 
-find_package(spdlog CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)

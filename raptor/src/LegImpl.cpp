@@ -6,7 +6,7 @@
 
 namespace raptor {
 
-  LegImpl::LegImpl(std::string routeId, std::string tripId, std::string fromStopId, std::string toStopId, const int departureTime, const int arrivalTime, Type type)
+  LegImpl::LegImpl(std::string routeId, std::string tripId, std::string fromStopId, std::string toStopId, const types::raptorIdx departureTime, const types::raptorIdx arrivalTime, Type type)
     : routeId(std::move(routeId))
     , tripId(std::move(tripId))
     , fromStopId(std::move(fromStopId))

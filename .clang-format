@@ -21,8 +21,8 @@ AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: Yes
-BinPackArguments: true
-BinPackParameters: true
+BinPackArguments: false                 # changed from true
+BinPackParameters: false                # changed from true
 BraceWrapping:
   AfterClass: true
   AfterControlStatement: true
@@ -41,7 +41,7 @@ BraceWrapping:
   SplitEmptyNamespace: true
   AfterCaseLabel: true
 BreakBeforeBinaryOperators: All
-BreakBeforeBraces: Custom
+BreakBeforeBraces: Stroustrup
 BreakBeforeInheritanceComma: false
 BreakInheritanceList: BeforeComma
 BreakBeforeTernaryOperators: true

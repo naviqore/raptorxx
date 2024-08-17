@@ -9,7 +9,7 @@
 
 namespace schedule {
   template<typename T>
-  class GTFS_API DataReader
+  class SCHEDULE_API DataReader
   {
   public:
     virtual ~DataReader() = default;
