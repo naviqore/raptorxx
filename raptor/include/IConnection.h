@@ -5,6 +5,9 @@
 #ifndef ICONNECTION_H
 #define ICONNECTION_H
 
+#include "usingTypes.h"
+
+
 #include <memory>
 #include <vector>
 
@@ -20,9 +23,9 @@ namespace raptor {
 
     [[nodiscard]] virtual std::vector<std::shared_ptr<Leg>> getLegs() const = 0;
 
-    [[nodiscard]] virtual std::tm getDepartureTime() const = 0;
+    [[nodiscard]] virtual types::raptorInt getDepartureTime() const = 0;
 
-    [[nodiscard]] virtual std::tm getArrivalTime() const = 0;
+    [[nodiscard]] virtual types::raptorInt getArrivalTime() const = 0;
   };
 }
 

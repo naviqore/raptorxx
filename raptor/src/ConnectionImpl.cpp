@@ -11,10 +11,10 @@ namespace raptor {
   std::vector<std::shared_ptr<Leg>> ConnectionImpl::getLegs() const {
     return legs;
   }
-  std::tm ConnectionImpl::getDepartureTime() const {
+ types::raptorInt ConnectionImpl::getDepartureTime() const {
     return {};
   }
-  std::tm ConnectionImpl::getArrivalTime() const {
+types::raptorInt ConnectionImpl::getArrivalTime() const {
     return {};
   }
 } // raptor
