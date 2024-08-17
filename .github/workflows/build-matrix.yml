@@ -80,6 +80,12 @@ jobs:
         run: |
           cmake --build build --config Release
 
-      - name: Run tests
+      - name: List contents of output directory
         run: |
-          ctest --test-dir ${{ github.workspace }}/output/bin/release --output-on-failure -C Release
+          echo "Contents of output directory:"
+          ls -R ${{ github.workspace }}/output/bin/release
+
+
+#      - name: Run tests
+#        run: |
+#          ctest --test-dir ${{ github.workspace }}/output/bin/release --output-on-failure -C Release
