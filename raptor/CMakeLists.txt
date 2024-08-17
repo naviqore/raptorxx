@@ -5,19 +5,13 @@ project("raptor"
 add_library(${PROJECT_NAME} SHARED)
 
 target_sources(${PROJECT_NAME} PRIVATE
-        src/Raptor.cpp
-        src/Raptor.h
         src/Leg.h
         src/LegImpl.cpp
         src/LegImpl.h
         src/RaptorAlgorithmFactory.cpp
         src/RaptorAlgorithmFactory.h
-        src/strategies/RaptorStrategy.cpp
-        src/strategies/RaptorStrategy.h
         src/ConnectionImpl.cpp
         src/ConnectionImpl.h
-        src/strategies/StandardRaptorStrategy.cpp
-        src/strategies/StandardRaptorStrategy.h
         src/utils/RaptorData.cpp
         src/utils/RaptorData.h
         src/utils/RaptorDataBuilder.cpp
@@ -50,8 +44,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         include/raptorTypes.h
         include/IConnection.h
         include/IRaptor.h
-        include/IRaptorAlgorithmStrategy.h
-        include/IRaptorAlgorithmFactory.h
         include/config/WalkingConfig.h
         include/config/TransferConfig.h
         include/usingTypes.h
