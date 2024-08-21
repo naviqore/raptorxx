@@ -15,14 +15,10 @@ RUN /usr/src/vcpkg/vcpkg install --triplet x64-linux
 # Configure and build the project
 RUN cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/usr/src/vcpkg/scripts/buildsystems/vcpkg.cmake
 RUN cmake --build build
-# RUN ctest --test-dir build --output-on-failure
 
-# Run the tests
-# CMD ["ctest", "--test-dir", "/usr/src/myapp/output/bin/release", "--output-on-failure"]
+RUN echo "RUNNING TESTS"
 
-# CMD ["ctest", "--test-dir", "/usr/src/myapp/output/bin/release", "--output-on-failure"]
-# execute the binary
-# CMD ["./output/bin/release/..."]
+RUN ctest --test-dir build --output-on-failure
 
 # $ docker build -t my-gcc-linux-app .
 # $ docker run -it --rm --name my-running-app my-gcc-linux-app
