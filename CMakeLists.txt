@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.25.1) # 3.28
 project(raptorxx VERSION 0.0.2)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -19,7 +19,7 @@ else ()
 endif ()
 
 configure_file(
-        "${PROJECT_SOURCE_DIR}/ProjectConfig.h.in"
+        "src/ProjectConfig.h.in"
         "${PROJECT_BINARY_DIR}/ProjectConfig.h"
 )
 
@@ -42,17 +42,15 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/rel
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/release)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/release)
 
-set(USE_ZURICH_GTFS ON)
-
-add_subdirectory(interfaces)
-add_subdirectory(logging)
-add_subdirectory(geometry)
-add_subdirectory(geometry/test)
-add_subdirectory(schedule)
-add_subdirectory(schedule/test)
-add_subdirectory(schedule/benchmarks)
-add_subdirectory(raptor)
-add_subdirectory(raptor/test)
+add_subdirectory(src/interfaces)
+add_subdirectory(src/logging)
+add_subdirectory(src/geometry)
+add_subdirectory(src/geometry/test)
+add_subdirectory(src/schedule)
+add_subdirectory(src/schedule/test)
+add_subdirectory(src/schedule/benchmarks)
+add_subdirectory(src/raptor)
+add_subdirectory(src/raptor/test)
 #TODO set up project in a new branch JIRA story
 # add_subdirectory(gtfsRaptorConfig)
 

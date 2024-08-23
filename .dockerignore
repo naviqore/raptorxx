@@ -1,0 +1,9 @@
+/.github
+/.git
+/.gitignore
+/.vs
+/.vscode
+/cmake-*
+/build
+/out
+/output
