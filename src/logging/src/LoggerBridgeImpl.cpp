@@ -41,7 +41,7 @@ void LoggerBridgeImpl::setLevel(const Level level)
     case WARN:
       spdLevel = spdlog::level::warn;
       break;
-    case ERROR:
+    case ERR:
       spdLevel = spdlog::level::err;
       break;
     case DEBUG:
@@ -60,7 +60,7 @@ LoggerBridge::Level LoggerBridgeImpl::getLevel() const
     case spdlog::level::warn:
       return WARN;
     case spdlog::level::err:
-      return ERROR;
+      return ERR;
     case spdlog::level::debug:
       [[fallthrough]];
     default:
