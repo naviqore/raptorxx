@@ -1,0 +1,3 @@
+add_subdirectory(csv_reader)
+add_subdirectory(csv_reader_fast)
+add_subdirectory(txt_reader)
