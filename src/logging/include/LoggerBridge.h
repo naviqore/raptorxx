@@ -15,7 +15,7 @@ public:
     DEBUG,
     INFO,
     WARN,
-    ERROR
+    ERR,
   };
   virtual ~LoggerBridge() = default;
   virtual void info(const std::string& message) = 0;
