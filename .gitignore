@@ -45,3 +45,5 @@
 /vcpkg_installed
 /build
 /Folder.DotSettings.user
+/packages/*
+/vcpkg_installed/*
