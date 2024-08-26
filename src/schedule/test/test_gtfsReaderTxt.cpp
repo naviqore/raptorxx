@@ -183,7 +183,7 @@ TEST(GTFS, TestStrategyReader) {
 
   const auto readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(schedule::gtfs::ReaderType::TXT, std::move(basePath));
 
-  getLogger(Target::CONSOLE, LoggerName::GTFS)->setLevel(LoggerBridge::ERROR);
+  getLogger(Target::CONSOLE, LoggerName::GTFS)->setLevel(LoggerBridge::ERR);
 
 
   // create strategy callable objects

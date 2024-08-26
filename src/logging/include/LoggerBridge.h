@@ -15,7 +15,7 @@ public:
     DEBUG,
     INFO,
     WARN,
-    ERR,
+    ERR // ERROR is a reserved keyword by windows.h
   };
   virtual ~LoggerBridge() = default;
   virtual void info(const std::string& message) = 0;
