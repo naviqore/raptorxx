@@ -6,66 +6,111 @@ on:
   pull_request:
     branches: [ "main" ]
 
+
 jobs:
-  build:
+  Test:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ windows-latest, ubuntu-latest ]
+        os:
+          - windows-2022
+          - ubuntu-24.04
+        compiler:
+          - llvm-18.1.6
+          - gcc-14.2
+          # `llvm-13.0.0`.
         include:
-          - os: windows-latest
-            compiler: msvc
-          #          - os: ubuntu-latest
-          #            compiler: gcc-linux
-          - os: ubuntu-latest
-            compiler: clang-linux
-
+          - os: "windows-2022"
+            compiler: "msvc"
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4.1.4
-
-
-      - name: Setup Compiler on Ubuntu (GCC or Clang)
-        if: matrix.os == 'ubuntu-latest'
-        uses: rlalik/setup-cpp-compiler@v1.2
-        with:
-          compiler: latest
-
-      - name: vcpkg installation
-        shell: bash
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git
-          cd vcpkg
-          if [[ "${{ runner.os }}" == "Windows" ]]; then
-            ./bootstrap-vcpkg.bat
-          else
-            ./bootstrap-vcpkg.sh
-          fi
-          ./vcpkg integrate install
-          ./vcpkg install
-
-      - name: Cache vcpkg packages
+      - uses: actions/checkout@v4.1.4
+      - name: Cache
         uses: actions/cache@v4.0.2
         with:
           path: |
-            ${{ github.workspace }}/vcpkg/installed
-            ${{ github.workspace }}/vcpkg/vcpkg
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+            ~/vcpkg
+            ./build/vcpkg_installed
+            ${{ env.HOME }}/.cache/vcpkg/archives
+            ${{ env.XDG_CACHE_HOME }}/vcpkg/archives
+            ${{ env.LOCALAPPDATA }}\vcpkg\archives
+            ${{ env.APPDATA }}\vcpkg\archives
+          key: ${{ runner.os }}-${{ matrix.compiler }}-${{ env.BUILD_TYPE }}-${{ hashFiles('**/CMakeLists.txt') }}-${{ hashFiles('./vcpkg.json')}}
           restore-keys: |
-            ${{ runner.os }}-vcpkg-
+            ${{ runner.os }}-${{ env.BUILD_TYPE }}-
 
-      - name: Configure CMake
-        run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+      - name: Setup Cpp
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: ${{ matrix.compiler }}
+          vcvarsall: ${{ contains(matrix.os, 'windows') }}
+          cmake: true
+          ninja: true
+          vcpkg: true
 
-      - name: Build
-        run: |
-          cmake --build build --config Release
 
-      - name: List contents of output directory
-        run: |
-          echo "Contents of output directory:"
-          ls -R ${{ github.workspace }}/output/bin/release
+
+
+#jobs:
+#  build:
+#    runs-on: ${{ matrix.os }}
+#    strategy:
+#      matrix:
+#        os: [ windows-latest, ubuntu-latest ]
+#        include:
+#          - os: windows-latest
+#            compiler: msvc
+#          #          - os: ubuntu-latest
+#          #            compiler: gcc-linux
+#          - os: ubuntu-latest
+#            compiler: gcc-linux
+#
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4.1.4
+#
+#
+#      - name: Setup Compiler on Ubuntu (GCC or Clang)
+#        if: matrix.os == 'ubuntu-latest'
+#        uses: rlalik/setup-cpp-compiler@v1.2
+#        with:
+#          compiler: latest
+#
+#      - name: vcpkg installation
+#        shell: bash
+#        run: |
+#          git clone https://github.com/microsoft/vcpkg.git
+#          cd vcpkg
+#          if [[ "${{ runner.os }}" == "Windows" ]]; then
+#            ./bootstrap-vcpkg.bat
+#          else
+#            ./bootstrap-vcpkg.sh
+#          fi
+#          ./vcpkg integrate install
+#          ./vcpkg install
+#
+#      - name: Cache vcpkg packages
+#        uses: actions/cache@v4.0.2
+#        with:
+#          path: |
+#            ${{ github.workspace }}/vcpkg/installed
+#            ${{ github.workspace }}/vcpkg/vcpkg
+#          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+#          restore-keys: |
+#            ${{ runner.os }}-vcpkg-
+#
+#      - name: Configure CMake
+#        run: |
+#          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+#
+#      - name: Build
+#        run: |
+#          cmake --build build --config Release
+#
+#      - name: List contents of output directory
+#        run: |
+#          echo "Contents of output directory:"
+#          ls -R ${{ github.workspace }}/output/bin/release
 
 
 #      - name: Run tests
