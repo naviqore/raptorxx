@@ -92,12 +92,13 @@ namespace converter {
     return data->stops | std::views::filter([&aStopName](const auto& stop) { return stop.second.stopName == aStopName; })
            | std::views::keys | std::ranges::to<std::vector<std::string>>();
 #else
+    std::vector<std::string> stopNames;
     auto filteredStops = data->stops
-                         | std::views::filter([&aStopName](const auto& stop) { return stop.second.stopName == aStopName; });
+                        | std::views::filter([&aStopName](const auto& stop) { return stop.second.stopName == aStopName; });
     std::ranges::transform(filteredStops, std::back_inserter(stopNames), [](const auto& stop) {
       return stop.first;
     });
-    return filteredStops;
+    return stopNames;
 #endif
   }
   const schedule::gtfs::StopTime& TimetableManager::getStopTimeFromStopId(std::string const& aStopId) const
@@ -162,16 +163,15 @@ namespace converter {
            | std::ranges::to<std::vector<schedule::gtfs::StopTime>>();
 #else
     std::vector<schedule::gtfs::StopTime> stopTimesFiltered;
-    std::ranges::transform(data->stopTimes.at(aStopId), std::back_inserter(stopTimesFiltered), [secondsGreaterThan](const schedule::gtfs::StopTime& stopTime) {
-      if (stopTime.departureTime.toSeconds() > secondsGreaterThan) {
+    auto departureTimeGreaterThan = [secondsGreaterThan](const schedule::gtfs::StopTime& stopTime) {
+      return stopTime.departureTime.toSeconds() > secondsGreaterThan;
+    };
+    std::ranges::transform(data->stopTimes.at(aStopId) | std::views::filter(departureTimeGreaterThan), std::back_inserter(stopTimesFiltered), [secondsGreaterThan](const schedule::gtfs::StopTime& stopTime) {
         return stopTime;
-      }
-      return schedule::gtfs::StopTime{};
     });
-    stopTimesFiltered.erase(std::remove_if(stopTimesFiltered.begin(), stopTimesFiltered.end(), [](const schedule::gtfs::StopTime& stopTime) {
-                              return stopTime.tripId.empty();
-                            }),
-                            stopTimesFiltered.end());
+    std::erase_if(stopTimesFiltered, [](const schedule::gtfs::StopTime& stopTime) {
+      return stopTime.tripId.empty();
+    });
     return stopTimesFiltered;
 #endif
   }
