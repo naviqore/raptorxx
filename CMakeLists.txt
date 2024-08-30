@@ -54,6 +54,7 @@ add_subdirectory(src/gtfsRaptorConfig)
 add_subdirectory(test/test_raptor)
 add_subdirectory(test/test_geometry)
 add_subdirectory(test/test_schedule)
+add_subdirectory(test/test_gtfsRaptorConfig)
 
 include(CTest)
 enable_testing()

@@ -11,12 +11,13 @@
 #include <algorithm>
 #include <string>
 #include <stdexcept>
+#include <schedule_export.h>
 
 namespace schedule::gtfs {
   struct StopTime;
 }
 namespace schedule::gtfs {
-  struct Trip
+  struct SCHEDULE_API Trip
   {
     Trip(std::string&& aRouteId, std::string&& aServiceId, std::string&& aTripId)
       : routeId(std::move(aRouteId))

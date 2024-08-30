@@ -9,9 +9,10 @@
 #include <string>
 #include <cstring>
 #include <stdexcept>
+#include <schedule_export.h>
 
 namespace schedule::gtfs {
-  struct Agency
+  struct SCHEDULE_API Agency
   {
     Agency(std::string&& aAgencyId, std::string&& aName, std::string&& aTimezone)
       : agencyId(std::move(aAgencyId))

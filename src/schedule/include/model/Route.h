@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <set>
 #include <unordered_set>
+#include <schedule_export.h>
 
 // https://gtfs.org/schedule/reference/#routestxt
 // Required
@@ -20,7 +21,7 @@ namespace schedule::gtfs {
   struct Trip;
 }
 namespace schedule::gtfs {
-  struct Route
+  struct SCHEDULE_API Route
   {
     enum RouteType : uint16_t
     {

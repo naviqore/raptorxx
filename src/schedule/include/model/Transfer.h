@@ -8,10 +8,11 @@
 #include <string>
 #include <stdexcept>
 #include <cstdint>
+#include <schedule_export.h>
 
 // https://gtfs.org/schedule/reference/#transferstxt
 namespace schedule::gtfs {
-  struct Transfer
+  struct SCHEDULE_API Transfer
   {
 
     enum TransferType : uint8_t

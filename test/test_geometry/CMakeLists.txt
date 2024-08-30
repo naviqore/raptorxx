@@ -8,12 +8,10 @@ add_subdirectory(src)
 
 
 find_package(GTest CONFIG REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         GTest::gtest_main
         GTest::gtest
-        spdlog::spdlog
         geometry
         logging
 )

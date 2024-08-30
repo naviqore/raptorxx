@@ -12,11 +12,12 @@
 #include <chrono>
 #include <cstdint>
 #include <model/helperFunctions.h>
+#include <schedule_export.h>
 
 // https://gtfs.org/schedule/reference/#calendar_datestxt
 
 namespace schedule::gtfs {
-  struct CalendarDate
+  struct SCHEDULE_API CalendarDate
   {
 
     enum ExceptionType : uint8_t

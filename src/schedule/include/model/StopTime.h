@@ -8,9 +8,10 @@
 #include "ServiceDayTime.h"
 #include <string>
 #include <stdexcept>
+#include <schedule_export.h>
 
 namespace schedule::gtfs {
-  struct StopTime
+  struct SCHEDULE_API StopTime
   {
     StopTime(std::string&& aTripId, std::string&& aArrivalTime, std::string&& aDepartureTime, std::string&& aStopId, int const aStopSequence)
       : tripId(std::move(aTripId))

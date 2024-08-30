@@ -11,10 +11,10 @@ add_subdirectory(src/agencySubsetWriter)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/schedule/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/raptor/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/logging/include)
-#target_include_directories(${PROJECT_NAME} PUBLIC
-#        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-#        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-#)
+target_include_directories(${PROJECT_NAME} PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 

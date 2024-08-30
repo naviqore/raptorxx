@@ -3,6 +3,7 @@
 #include "GtfsReaderStrategyFactory.h"
 #include "GtfsReader.h"
 #include "CalendarDate.h"
+#include "LoggerFactory.h"
 
 #include <algorithm>
 #include <gtest/gtest.h>
@@ -31,7 +32,7 @@ protected:
   }
 
   void TearDown() override {
-    std::cout << "GtfsReaderStrategiesTest::TearDown()" << '\n';
+    getConsoleLogger(LoggerName::SCHEDULE)->info("GtfsReaderStrategiesTest TearDown");
     reader.reset(nullptr);
   }
 };

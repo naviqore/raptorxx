@@ -11,12 +11,13 @@
 
 #include <string>
 #include <stdexcept>
+#include <schedule_export.h>
 
 // https://gtfs.org/schedule/reference/#stopstxt
 // Required
 
 namespace schedule::gtfs {
-  struct Stop
+  struct SCHEDULE_API Stop
   {
     // TODO consider float instead of double for lat/lon
     Stop(std::string&& aStopId, std::string&& aStopName, const geometry::Coordinate<double> aStopLat, const geometry::Coordinate<double> aStopLon, std::string&& aParentStation)
