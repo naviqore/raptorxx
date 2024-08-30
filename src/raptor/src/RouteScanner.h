@@ -7,7 +7,7 @@
 
 #include "data/ActiveTrip.h"
 #include "utils/StopLabelsAndTimes.h"
-#include "utils/RaptorData.h"
+#include "include/RaptorData.h"
 
 #include <unordered_set>
 #include <utility>
@@ -23,7 +23,7 @@ namespace raptor {
   public:
     RouteScanner(StopLabelsAndTimes& stopLabelsAndTimes, const RaptorData& raptorData, types::raptorInt minimumTransferDuration);
 
-    std::unordered_set<types::raptorIdx> scan(types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops) const;
+    [[nodiscard]] std::unordered_set<types::raptorIdx> scan(types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops) const;
 
   private:
     [[nodiscard]] std::unordered_set<types::raptorIdx> getRoutesToScan(const std::unordered_set<types::raptorIdx>& markedStops) const;

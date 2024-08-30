@@ -45,13 +45,14 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/rel
 add_subdirectory(src/interfaces)
 add_subdirectory(src/logging)
 add_subdirectory(src/geometry)
-add_subdirectory(src/geometry/test)
 add_subdirectory(src/schedule)
 add_subdirectory(src/schedule/test)
 add_subdirectory(src/schedule/benchmarks)
 add_subdirectory(src/raptor)
-add_subdirectory(src/raptor/test)
 add_subdirectory(src/gtfsRaptorConfig)
+# TESTS
+add_subdirectory(test/test_raptor)
+add_subdirectory(test/test_geometry)
 
 include(CTest)
 enable_testing()

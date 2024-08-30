@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <utils/RaptorData.h>
+#include "RaptorData.h"
 #include <RouteBuilder.h>
 
 
@@ -15,7 +15,6 @@
 #include <memory>
 #include <unordered_set>
 #include <raptor_export.h>
-// #include "RaptorAlgorithm.h" // Assuming RaptorAlgorithm is already converted to C++
 
 namespace raptor {
 

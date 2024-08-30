@@ -7,9 +7,11 @@
 
 #include <optional>
 #include <string>
+#include <raptor_export.h>
+
 
 namespace raptor {
-  class Leg
+  class RAPTOR_API Leg
   {
   public:
     enum Type

@@ -1,0 +1,19 @@
+target_sources(${PROJECT_NAME}
+        PUBLIC
+        Connection.h
+        IConnection.h
+        IRaptor.h
+        LocalDateTime.h
+        RaptorAlgorithm.h
+        raptorRouteStructures.h
+        raptorTypes.h
+        RouteBuilder.h
+        usingTypes.h
+        RaptorDataBuilder.h
+        Leg.h
+        RaptorRouter.h
+        RaptorData.h
+        RouteContainer.h
+)
+
+add_subdirectory(config)

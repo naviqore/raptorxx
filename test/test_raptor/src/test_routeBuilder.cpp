@@ -2,7 +2,8 @@
 // Created by MichaelBrunner on 20/07/2024.
 //
 
-#include "include/RouteBuilder.h"
+#include <raptorRouteStructures.h>
+#include <RouteBuilder.h>
 #include <gtest/gtest.h>
 
 

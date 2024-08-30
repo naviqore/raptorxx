@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "utils/RaptorDataBuilder.h"
+#include "RaptorDataBuilder.h"
 #include <vector>
 #include <string>
 #include <memory>

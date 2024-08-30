@@ -4,17 +4,18 @@
 
 #pragma once
 
-#include "data/raptorRouteStructures.h"
+#include "raptorRouteStructures.h"
 
 
 #include <string>
 #include <map>
 #include <vector>
+#include <raptor_export.h>
 
 
 namespace raptor {
 
-  class RouteContainer
+  class RAPTOR_API RouteContainer
   {
   public:
     RouteContainer(std::string  id, const std::map<int, std::string>& stopSequence, const std::map<std::string, std::vector<StopTime>>& trips);

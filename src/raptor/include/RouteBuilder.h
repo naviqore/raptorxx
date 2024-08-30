@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <vector>
 #include <map>
-#include "utils/RouteContainer.h"
+#include "RouteContainer.h"
 
 #include <raptor_export.h>
 
