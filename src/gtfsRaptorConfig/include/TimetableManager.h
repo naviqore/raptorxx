@@ -50,8 +50,6 @@ namespace converter {
 
     [[nodiscard]] const schedule::gtfs::Trip& getTripsFromStopTimeTripId(std::string const& aTripId) const;
 
-    [[nodiscard]] std::vector<std::string> getVisitedStopIds() const;
-
   private:
     void createRelations() const;
     void buildTripsToRoutesRelations() const;

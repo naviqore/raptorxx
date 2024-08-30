@@ -116,7 +116,7 @@ namespace raptor {
     auto validatedTargetStops = validation::validateStopsAndGetIndices(arrivalStops, raptorData.getLookup().stops);
 
     // not all compilers support std::ranges::to =(
-#ifdef _MSC_VER
+#if defined(__cpp_lib_ranges_to_container)
     const auto sourceStopIndices = validatedSourceStops | std::views::keys | std::ranges::to<std::vector<types::raptorIdx>>();
     const auto targetStopIndices = validatedTargetStops | std::views::keys | std::ranges::to<std::vector<types::raptorIdx>>();
     const auto sourceTimes = validatedSourceStops | std::views::values | std::ranges::to<std::vector<types::raptorInt>>();
