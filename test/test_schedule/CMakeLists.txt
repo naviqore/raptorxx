@@ -39,12 +39,4 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 
-message(STATUS "CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}/src/schedule/test/test-data/")
-
-add_definitions(-DTEST_DATA_DIR="${CMAKE_SOURCE_DIR}/src/schedule/test/test-data/")
-
-
-
-
-
-
+add_definitions(-DTEST_DATA_DIR="${CMAKE_SOURCE_DIR}/test/test_schedule/test-data/")
