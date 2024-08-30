@@ -11,53 +11,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest] # , clang-macos-latest
+        os: [windows-latest, ubuntu-latest]
         include:
           - os: windows-latest
             compiler: msvc
           - os: ubuntu-latest
-            compiler: gcc-linux
-#          - os: clang-macos-latest
-#            compiler: clang-macos
+            compiler: clang-latest # gcc-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.4
-
-      - name: Install GCC 13.1
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-          sudo apt-get update
-          sudo apt-get install -y gcc-13 g++-13
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 60
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 60
-
-      - name: Cache Homebrew
-        if: matrix.os == 'clang-macos-latest'
-        uses: actions/cache@v4.0.2
-        with:
-          path: /usr/local/Homebrew
-          key: ${{ runner.os }}-homebrew-${{ hashFiles('**/Brewfile') }}
-          restore-keys: |
-            ${{ runner.os }}-homebrew-
-
-      - name: Install Clang 14
-        if: matrix.os == 'clang-macos-latest'
-        run: |
-          brew update
-          brew install llvm@14
-          echo 'export PATH="/usr/local/opt/llvm@14/bin:$PATH"' >> ~/.zshrc
-          echo 'export LDFLAGS="-L/usr/local/opt/llvm@14/lib"' >> ~/.zshrc
-          echo 'export CPPFLAGS="-I/usr/local/opt/llvm@14/include"' >> ~/.zshrc
-          source ~/.zshrc
-
-      - name: Save Homebrew Cache
-        if: matrix.os == 'clang-macos-latest'
-        uses: actions/cache@v3
-        with:
-          path: /usr/local/Homebrew
-          key: ${{ runner.os }}-homebrew-${{ hashFiles('**/Brewfile') }}
 
       - name: vcpkg installation
         shell: bash
