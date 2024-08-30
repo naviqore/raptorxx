@@ -13,7 +13,8 @@
 namespace converter {
 
   RoutePartitioner::RoutePartitioner(schedule::gtfs::GtfsData* data)
-    : data(data) {
+    : data(data)
+  {
 
     // auto routes = data->routes | std::views::values;
     // std::vector<Route> routeList(routes.begin(), routes.end());
@@ -26,31 +27,40 @@ namespace converter {
     });
   }
 
-  std::vector<SubRoute> RoutePartitioner::getSubRoutes(std::string const& routeId) const {
+  std::vector<SubRoute> RoutePartitioner::getSubRoutes(std::string const& routeId) const
+  {
     const auto& subRoutesForRoute = subRoutes.at(routeId);
+#if defined(__cpp_lib_ranges_to_container)
     return std::ranges::views::values(subRoutesForRoute) | std::ranges::to<std::vector<SubRoute>>();
+#else
+    std::vector<SubRoute> subRoutesVector;
+    std::ranges::transform(subRoutesForRoute, std::back_inserter(subRoutesVector), [](const auto& pair) {
+      return pair.second;
+    });
+    return subRoutesVector;
+#endif
   }
 
-  const SubRoute& RoutePartitioner::getSubRoute(std::string const& tripId) const {
+  const SubRoute& RoutePartitioner::getSubRoute(std::string const& tripId) const
+  {
     const auto route = data->routes.at(tripId);
     const auto& subRoutesForRoute = subRoutes.at(route.routeId);
     const auto key = generateStopSequenceKey(tripId);
     return subRoutesForRoute.at(key);
   }
 
-  void RoutePartitioner::processRoute(schedule::gtfs::Route const& route) {
+  void RoutePartitioner::processRoute(schedule::gtfs::Route const& route)
+  {
     std::unordered_map<std::string, SubRoute> sequenceKeyToSubRoute;
     sequenceKeyToSubRoute.reserve(data->routes.at(route.routeId).trips.size());
 
-    for (const auto& tripId : data->routes.at(route.routeId).trips)
-    {
+    for (const auto& tripId : data->routes.at(route.routeId).trips) {
       const schedule::gtfs::Trip& trip = data->trips.at(tripId);
       auto key = this->generateStopSequenceKey(tripId);
 
       auto [it, inserted] = sequenceKeyToSubRoute.try_emplace(key,
                                                               SubRoute(std::format("{}_sr{}", route.routeId, sequenceKeyToSubRoute.size() + 1), route.routeId, key, extractStopSequence(trip)));
-      if (!inserted)
-      {
+      if (!inserted) {
         it->second.addTrip(trip);
       }
     }
@@ -77,20 +87,18 @@ namespace converter {
   //   subRoutes.insert_or_assign(route.routeId, sequenceKeyToSubRoute);
   // }
 
-  std::string RoutePartitioner::generateStopSequenceKey(const std::string& tripId) const {
+  std::string RoutePartitioner::generateStopSequenceKey(const std::string& tripId) const
+  {
     const auto range = data->trips.at(tripId).stopTimes;
     std::string sequenceKey;
     sequenceKey.reserve(std::distance(range.begin(), range.end()) * 401); // 400 + 1 for "_"
 
     bool first = true;
-    for (auto it = range.begin(); it != range.end(); ++it)
-    {
-      if (!first)
-      {
+    for (auto it = range.begin(); it != range.end(); ++it) {
+      if (!first) {
         sequenceKey += "_";
       }
-      else
-      {
+      else {
         first = false;
       }
       sequenceKey += it->stopId;
@@ -120,13 +128,13 @@ namespace converter {
   //   return sequenceKey;
   // }
 
-  std::vector<schedule::gtfs::Stop> RoutePartitioner::extractStopSequence(schedule::gtfs::Trip const& aTrip) const {
+  std::vector<schedule::gtfs::Stop> RoutePartitioner::extractStopSequence(schedule::gtfs::Trip const& aTrip) const
+  {
     std::vector<schedule::gtfs::Stop> stops;
     const auto range = data->trips.at(aTrip.tripId).stopTimes;
     stops.reserve(std::distance(range.begin(), range.end()));
 
-    for (const auto& it : range)
-    {
+    for (const auto& it : range) {
       stops.push_back(data->stops.at(it.stopId));
     }
     return stops;

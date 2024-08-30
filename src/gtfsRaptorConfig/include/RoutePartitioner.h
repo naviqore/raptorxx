@@ -2,19 +2,17 @@
 // Created by MichaelBrunner on 19/07/2024.
 //
 
-#ifndef ROUTEPARTITIONER_H
-#define ROUTEPARTITIONER_H
+#pragma once
 
 #include "GtfsData.h"
 #include "model/Route.h"
-
-#include <functional>
-#include <map>
-#include <utility>
 #include <gtfsRaptorConfig_export.h>
+#include <unordered_map>
+#include <vector>
+#include <string>
+#include "SubRoute.h"
 
 namespace converter {
-  class SubRoute;
 
   class GTFS_RAPTOR_API RoutePartitioner
   {
@@ -40,5 +38,3 @@ namespace converter {
 
 } // gtfs
 // schedule
-
-#endif //ROUTEPARTITIONER_H

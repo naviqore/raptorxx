@@ -185,13 +185,12 @@ namespace raptor {
       const auto numberOfStops = routeContainer.stopSequence().size();
       const auto numberOfTrips = routeContainer.trips().size();
 
-#ifdef _MSC_VER
+#if defined(__cpp_lib_ranges_to_container)
       const auto tripIdsArray = routeContainer.trips() | std::views::keys | std::ranges::to<std::vector<std::string>>();
 #else
       std::vector<std::string> tripIdsArray;
       std::ranges::transform(routeContainer.trips(), std::back_inserter(tripIdsArray), [](const auto& pair) { return pair.first; });
 #endif
-
       routeArr[routeIdx] = Route(routeContainer.id(), routeStopCnt, static_cast<int>(numberOfStops), stopTimeCnt, static_cast<int>(numberOfTrips), tripIdsArray);
 
       for (int position = 0; position < numberOfStops; ++position) {

@@ -1,0 +1,13 @@
+target_sources(${PROJECT_NAME}
+        PUBLIC
+        Agency.h
+        Calendar.h
+        CalendarDate.h
+        CMakeLists.txt
+        helperFunctions.h
+        Route.h
+        Stop.h
+        StopTime.h
+        Transfer.h
+        Trip.h
+)
