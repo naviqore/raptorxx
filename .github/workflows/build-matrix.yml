@@ -18,7 +18,7 @@ jobs:
           - ubuntu-24.04
         compiler:
           - llvm-18.1.6
-          - gcc-14.2
+#          - gcc-latest
           # `llvm-13.0.0`.
         include:
           - os: "windows-2022"
@@ -48,7 +48,18 @@ jobs:
           ninja: true
           vcpkg: true
 
+      - name: Configure CMake
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
+      - name: Build
+        run: |
+          cmake --build build --config Release
+
+      - name: List contents of output directory
+        run: |
+          echo "Contents of output directory:"
+          ls -R ${{ github.workspace }}/output/bin/release
 
 
 #jobs:
