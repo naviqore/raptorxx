@@ -16,11 +16,40 @@ jobs:
           - os: windows-latest
             compiler: msvc
           - os: ubuntu-latest
-            compiler: clang-latest # gcc-latest
+            compiler: gcc-linux
+          - os: ubuntu-latest
+            compiler: clang-linux
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.4
+
+      - name: Install GCC 14.2 on Ubuntu
+        if: matrix.compiler == 'gcc-linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget lsb-release software-properties-common
+          wget https://ftp.gnu.org/gnu/gcc/gcc-14.2.0/gcc-14.2.0.tar.xz
+          tar -xf gcc-14.2.0.tar.xz
+          cd gcc-14.2.0
+          ./contrib/download_prerequisites
+          mkdir build && cd build
+          ../configure --enable-languages=c,c++ --disable-multilib
+          make -j$(nproc)
+          sudo make install
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/local/bin/gcc 60
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/local/bin/g++ 60
+
+      - name: Install Clang 18.1.8 on Ubuntu
+        if: matrix.compiler == 'clang-linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget lsb-release software-properties-common
+          wget https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/clang+llvm-18.1.8-x86_64-linux-gnu-ubuntu-22.04.tar.xz
+          tar -xf clang+llvm-18.1.8-x86_64-linux-gnu-ubuntu-22.04.tar.xz
+          sudo cp -r clang+llvm-18.1.8-x86_64-linux-gnu-ubuntu-22.04/* /usr/local/
+          sudo update-alternatives --install /usr/bin/clang clang /usr/local/bin/clang 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/local/bin/clang++ 100
 
       - name: vcpkg installation
         shell: bash
