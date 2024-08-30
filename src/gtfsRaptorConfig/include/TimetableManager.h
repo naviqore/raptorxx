@@ -2,26 +2,20 @@
 // Created by MichaelBrunner on 13/06/2024.
 //
 
-#ifndef RELATIONMANAGER_H
-#define RELATIONMANAGER_H
+#pragma once
 
 #include "GtfsData.h"
 #include "RoutePartitioner.h"
-
 #include <vector>
 #include "model/StopTime.h"
-#include "model/Trip.h"
 #include "model/Stop.h"
 #include "model/Route.h"
-
-#include <iostream>
 #include <gtfsRaptorConfig_export.h>
 #include <ranges>
 
 namespace converter {
 
-  class GTFS_RAPTOR_API TimetableManager
-  {
+  class GTFS_RAPTOR_API TimetableManager {
     std::unique_ptr<schedule::gtfs::GtfsData> data;
     std::unique_ptr<RoutePartitioner> routePartitioner;
 
@@ -34,7 +28,7 @@ namespace converter {
 
     [[nodiscard]] RoutePartitioner& getRoutePartitioner();
 
-    [[nodiscard]] const RoutePartitioner& getRoutePartitioner() const ;
+    [[nodiscard]] const RoutePartitioner& getRoutePartitioner() const;
 
     [[nodiscard]] const std::string& getStopNameFromStopId(std::string const& aStopId) const;
 
@@ -56,13 +50,9 @@ namespace converter {
 
     [[nodiscard]] const schedule::gtfs::Trip& getTripsFromStopTimeTripId(std::string const& aTripId) const;
 
-    [[nodiscard]] std::vector<std::string> getVisitedStopIds() const;
-
   private:
     void createRelations() const;
     void buildTripsToRoutesRelations() const;
     void buildStopTimesToTripsAndRoutesRelations() const;
   };
 } // gtfs
-
-#endif //RELATIONMANAGER_H
