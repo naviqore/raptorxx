@@ -3,7 +3,7 @@ target_sources(${PROJECT_NAME}
         helperFunctions.h
         LocalDateTime.cpp
         RaptorData.cpp
-        RaptorDataBuilder.cpp
+        RaptorRouterBuilder.cpp
         RouteBuilder.cpp
         RouteContainer.cpp
         StopLabelsAndTimes.cpp

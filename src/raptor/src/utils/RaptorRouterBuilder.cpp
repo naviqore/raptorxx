@@ -2,7 +2,7 @@
 // Created by MichaelBrunner on 20/07/2024.
 //
 
-#include "RaptorDataBuilder.h"
+#include "RaptorRouterBuilder.h"
 
 #include "LoggerFactory.h"
 #include "RouteBuilder.h"
@@ -62,7 +62,7 @@ namespace raptor {
     return *this;
   }
 
-  RaptorRouterBuilder& RaptorRouterBuilder::addStopTime(const std::string& routeId, const std::string& tripId, const int position, const std::string& stopId, const int arrival, const int departure)
+  RaptorRouterBuilder& RaptorRouterBuilder::addStopTime(const std::string& routeId, const std::string& tripId, const int position, const std::string& stopId, types::raptorInt arrival, types::raptorInt departure)
   {
     const StopTime stopTime(arrival, departure);
     getRouteBuilder(routeId)->addStopTime(tripId, position, stopId, stopTime);

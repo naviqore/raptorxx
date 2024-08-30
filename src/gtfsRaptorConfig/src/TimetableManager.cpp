@@ -94,7 +94,7 @@ namespace converter {
 #else
     std::vector<std::string> stopNames;
     auto filteredStops = data->stops
-                        | std::views::filter([&aStopName](const auto& stop) { return stop.second.stopName == aStopName; });
+                         | std::views::filter([&aStopName](const auto& stop) { return stop.second.stopName == aStopName; });
     std::ranges::transform(filteredStops, std::back_inserter(stopNames), [](const auto& stop) {
       return stop.first;
     });
@@ -167,7 +167,7 @@ namespace converter {
       return stopTime.departureTime.toSeconds() > secondsGreaterThan;
     };
     std::ranges::transform(data->stopTimes.at(aStopId) | std::views::filter(departureTimeGreaterThan), std::back_inserter(stopTimesFiltered), [secondsGreaterThan](const schedule::gtfs::StopTime& stopTime) {
-        return stopTime;
+      return stopTime;
     });
     std::erase_if(stopTimesFiltered, [](const schedule::gtfs::StopTime& stopTime) {
       return stopTime.tripId.empty();
@@ -184,6 +184,19 @@ namespace converter {
   const schedule::gtfs::Trip& TimetableManager::getTripsFromStopTimeTripId(std::string const& aTripId) const
   {
     return data->trips.at(aTripId);
+  }
+
+  std::vector<schedule::gtfs::Route> TimetableManager::getRoutes() const
+  {
+#if defined(__cpp_lib_ranges_to_container)
+    return data->routes | std::views::values | std::ranges::to<std::vector<schedule::gtfs::Route>>();
+#else
+    std::vector<schedule::gtfs::Route> routes;
+    std::ranges::transform(data->routes, std::back_inserter(routes), [](const auto& route) {
+      return route.second;
+    });
+    return routes;
+#endif
   }
 
 } // gtfs
