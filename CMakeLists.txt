@@ -42,17 +42,18 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/rel
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/release)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/release)
 
+# SOURCE
 add_subdirectory(src/interfaces)
 add_subdirectory(src/logging)
 add_subdirectory(src/geometry)
 add_subdirectory(src/schedule)
-add_subdirectory(test/test_schedule)
 add_subdirectory(src/schedule/benchmarks)
 add_subdirectory(src/raptor)
 add_subdirectory(src/gtfsRaptorConfig)
 # TESTS
 add_subdirectory(test/test_raptor)
 add_subdirectory(test/test_geometry)
+add_subdirectory(test/test_schedule)
 
 include(CTest)
 enable_testing()

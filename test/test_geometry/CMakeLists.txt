@@ -4,10 +4,7 @@ project("geometry_tests"
 
 
 add_executable(${PROJECT_NAME})
-
-target_sources(${PROJECT_NAME} PRIVATE
-        test_kdTree.cpp
-)
+add_subdirectory(src)
 
 
 find_package(GTest CONFIG REQUIRED)
