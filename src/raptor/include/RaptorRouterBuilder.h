@@ -24,7 +24,7 @@ namespace raptor {
     explicit RaptorRouterBuilder(int defaultSameStopTransferTime);
 
     RaptorRouterBuilder& addStop(const std::string& id);
-    RaptorRouterBuilder& addRoute(const std::string& id, const std::vector<std::string>& stopIds);
+    RaptorRouterBuilder& addRoute(const std::string& routeId, const std::vector<std::string>& stopIds);
     RaptorRouterBuilder& addTrip(const std::string& tripId, const std::string& routeId);
     RaptorRouterBuilder& addStopTime(const std::string& routeId, const std::string& tripId, int position, const std::string& stopId, types::raptorInt arrival, types::raptorInt departure);
     RaptorRouterBuilder& addTransfer(const std::string& sourceStopId, const std::string& targetStopId, int duration);

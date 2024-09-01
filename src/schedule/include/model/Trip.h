@@ -17,16 +17,20 @@ namespace schedule::gtfs {
   struct StopTime;
 }
 namespace schedule::gtfs {
-  struct SCHEDULE_API Trip
-  {
+
+  inline auto stopTimeCompare = [](const StopTime& lhs, const StopTime& rhs) {
+    return lhs.departureTime.toSeconds() < rhs.departureTime.toSeconds();
+  };
+
+  struct SCHEDULE_API Trip {
     Trip(std::string&& aRouteId, std::string&& aServiceId, std::string&& aTripId)
       : routeId(std::move(aRouteId))
       , serviceId(std::move(aServiceId))
-      , tripId(std::move(aTripId)) {
+      , tripId(std::move(aTripId))
+    {
       if (routeId.empty()
           || serviceId.empty()
-          || tripId.empty())
-      {
+          || tripId.empty()) {
         throw std::invalid_argument("Mandatory trip fields must not be empty");
       }
     }
@@ -34,8 +38,10 @@ namespace schedule::gtfs {
     std::string serviceId;
     std::string tripId;
 
-    std::vector<StopTime> stopTimes{};
+    std::set<StopTime, decltype(stopTimeCompare)> stopTimes{};
+    // std::vector<StopTime> stopTimes{}; //TODO: think about storing pointers to StopTime objects
   };
+
 
   inline auto tripHash = [](const Trip& trip) {
     const auto h1 = std::hash<std::string>{}(trip.tripId);

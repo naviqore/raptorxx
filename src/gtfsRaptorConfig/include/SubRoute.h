@@ -11,18 +11,17 @@
 
 namespace converter {
 
-class GTFS_RAPTOR_API SubRoute
-  {
-    std::string SubRouteId{};
-    std::string routeId{};
-    std::string stopSequenceKey{};
-    std::vector<schedule::gtfs::Stop> stopsSequence{};
-    std::vector<schedule::gtfs::Trip> trips{};
+  class GTFS_RAPTOR_API SubRoute {
+    std::string SubRouteId;
+    std::string routeId;
+    std::string stopSequenceKey;
+    std::vector<schedule::gtfs::Stop> stopsSequence;
+    std::vector<schedule::gtfs::Trip> trips;
 
   public:
     explicit SubRoute(std::string&& subRouteId, std::string routeId, std::string stopSequenceKey, std::vector<schedule::gtfs::Stop>&& stopsSequence);
 
-   SubRoute(const SubRoute& aSubRoute);
+    SubRoute(const SubRoute& aSubRoute);
 
     SubRoute(SubRoute&& aSubRoute) noexcept = default;
     SubRoute& operator=(const SubRoute& aSubRoute) = default;
@@ -30,17 +29,15 @@ class GTFS_RAPTOR_API SubRoute
 
     void addTrip(schedule::gtfs::Trip const& trip);
 
-    [[nodiscard]] const std::string& getSubRouteId() const ;
+    [[nodiscard]] const std::string& getSubRouteId() const;
 
     [[nodiscard]] const std::string& getRouteId() const;
 
-    [[nodiscard]] const std::string& getStopSequenceKey() const {
-      return stopSequenceKey;
-    }
+    [[nodiscard]] const std::string& getStopSequenceKey() const;
 
     [[nodiscard]] const std::vector<schedule::gtfs::Stop>& getStopsSequence() const;
 
-    [[nodiscard]] size_t stopIndex(std::string_view stopId) const ;
+    [[nodiscard]] size_t stopIndex(std::string_view stopId) const;
 
     [[nodiscard]] const std::vector<schedule::gtfs::Trip>& getTrips() const;
 

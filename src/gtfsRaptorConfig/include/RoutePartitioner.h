@@ -24,6 +24,8 @@ namespace converter {
 
     [[nodiscard]] const SubRoute& getSubRoute(std::string const& tripId) const;
 
+    [[nodiscard]] const std::vector<std::string>& getTrips(std::string const& routeId) const;
+
 
   private:
     std::unordered_map<std::string, std::unordered_map<std::string, SubRoute> /*, decltype(routeHash), decltype(routeEqual)*/> subRoutes{};

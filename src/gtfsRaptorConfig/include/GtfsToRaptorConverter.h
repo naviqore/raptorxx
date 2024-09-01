@@ -21,7 +21,7 @@ namespace converter {
     std::unordered_set<std::string> addedStopIds{};
     raptor::RaptorRouterBuilder raptorRouterBuilder;
     TimetableManager timetableManager;
-    RoutePartitioner routePartitioner;
+    std::unique_ptr<RoutePartitioner> routePartitioner;
 
   public:
     explicit GtfsToRaptorConverter(schedule::gtfs::GtfsData&& data, int defaultSameStopTransferTime);
@@ -32,7 +32,7 @@ namespace converter {
     void addRoute(SubRoute const& subRoute);
     void addStopIdsToRoute(std::string const& subRouteId, const std::vector<std::string>& stopIdsVector);
     void addTripsToRouterBuilder(SubRoute const& subRoute);
-    void addStopTimesToRouterBuilder(schedule::gtfs::StopTime const& stopTime, std::string const& tripId, int position);
+    void addStopTimesToRouterBuilder(schedule::gtfs::StopTime const& stopTime, std::string const& tripId, std::string const& subRouteId, int position);
     void addTransfers();
 
   };

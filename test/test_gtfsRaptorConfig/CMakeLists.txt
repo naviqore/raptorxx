@@ -25,7 +25,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/rapto
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/schedule/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/gtfsRaptorConfig/include)
 
-add_definitions(-DTEST_DATA_DIR="${CMAKE_SOURCE_DIR}/test/test_schedule/test-data/")
-
+add_definitions(-DTEST_DATA_DIR="${CMAKE_SOURCE_DIR}/test/test_gtfsRaptorConfig/test-data/Verkehrsbetriebe_der_Stadt_St_Gallen/")
+# add_definitions(-DTEST_DATA_DIR="${CMAKE_SOURCE_DIR}/test/test_gtfsRaptorConfig/test-data/sample-feed-1/")
 
 
