@@ -5,6 +5,9 @@
 #ifndef STOP_H
 #define STOP_H
 
+#include "Transfer.h"
+
+
 #include <spatial/Coordinate.h>
 #include <spatial/CoordinateComponent.h>
 
@@ -35,6 +38,7 @@ namespace schedule::gtfs {
     std::string stopName;
     geometry::CoordinateComponent<geometry::Coordinate<double>> stopPoint;
     std::string parentStation;
+    std::vector<Transfer> transfers; //TODO: consider using a map instead of a vector
   };
 
   inline auto stopHash = [](const Stop& stop) {

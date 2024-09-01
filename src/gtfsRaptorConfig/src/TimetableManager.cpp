@@ -22,7 +22,6 @@ namespace converter {
   {
     buildTripsToRoutesRelations();
     buildStopTimesToTripsAndRoutesRelations();
-    sortTripStopTimes();
   }
 
   void TimetableManager::buildTripsToRoutesRelations() const
@@ -38,13 +37,6 @@ namespace converter {
       schedule::gtfs::Trip& tripServingStopTime = data->trips.at(stopTime.tripId);
       tripServingStopTime.stopTimes.insert(stopTime);
     }
-  }
-
-  void TimetableManager::sortTripStopTimes() const
-  {
-    // std::ranges::for_each(data->trips | std::views::values, [this](schedule::gtfs::Trip& trip) {
-    //   std::ranges::sort(trip.stopTimes, schedule::gtfs::stopTimeCompare);
-    // });
   }
 
   const schedule::gtfs::GtfsData& TimetableManager::getData() const

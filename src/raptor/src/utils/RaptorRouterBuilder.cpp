@@ -47,7 +47,7 @@ namespace raptor {
       stopRoutes[stopId].insert(routeId);
     }
 
-    const auto joinedStopIds = stopIds | std::views::join;
+    // const auto joinedStopIds = stopIds | std::views::join;
     // getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Adding route: id={} stopSequence=[{}] ", routeId, utils::joinToString(joinedStopIds)));
 
     routeBuilders[routeId] = std::make_shared<RouteBuilder>(routeId, stopIds);

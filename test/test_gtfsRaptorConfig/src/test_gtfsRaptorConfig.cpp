@@ -35,7 +35,7 @@ protected:
     // const auto transferStrategy = readerFactory->getStrategy(GtfsStrategyType::TRANSFER);
     const auto tripStrategy = readerFactory->getStrategy(GtfsStrategyType::TRIP);
 
-    std::vector strategies = {calendarStrategy, calendarDatesStrategy, routesStrategy, stopStrategy, stopTimeStrategy/*, transferStrategy*/, tripStrategy};
+    std::vector strategies = {calendarStrategy, calendarDatesStrategy, routesStrategy, stopStrategy, stopTimeStrategy /*, transferStrategy*/, tripStrategy};
 
     reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategies));
     reader->readData();
@@ -62,7 +62,7 @@ TEST_F(GtfsRaptorConfigTest, shouldConvertGtfsScheduleToRaptor)
   ASSERT_TRUE(raptor != nullptr);
 }
 
-TEST_F(GtfsRaptorConfigTest, route)
+TEST_F(GtfsRaptorConfigTest, routeFromVonwilToStephanshorn)
 {
   auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0);
   const auto raptor = mapper.convert();
@@ -73,6 +73,26 @@ TEST_F(GtfsRaptorConfigTest, route)
   const auto connections = raptorRouter.routeEarliestArrival(
     {{"8589640", static_cast<raptor::types::raptorInt>(EIGHT_AM.secondsOfDay())}},
     {{"8589631", 0}},
+    queryConfig);
+
+
+  ASSERT_TRUE(raptor != nullptr);
+}
+
+// "8588889","Abtwil SG, Dorf"
+// "8574467","St. Gallen, Kantonsspital"
+
+TEST_F(GtfsRaptorConfigTest, routeFromAbtwilDorfToWestcenter)
+{
+  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0);
+  const auto raptor = mapper.convert();
+
+  const auto queryConfig = raptor::config::QueryConfig();
+  const auto raptorRouter = raptor::RaptorRouter(std::move(*raptor));
+  // Act
+  const auto connections = raptorRouter.routeEarliestArrival(
+    {{"8588889", static_cast<raptor::types::raptorInt>(EIGHT_AM.secondsOfDay())}},
+    {{"8589644", 0}},
     queryConfig);
 
 

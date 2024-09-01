@@ -41,8 +41,7 @@ namespace converter {
       raptorRouterBuilder.addTrip(trip.tripId, subRoute.getSubRouteId());
       addedTripIds.insert(trip.tripId);
 
-      const auto& stopTimes = trip.stopTimes;
-      for (const auto& [index, stopTime] : std::views::enumerate(stopTimes)) {
+      for (const auto& stopTimes = trip.stopTimes; const auto& [index, stopTime] : std::views::enumerate(stopTimes)) {
         addStopTimesToRouterBuilder(stopTime, trip.tripId, subRoute.getSubRouteId(), static_cast<int>(index));
       }
     });
@@ -58,18 +57,19 @@ namespace converter {
                                     stopTime.arrivalTime.toSeconds(),
                                     stopTime.departureTime.toSeconds());
   }
+
   void GtfsToRaptorConverter::addTransfers()
   {
-    /*std::ranges::for_each(addedStopIds, [this](const std::string& stopId) {
-      try {
-        std::ranges::for_each(timetableManager.getData().transfer.at(stopId), [this](const schedule::gtfs::Transfer& transfer) {
-          raptorRouterBuilder.addTransfer(transfer.fromStopId, transfer.toStopId, transfer.minTransferTime);
-        });
+    const auto& transfers = timetableManager.getData().transfer;
+    std::ranges::for_each(addedStopIds, [this, &transfers](const std::string& stopId) {
+      if (false == transfers.empty()) {
+        if (transfers.contains(stopId)) {
+          std::ranges::for_each(transfers.at(stopId), [this](const schedule::gtfs::Transfer& transfer) {
+            raptorRouterBuilder.addTransfer(transfer.fromStopId, transfer.toStopId, transfer.minTransferTime);
+          });
+        }
       }
-      catch (std::out_of_range& e) {
-        getConsoleLogger(LoggerName::GTFS_TO_RAPTOR_CONVERTER)->error(std::format("Error adding transfers: {}", e.what()));
-      }
-    });*/
+    });
   }
 
   void GtfsToRaptorConverter::addRoute(SubRoute const& subRoute)
