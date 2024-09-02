@@ -7,7 +7,7 @@
 
 #include "config/QueryConfig.h"
 #include "utils/StopLabelsAndTimes.h"
-#include "utils/RaptorData.h"
+#include "include/RaptorData.h"
 
 #include <vector>
 #include <set>

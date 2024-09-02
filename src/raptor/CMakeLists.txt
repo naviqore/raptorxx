@@ -4,54 +4,8 @@ project("raptor"
 
 add_library(${PROJECT_NAME} SHARED)
 
-target_sources(${PROJECT_NAME} PRIVATE
-        src/Leg.h
-        src/LegImpl.cpp
-        src/LegImpl.h
-        src/RaptorAlgorithmFactory.cpp
-        src/RaptorAlgorithmFactory.h
-        src/ConnectionImpl.cpp
-        src/ConnectionImpl.h
-        src/utils/RaptorData.cpp
-        src/utils/RaptorData.h
-        src/utils/RaptorDataBuilder.cpp
-        src/utils/RaptorDataBuilder.h
-        src/utils/RouteBuilder.cpp
-        src/RaptorRouter.cpp
-        src/RaptorRouter.h
-        src/Query.cpp
-        src/Query.h
-        src/utils/StopLabelsAndTimes.cpp
-        src/utils/StopLabelsAndTimes.h
-        src/FootpathRelaxer.cpp
-        src/FootpathRelaxer.h
-        src/RouteScanner.cpp
-        src/RouteScanner.h
-        src/QueryConfig.cpp
-        src/data/ActiveTrip.h
-        src/data/raptorRouteStructures.h
-        src/utils/RouteContainer.cpp
-        src/utils/RouteContainer.h
-        src/LabelPostprocessor.cpp
-        src/LabelPostprocessor.h
-        src/RaptorConnection.cpp
-        src/RaptorConnection.h
-        src/utils/LocalDateTime.cpp
-        src/utils/helperFunctions.h
-        PUBLIC
-        include/RaptorAlgorithm.h
-        include/config/QueryConfig.h
-        include/raptorTypes.h
-        include/IConnection.h
-        include/IRaptor.h
-        include/config/WalkingConfig.h
-        include/config/TransferConfig.h
-        include/usingTypes.h
-        include/config/TravelConfig.h
-        include/RouteBuilder.h
-        include/LocalDateTime.h
-        include/Connection.h
-)
+add_subdirectory(include)
+add_subdirectory(src)
 
 target_include_directories(${PROJECT_NAME}
         PRIVATE

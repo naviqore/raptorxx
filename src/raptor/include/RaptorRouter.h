@@ -7,7 +7,7 @@
 
 #include "config/QueryConfig.h"
 #include "RaptorAlgorithm.h"
-#include "utils/RaptorData.h"
+#include "RaptorData.h"
 
 #include <map>
 #include <vector>

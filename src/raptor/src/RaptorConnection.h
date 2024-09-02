@@ -4,7 +4,7 @@
 
 #pragma once
 #include "Connection.h"
-#include "Leg.h"
+#include "include/Leg.h"
 #include "usingTypes.h"
 
 

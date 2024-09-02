@@ -1,0 +1,24 @@
+target_sources(${PROJECT_NAME}
+        PRIVATE
+        ConnectionImpl.cpp
+        ConnectionImpl.h
+        FootpathRelaxer.cpp
+        FootpathRelaxer.h
+        LabelPostprocessor.cpp
+        LabelPostprocessor.h
+        LegImpl.cpp
+        LegImpl.h
+        Query.cpp
+        Query.h
+        QueryConfig.cpp
+        RaptorAlgorithmFactory.cpp
+        RaptorAlgorithmFactory.h
+        RaptorConnection.cpp
+        RaptorConnection.h
+        RaptorRouter.cpp
+        RouteScanner.cpp
+        RouteScanner.h
+)
+
+add_subdirectory(data)
+add_subdirectory(utils)

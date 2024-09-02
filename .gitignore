@@ -36,7 +36,7 @@
 /.idea
 /src/schedule/cmake-*/*
 /src/schedule/.idea
-/src/schedule/test/cmake-*/*
+/test/test_schedule/cmake-*/*
 /.vscode
 /output
 /.vs/raptorxx/FileContentIndex

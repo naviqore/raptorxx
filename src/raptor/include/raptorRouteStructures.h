@@ -10,10 +10,11 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <raptor_export.h>
 
 namespace raptor {
 
-  struct RouteStop
+  struct RAPTOR_API RouteStop
   {
     types::raptorIdx stopIndex;
     types::raptorIdx routeIndex;
@@ -21,7 +22,7 @@ namespace raptor {
 
   //////////////////////////////////////////////////////////////////////////
 
-  struct StopTime
+  struct RAPTOR_API StopTime
   {
     types::raptorInt arrival;
     types::raptorInt departure;
@@ -29,31 +30,31 @@ namespace raptor {
 
   //////////////////////////////////////////////////////////////////////////
 
-  struct Route
+  struct RAPTOR_API Route
   {
     std::string id;
-    types::raptorIdx firstRouteStopIndex;
-    types::raptorInt numberOfStops;
-    types::raptorIdx firstStopTimeIndex;
-    types::raptorInt numberOfTrips;
+    types::raptorIdx firstRouteStopIndex{};
+    types::raptorInt numberOfStops{};
+    types::raptorIdx firstStopTimeIndex{};
+    types::raptorInt numberOfTrips{};
     std::vector<std::string> tripIds;
   };
 
   //////////////////////////////////////////////////////////////////////////
 
-  struct Stop
+  struct RAPTOR_API Stop
   {
     std::string id;
-    types::raptorIdx stopRouteIndex;
-    types::raptorInt numberOfRoutes;
-    types::raptorInt sameStopTransferTime;
-    int transferIndex;
-    types::raptorInt numberOfTransfers;
+    types::raptorIdx stopRouteIndex{};
+    types::raptorInt numberOfRoutes{};
+    types::raptorInt sameStopTransferTime{};
+    int transferIndex{};
+    types::raptorInt numberOfTransfers{};
   };
 
   //////////////////////////////////////////////////////////////////////////
 
-  struct Transfer
+  struct RAPTOR_API Transfer
   {
     types::raptorIdx targetStopIndex;
     types::raptorInt duration;
@@ -61,7 +62,7 @@ namespace raptor {
 
   //////////////////////////////////////////////////////////////////////////
 
-  struct StopRoutesIndexLookup
+  struct RAPTOR_API StopRoutesIndexLookup
   {
     std::unordered_map<std::string, types::raptorIdx> stops;
     std::unordered_map<std::string, types::raptorIdx> routes;
@@ -69,7 +70,7 @@ namespace raptor {
 
   //////////////////////////////////////////////////////////////////////////
 
-  struct StopContext
+  struct RAPTOR_API StopContext
   {
     std::vector<Transfer> transfers;
     std::vector<Stop> stops;
@@ -78,7 +79,7 @@ namespace raptor {
 
   //////////////////////////////////////////////////////////////////////////
 
-  struct RouteTraversal
+  struct RAPTOR_API RouteTraversal
   {
     std::vector<RouteStop> routeStops;
     std::vector<StopTime> stopTimes;

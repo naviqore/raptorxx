@@ -6,7 +6,7 @@
 
 #include "Connection.h"
 #include "RaptorConnection.h"
-#include "data/raptorRouteStructures.h"
+#include "include/raptorRouteStructures.h"
 #include "usingTypes.h"
 #include "utils/StopLabelsAndTimes.h"
 

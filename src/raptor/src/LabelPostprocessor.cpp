@@ -6,7 +6,7 @@
 
 #include "LegImpl.h"
 #include "RaptorConnection.h"
-#include "RaptorRouter.h"
+#include "include/RaptorRouter.h"
 #include "RouteScanner.h"
 
 #include <algorithm>

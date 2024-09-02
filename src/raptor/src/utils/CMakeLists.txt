@@ -1,0 +1,11 @@
+target_sources(${PROJECT_NAME}
+        PRIVATE
+        helperFunctions.h
+        LocalDateTime.cpp
+        RaptorData.cpp
+        RaptorDataBuilder.cpp
+        RouteBuilder.cpp
+        RouteContainer.cpp
+        StopLabelsAndTimes.cpp
+        StopLabelsAndTimes.h
+)

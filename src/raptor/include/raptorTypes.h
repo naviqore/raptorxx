@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <limits>
+#include <string>
 
 namespace raptor::utils {
   static constexpr auto INFINITY_VALUE = std::numeric_limits<int>::max();

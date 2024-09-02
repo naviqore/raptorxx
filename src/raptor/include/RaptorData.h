@@ -4,19 +4,19 @@
 
 #pragma once
 
-#include <data/raptorRouteStructures.h>
+#include <raptorRouteStructures.h>
+#include <raptor_export.h>
 
 namespace raptor {
 
 
-  class RaptorData
-  {
+  class RAPTOR_API RaptorData {
     StopRoutesIndexLookup lookup;
     StopContext stopContext;
     RouteTraversal routeTraversal;
 
   public:
-    explicit RaptorData(StopRoutesIndexLookup  lookup, StopContext  stopContext, RouteTraversal  routeTraversal);
+    explicit RaptorData(StopRoutesIndexLookup lookup, StopContext stopContext, RouteTraversal routeTraversal);
 
     [[nodiscard]] const StopRoutesIndexLookup& getLookup() const;
 
