@@ -22,7 +22,6 @@ static void BM_read_gtfs_schedule(benchmark::State& state) {
   const auto readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(
       schedule::gtfs::ReaderType::CSV_PARALLEL, std::move(basePath));
 
-  // create strategy callable objects
   const auto agencyStrategy =
       readerFactory->getStrategy(GtfsStrategyType::AGENCY);
   const auto calendarStrategy =
