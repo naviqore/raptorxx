@@ -110,7 +110,17 @@ namespace raptor {
     for (const auto& routeBuilder : routeBuilders | std::views::values) {
       containers.push_back(routeBuilder->build());
     }
-    std::sort(containers.begin(), containers.end());
+
+    std::ranges::sort(containers, [](const RouteContainer& lhs, const RouteContainer& rhs) {
+      if (lhs.trips().empty()) {
+        return false;
+      }
+      if (rhs.trips().empty()) {
+        return true;
+      }
+      return lhs.trips().begin()->second.at(0).arrival < rhs.trips().begin()->second.at(0).arrival;
+    });
+
 
     return containers;
   }

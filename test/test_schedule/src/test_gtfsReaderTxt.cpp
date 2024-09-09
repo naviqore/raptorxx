@@ -143,7 +143,7 @@ TEST_F(GtfsCsvReaderStrategiesTest, testTransferReaderTxt) {
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
   const schedule::gtfs::GtfsData& data = reader->getData().get();
-  const auto transferFrom = data.transfer.at("1100079");
+  const auto transferFrom = data.transfers.at("1100079");
   ASSERT_EQ(transferFrom[0].toStopId, "8014441");
 }
 
@@ -204,6 +204,6 @@ TEST(GTFS, TestStrategyReader) {
   //
    EXPECT_FALSE(data.agencies.empty() || data.calendars.empty()
                 || data.calendarDates.empty() || data.routes.empty() || data.stops.empty()
-                || data.stopTimes.empty() || data.transfer.empty() || data.trips.empty());
+                || data.stopTimes.empty() || data.transfers.empty() || data.trips.empty());
 }
 

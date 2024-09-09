@@ -56,13 +56,15 @@ namespace converter {
     std::unordered_map<std::string, SubRoute> sequenceKeyToSubRouteHashMap;
     sequenceKeyToSubRouteHashMap.reserve(getTrips(route.routeId).size());
 
-    auto test = getTrips(route.routeId); //TODO remove this line after testing
     for (const auto& tripId : getTrips(route.routeId)) {
       const schedule::gtfs::Trip& trip = data->trips.at(tripId);
       auto key = this->generateStopSequenceKey(tripId);
 
       auto [it, inserted] = sequenceKeyToSubRouteHashMap.try_emplace(key,
-                                                              SubRoute(std::format("{}_sr{}", route.routeId, sequenceKeyToSubRouteHashMap.size() + 1), route.routeId, key, extractStopSequence(trip)));
+                                                                     SubRoute(std::format("{}_sr{}", route.routeId, sequenceKeyToSubRouteHashMap.size() + 1),
+                                                                              route.routeId,
+                                                                              key,
+                                                                              extractStopSequence(trip)));
       if (!inserted) {
         it->second.addTrip(trip);
       }
@@ -84,7 +86,7 @@ namespace converter {
       else {
         first = false;
       }
-      sequenceKey += it->stopId;
+      sequenceKey += (*it)->stopId;
     }
     return sequenceKey;
   }
@@ -92,11 +94,13 @@ namespace converter {
   std::vector<schedule::gtfs::Stop> RoutePartitioner::extractStopSequence(schedule::gtfs::Trip const& aTrip) const
   {
     std::vector<schedule::gtfs::Stop> stops;
-    const auto& range = data->trips.at(aTrip.tripId).stopTimes;
+
+    // const auto& range = data->trips.at(aTrip.tripId).stopTimes;
+    const auto& range = aTrip.stopTimes;
     stops.reserve(std::distance(range.begin(), range.end()));
 
-    std::ranges::transform(range, std::back_inserter(stops), [&](const schedule::gtfs::StopTime& stopTime) {
-      return data->stops.at(stopTime.stopId);
+    std::ranges::transform(range, std::back_inserter(stops), [&](const schedule::gtfs::StopTime* stopTime) {
+      return data->stops.at(stopTime->stopId);
     });
 
     return stops;

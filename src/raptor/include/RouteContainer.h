@@ -22,7 +22,7 @@ namespace raptor {
 
     [[nodiscard]] const std::string& id() const;
 
-    bool operator<(const RouteContainer& other) const;
+    //bool operator<(const RouteContainer& other) const; //TODO remove operator<  and use a function instead
 
     [[nodiscard]] const std::map<int, std::string>& stopSequence() const;
 

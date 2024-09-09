@@ -32,17 +32,14 @@ protected:
     const auto routesStrategy = readerFactory->getStrategy(GtfsStrategyType::ROUTE);
     const auto stopStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP);
     const auto stopTimeStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP_TIME);
-    // const auto transferStrategy = readerFactory->getStrategy(GtfsStrategyType::TRANSFER);
+    const auto transferStrategy = readerFactory->getStrategy(GtfsStrategyType::TRANSFER);
     const auto tripStrategy = readerFactory->getStrategy(GtfsStrategyType::TRIP);
 
-    std::vector strategies = {calendarStrategy, calendarDatesStrategy, routesStrategy, stopStrategy, stopTimeStrategy /*, transferStrategy*/, tripStrategy};
+    std::vector strategies = {calendarStrategy, calendarDatesStrategy, routesStrategy, stopStrategy, stopTimeStrategy, transferStrategy, tripStrategy};
 
     reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategies));
     reader->readData();
-    auto gtfsData = reader->getData().get();
-
-    auto timetableManager = converter::TimetableManager(std::move(gtfsData));
-    this->data = timetableManager.getData();
+    this->data = reader->getData().get();
 
     EIGHT_AM = START_OF_DAY.addHours(std::chrono::hours(8));
     NINE_AM = START_OF_DAY.addHours(std::chrono::hours(9));
@@ -93,6 +90,60 @@ TEST_F(GtfsRaptorConfigTest, routeFromAbtwilDorfToWestcenter)
   const auto connections = raptorRouter.routeEarliestArrival(
     {{"8588889", static_cast<raptor::types::raptorInt>(EIGHT_AM.secondsOfDay())}},
     {{"8589644", 0}},
+    queryConfig);
+
+
+  ASSERT_TRUE(raptor != nullptr);
+}
+
+TEST_F(GtfsRaptorConfigTest, routeFromSpeicherArToHaggen)
+{
+  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0);
+  const auto raptor = mapper.convert();
+
+  const auto queryConfig = raptor::config::QueryConfig();
+  const auto raptorRouter = raptor::RaptorRouter(std::move(*raptor));
+  // Act
+  const auto connections = raptorRouter.routeEarliestArrival(
+    {{"8506366", static_cast<raptor::types::raptorInt>(EIGHT_AM.secondsOfDay())}},
+    {{"8589582", 0}},
+    queryConfig);
+
+
+  ASSERT_TRUE(raptor != nullptr);
+}
+
+// "8579880","Heiligkreuz (Mels), Untergasse","47.0594853159118","9.41034667586818","","Parent8579880"
+// "8587965","Erlenbach ZH, Bahnhof","47.305818015385","8.5912448333883","","Parent8587965"
+TEST_F(GtfsRaptorConfigTest, routeFromHeiligkreuzToErlenbach)
+{
+  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0);
+  const auto raptor = mapper.convert();
+
+  const auto queryConfig = raptor::config::QueryConfig();
+  const auto raptorRouter = raptor::RaptorRouter(std::move(*raptor));
+  // Act
+  const auto connections = raptorRouter.routeEarliestArrival(
+    {{"8574614", static_cast<raptor::types::raptorInt>(EIGHT_AM.secondsOfDay())}},
+    {{"8587965",  static_cast<raptor::types::raptorInt>(EIGHT_AM.secondsOfDay() + 60 * 60 * 2)}},
+    queryConfig);
+
+
+  ASSERT_TRUE(raptor != nullptr);
+}
+
+// "8579885","Mels, Bahnhof"
+TEST_F(GtfsRaptorConfigTest, routeStGallenVonwilToMels)
+{
+  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 120);
+  const auto raptor = mapper.convert();
+
+  const auto queryConfig = raptor::config::QueryConfig();
+  const auto raptorRouter = raptor::RaptorRouter(std::move(*raptor));
+  // Act
+  const auto connections = raptorRouter.routeEarliestArrival(
+    {{"8589640", static_cast<raptor::types::raptorInt>(EIGHT_AM.secondsOfDay())}},
+    {{"8579885",  static_cast<raptor::types::raptorInt>(EIGHT_AM.secondsOfDay() + 60 * 60 * 2)}},
     queryConfig);
 
 

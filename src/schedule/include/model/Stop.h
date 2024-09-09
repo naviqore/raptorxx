@@ -20,17 +20,16 @@
 // Required
 
 namespace schedule::gtfs {
-  struct SCHEDULE_API Stop
-  {
+  struct SCHEDULE_API Stop {
     // TODO consider float instead of double for lat/lon
     Stop(std::string&& aStopId, std::string&& aStopName, const geometry::Coordinate<double> aStopLat, const geometry::Coordinate<double> aStopLon, std::string&& aParentStation)
       : stopId(std::move(aStopId))
       , stopName(std::move(aStopName))
       , stopPoint(aStopLat, aStopLon)
-      , parentStation(std::move(aParentStation)) {
+      , parentStation(std::move(aParentStation))
+    {
       if (stopId.empty()
-          || stopName.empty())
-      {
+          || stopName.empty()) {
         throw std::invalid_argument("Mandatory stop fields must not be empty");
       }
     }
@@ -38,7 +37,9 @@ namespace schedule::gtfs {
     std::string stopName;
     geometry::CoordinateComponent<geometry::Coordinate<double>> stopPoint;
     std::string parentStation;
-    std::vector<Transfer> transfers; //TODO: consider using a map instead of a vector
+    std::vector<std::string> stopIdsChildren;
+    std::vector<const Transfer*> transferIds; //TODO: consider using a map instead of a vector Transfer
+    std::vector<std::string> stopTimes;
   };
 
   inline auto stopHash = [](const Stop& stop) {

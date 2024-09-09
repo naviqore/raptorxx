@@ -22,6 +22,9 @@ namespace converter {
   {
     buildTripsToRoutesRelations();
     buildStopTimesToTripsAndRoutesRelations();
+    buildStopRelations();
+    // buildStopTransferRelations();
+    // buildParentChildrenStationRelations();
   }
 
   void TimetableManager::buildTripsToRoutesRelations() const
@@ -33,10 +36,59 @@ namespace converter {
 
   void TimetableManager::buildStopTimesToTripsAndRoutesRelations() const
   {
-    for (const auto& stopTime : data->stopTimes | std::views::values | std::views::join) {
+    std::ranges::for_each(data->stopTimes | std::views::values | std::views::join, [this](const schedule::gtfs::StopTime& stopTime) {
       schedule::gtfs::Trip& tripServingStopTime = data->trips.at(stopTime.tripId);
-      tripServingStopTime.stopTimes.insert(stopTime);
-    }
+      tripServingStopTime.stopTimes.insert(&stopTime);
+    });
+  }
+
+  void TimetableManager::buildStopTransferRelations() const
+  {
+    // std::unordered_map<std::string, std::vector<const schedule::gtfs::Transfer*>> transferMap;
+    // std::ranges::for_each(data->transfers | std::views::values | std::views::join, [&transferMap](const schedule::gtfs::Transfer& transfer) {
+    //   transferMap[transfer.fromStopId].push_back(&transfer);
+    // });
+
+    // std::ranges::for_each(data->stops | std::views::values, [this, &transferMap](schedule::gtfs::Stop& stop) {
+    //   if (const auto it = transferMap.find(stop.stopId); it != transferMap.end()) {
+    //     for (const auto* transfer : it->second) {
+    //       stop.transferIds.push_back(transfer->fromStopId); //TODO consider adding pointers to the transfer objects
+    //     }
+    //   }
+    // });
+  }
+
+  void TimetableManager::buildParentChildrenStationRelations() const
+  {
+    std::ranges::for_each(data->stops | std::views::values, [this](const schedule::gtfs::Stop& stop) {
+      if (!stop.parentStation.empty()) {
+        data->parentChildrenStations[stop.parentStation].push_back(stop.stopId);
+      }
+    });
+  }
+
+  void TimetableManager::buildStopRelations() const
+  {
+    std::unordered_map<std::string, std::vector<const schedule::gtfs::Transfer*>> transferMap;
+    std::ranges::for_each(data->transfers | std::views::values | std::views::join, [&transferMap](const schedule::gtfs::Transfer& transfer) {
+      transferMap[transfer.fromStopId].push_back(&transfer);
+    });
+
+    std::ranges::for_each(data->stops | std::views::values, [this, &transferMap](schedule::gtfs::Stop& stop) {
+      for (const auto transfer : transferMap[stop.stopId]) {
+        stop.transferIds.push_back(transfer);
+      }
+
+      // if (const auto it = transferMap.find(stop.stopId); it != transferMap.end()) {
+      //   for (const auto* transfer : it->second) {
+      //     stop.transferIds.push_back(transfer->fromStopId); //TODO consider adding pointers to the transfer objects
+      //   }
+      // }
+      //
+      // if (!stop.parentStation.empty()) {
+      //   data->parentChildrenStations[stop.parentStation].push_back(stop.stopId);
+      // }
+    });
   }
 
   const schedule::gtfs::GtfsData& TimetableManager::getData() const

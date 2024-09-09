@@ -140,7 +140,7 @@ TEST_F(GtfsCsvReaderStrategiesTest, testTransferReaderCsv) {
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
   const schedule::gtfs::GtfsData& data = reader->getData().get();
-  const auto transferFrom = data.transfer.at("1100079");
+  const auto transferFrom = data.transfers.at("1100079");
   ASSERT_EQ(transferFrom[0].toStopId, "8014441");
 }
 

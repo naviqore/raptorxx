@@ -82,13 +82,19 @@ namespace raptor {
 
   void RouteBuilder::validate() const
   {
-    for (const auto& [tripId, routeStopTimes] : trips) {
-      for (const auto& stopSequenceIndex : stopSequence | std::views::keys) {
-        if (routeStopTimes[stopSequenceIndex].arrival == 0 && routeStopTimes[stopSequenceIndex].departure == 0) {
-          throw std::runtime_error("Stop time at stop " + std::to_string(stopSequenceIndex) + " on trip " + tripId + " not set.");
-        }
+    //TODO check if this can even be used for validation
+    for (const auto& routeStopTimes : trips | std::views::values) {
+      for (const auto& [key, value] : stopSequence) {
       }
     }
+
+    // for (const auto& [tripId, routeStopTimes] : trips) {
+    //   for (const auto& stopSequenceIndex : stopSequence | std::views::keys) {
+    //     if (routeStopTimes[stopSequenceIndex].arrival == 0 && routeStopTimes[stopSequenceIndex].departure == 0) {
+    //       throw std::runtime_error("Stop time at stop " + std::to_string(stopSequenceIndex) + " on trip " + tripId + " not set.");
+    //     }
+    //   }
+    // }
   }
 
 } // namespace raptor

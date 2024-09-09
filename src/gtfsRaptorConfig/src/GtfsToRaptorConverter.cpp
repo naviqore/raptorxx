@@ -33,7 +33,7 @@ namespace converter {
 
   void GtfsToRaptorConverter::addTripsToRouterBuilder(SubRoute const& subRoute)
   {
-    std::set<std::string> addedTripIds;
+    std::set<std::string> addedTripIds; // in future use std::flat_set as cxx23 is released
     std::ranges::for_each(subRoute.getTrips(), [this, &subRoute, &addedTripIds](const schedule::gtfs::Trip& trip) {
       if (addedTripIds.contains(trip.tripId)) {
         return;
@@ -41,8 +41,9 @@ namespace converter {
       raptorRouterBuilder.addTrip(trip.tripId, subRoute.getSubRouteId());
       addedTripIds.insert(trip.tripId);
 
-      for (const auto& stopTimes = trip.stopTimes; const auto& [index, stopTime] : std::views::enumerate(stopTimes)) {
-        addStopTimesToRouterBuilder(stopTime, trip.tripId, subRoute.getSubRouteId(), static_cast<int>(index));
+      for (const auto& stopTimes = trip.stopTimes;
+           const auto& [index, stopTime] : std::views::enumerate(stopTimes)) {
+        addStopTimesToRouterBuilder(*stopTime, trip.tripId, subRoute.getSubRouteId(), static_cast<int>(index));
       }
     });
   }
@@ -60,16 +61,19 @@ namespace converter {
 
   void GtfsToRaptorConverter::addTransfers()
   {
-    const auto& transfers = timetableManager.getData().transfer;
-    std::ranges::for_each(addedStopIds, [this, &transfers](const std::string& stopId) {
-      if (false == transfers.empty()) {
-        if (transfers.contains(stopId)) {
-          std::ranges::for_each(transfers.at(stopId), [this](const schedule::gtfs::Transfer& transfer) {
-            raptorRouterBuilder.addTransfer(transfer.fromStopId, transfer.toStopId, transfer.minTransferTime);
-          });
+    for (const auto& stopId : addedStopIds) {
+      for (const auto& stop = timetableManager.getData().stops.at(stopId);
+           const auto transfer : stop.transferIds) {
+        if (transfer->transferType == schedule::gtfs::Transfer::MINIMUM_TIME && transfer->minTransferTime > 0) {
+          try {
+            raptorRouterBuilder.addTransfer(transfer->fromStopId, transfer->toStopId, transfer->minTransferTime);
+          }
+          catch (const std::invalid_argument& e) {
+            getConsoleLogger(LoggerName::RAPTOR)->error(e.what());
+          }
         }
       }
-    });
+    }
   }
 
   void GtfsToRaptorConverter::addRoute(SubRoute const& subRoute)

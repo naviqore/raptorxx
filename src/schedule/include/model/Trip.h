@@ -18,8 +18,8 @@ namespace schedule::gtfs {
 }
 namespace schedule::gtfs {
 
-  inline auto stopTimeCompare = [](const StopTime& lhs, const StopTime& rhs) {
-    return lhs.departureTime.toSeconds() < rhs.departureTime.toSeconds();
+  inline auto stopTimeCompare = [](const StopTime* lhs, const StopTime* rhs) {
+    return lhs->departureTime.toSeconds() < rhs->departureTime.toSeconds();
   };
 
   struct SCHEDULE_API Trip {
@@ -38,7 +38,7 @@ namespace schedule::gtfs {
     std::string serviceId;
     std::string tripId;
 
-    std::set<StopTime, decltype(stopTimeCompare)> stopTimes{};
+    std::set<const StopTime*, decltype(stopTimeCompare)> stopTimes{};
     // std::vector<StopTime> stopTimes{}; //TODO: think about storing pointers to StopTime objects
   };
 

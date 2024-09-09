@@ -40,7 +40,7 @@ namespace schedule::gtfs {
         continue;
       }
 
-      aReader.getData().get().transfer[std::string(fields[headerMap["from_stop_id"]])].emplace_back(
+      aReader.getData().get().transfers[std::string(fields[headerMap["from_stop_id"]])].emplace_back(
         std::string(fields[headerMap["from_stop_id"]]),
         std::string(fields[headerMap["to_stop_id"]]),
         static_cast<Transfer::TransferType>(std::stoi(std::string(fields[headerMap["transfer_type"]]))),

@@ -47,7 +47,7 @@ namespace schedule::gtfs {
 
       auto temp = fromStopId;
 
-      aReader.getData().get().transfer[temp].emplace_back(
+      aReader.getData().get().transfers[temp].emplace_back(
         std::move(fromStopId),
         std::move(toStopId),
         static_cast<Transfer::TransferType>(transferType),

@@ -15,7 +15,7 @@ namespace converter {
     std::string SubRouteId;
     std::string routeId;
     std::string stopSequenceKey;
-    std::vector<schedule::gtfs::Stop> stopsSequence;
+    std::vector<schedule::gtfs::Stop> stopsSequence; //TODO store pointers to the stops
     std::vector<schedule::gtfs::Trip> trips;
 
   public:

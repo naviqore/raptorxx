@@ -20,7 +20,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(${PROJECT_NAME}
         PRIVATE
         ${CMAKE_SOURCE_DIR}/src/schedule
-        ${CMAKE_SOURCE_DIR}/src/schedule/src # specify path to include files during build
+        ${CMAKE_SOURCE_DIR}/src/schedule/src
         PUBLIC
         ${CMAKE_SOURCE_DIR}/src/schedule/include
 )
