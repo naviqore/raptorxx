@@ -53,7 +53,7 @@ TEST_F(GtfsRoutePartitionerTest, shouldConvertGtfsScheduleToRaptor)
 
   ASSERT_TRUE(false == subRoute.getTrips().empty());
   ASSERT_STREQ(subRoute.getRouteId().c_str(), "92-2-B-j24-1");
-  ASSERT_STREQ(subRoute.getStopsSequence().front().stopId.c_str(), "8580689:0:A"); // St. Gallen, Neudorf/R'str.
-  ASSERT_STREQ(subRoute.getStopsSequence().back().stopId.c_str(), "8589644"); // St. Gallen, Westcenter
+  ASSERT_STREQ(subRoute.getStopsSequence().front()->stopId.c_str(), "8580689:0:A"); // St. Gallen, Neudorf/R'str.
+  ASSERT_STREQ(subRoute.getStopsSequence().back()->stopId.c_str(), "8589644"); // St. Gallen, Westcenter
   ASSERT_TRUE(subRoute.getTrips().size() == 279);
 }

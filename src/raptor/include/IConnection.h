@@ -21,7 +21,7 @@ namespace raptor {
   public:
     virtual ~IConnection() = default;
 
-    [[nodiscard]] virtual std::vector<std::shared_ptr<Leg>> getLegs() const = 0;
+    [[nodiscard]] virtual const std::vector<std::shared_ptr<Leg>>& getLegs() const = 0;
 
     [[nodiscard]] virtual types::raptorInt getDepartureTime() const = 0;
 

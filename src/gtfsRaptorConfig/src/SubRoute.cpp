@@ -6,7 +6,7 @@
 
 namespace converter {
 
-  SubRoute::SubRoute(std::string&& subRouteId, std::string routeId, std::string stopSequenceKey, std::vector<schedule::gtfs::Stop>&& stopsSequence)
+  SubRoute::SubRoute(std::string&& subRouteId, std::string routeId, std::string stopSequenceKey, std::vector<const schedule::gtfs::Stop*>&& stopsSequence)
     : SubRouteId(std::move(subRouteId))
     , routeId(std::move(routeId))
     , stopSequenceKey(std::move(stopSequenceKey))
@@ -31,7 +31,7 @@ namespace converter {
 
   void SubRoute::addTrip(schedule::gtfs::Trip const& trip)
   {
-    this->trips.push_back(trip);
+    this->trips.push_back(&trip);
   }
 
   const std::string& SubRoute::getSubRouteId() const
@@ -49,7 +49,7 @@ namespace converter {
     return stopSequenceKey;
   }
 
-  const std::vector<schedule::gtfs::Stop>& SubRoute::getStopsSequence() const
+  const std::vector<const schedule::gtfs::Stop*>& SubRoute::getStopsSequence() const
   {
     return this->stopsSequence;
   }
@@ -57,20 +57,20 @@ namespace converter {
   size_t SubRoute::stopIndex(const std::string_view stopId) const
   {
     for (size_t i = 0; i < this->stopsSequence.size(); ++i) {
-      if (this->stopsSequence[i].stopId == stopId) {
+      if (this->stopsSequence[i]->stopId == stopId) {
         return i;
       }
     }
     return this->stopsSequence.size();
   }
 
-  const std::vector<schedule::gtfs::Trip>& SubRoute::getTrips() const
+  const std::vector<const schedule::gtfs::Trip*>& SubRoute::getTrips() const
   {
     return this->trips;
   }
 
   bool SubRoute::operator==(const SubRoute& aSubRoute) const
   {
-    return this->SubRouteId == aSubRoute.getSubRouteId(); // && stopSequenceKey == aSubRoute.stopSequenceKey
+    return this->SubRouteId == aSubRoute.getSubRouteId();
   }
 } // converter

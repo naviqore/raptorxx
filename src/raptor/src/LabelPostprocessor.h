@@ -27,7 +27,7 @@ namespace raptor {
 
   public:
     explicit LabelPostprocessor(const RaptorRouter& raptorData);
-    std::vector<std::unique_ptr<Connection>> reconstructParetoOptimalSolutions(const std::vector<std::vector<std::unique_ptr<StopLabelsAndTimes::Label>>>& bestLabelsPerRound,
+    [[nodiscard]] std::vector<std::unique_ptr<Connection>> reconstructParetoOptimalSolutions(const std::vector<std::vector<std::unique_ptr<StopLabelsAndTimes::Label>>>& bestLabelsPerRound,
                                                                                const std::map<types::raptorIdx, types::raptorIdx>& targetStops,
                                                                                const types::raptorInt& referenceDate) const;
   };

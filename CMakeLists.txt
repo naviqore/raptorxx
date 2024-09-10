@@ -56,6 +56,7 @@ add_subdirectory(test/test_schedule)
 add_subdirectory(test/test_gtfsRaptorConfig)
 # BECHMARKS
 add_subdirectory(benchmark/benchmark_schedule)
+add_subdirectory(benchmark/benchmark_gtfsRaptor)
 
 include(CTest)
 enable_testing()

@@ -107,8 +107,8 @@ namespace raptor {
       }
       else
       {
-        const StopTime& stopTimeObj = stopTimes[firstStopTimeIdx + activeTrip->tripOffset * numberOfStops + stopOffset];
-        if (!checkIfTripIsPossibleAndUpdateMarks(stopTimeObj, activeTrip, stop, bestStopTime, stopIdx, round, lastRound, markedStopsNext, currentRouteIdx))
+        if (const StopTime& stopTimeObj = stopTimes[firstStopTimeIdx + activeTrip->tripOffset * numberOfStops + stopOffset];
+          !checkIfTripIsPossibleAndUpdateMarks(stopTimeObj, activeTrip, stop, bestStopTime, stopIdx, round, lastRound, markedStopsNext, currentRouteIdx))
         {
           continue;
         }
@@ -167,8 +167,8 @@ namespace raptor {
 
     while (tripOffset < numberOfTrips)
     {
-      const StopTime& currentStopTime = stopTimes[firstStopTimeIdx + tripOffset * numberOfStops + stopOffset];
-      if (currentStopTime.departure >= referenceTime)
+      if (const StopTime& currentStopTime = stopTimes[firstStopTimeIdx + tripOffset * numberOfStops + stopOffset];
+        currentStopTime.departure >= referenceTime)
       {
         getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Found active trip ({}) on route {}", tripOffset, route.id));
         types::raptorInt entryTime = currentStopTime.departure;

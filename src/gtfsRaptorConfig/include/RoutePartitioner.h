@@ -35,7 +35,7 @@ namespace converter {
 
     [[nodiscard]] std::string generateStopSequenceKey(const std::string& tripId) const;
 
-    [[nodiscard]] std::vector<schedule::gtfs::Stop> extractStopSequence(schedule::gtfs::Trip const& aTrip) const;
+    [[nodiscard]] std::vector<const schedule::gtfs::Stop*> extractStopSequence(schedule::gtfs::Trip const& aTrip) const;
   };
 
 } // gtfs

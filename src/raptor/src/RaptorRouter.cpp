@@ -102,39 +102,28 @@ namespace raptor {
     validation::checkNonNullOrEmptyStops(departureStops, "Departure");
     validation::checkNonNullOrEmptyStops(arrivalStops, "Arrival");
 
-    auto departureStopIds = departureStops | std::views::keys;
-    auto arrivalStopIds = arrivalStops | std::views::keys;
-    auto departureAt = departureStops | std::views::values;
-
-    std::string departureStopIdsStr = utils::joinToString(departureStopIds);
-    std::string arrivalStopIdsStr = utils::joinToString(arrivalStopIds);
-    std::string departureAtStr = utils::joinToString(departureAt);
-
-    getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Routing earliest arrival from {} to {} departing at {}", departureStopIdsStr, arrivalStopIdsStr, departureAtStr));
-
     auto validatedSourceStops = validation::validateStopsAndGetIndices(departureStops, raptorData.getLookup().stops);
     auto validatedTargetStops = validation::validateStopsAndGetIndices(arrivalStops, raptorData.getLookup().stops);
 
-    // not all compilers support std::ranges::to =(
-#if defined(__cpp_lib_ranges_to_container)
-    const auto sourceStopIndices = validatedSourceStops | std::views::keys | std::ranges::to<std::vector<types::raptorIdx>>();
-    const auto targetStopIndices = validatedTargetStops | std::views::keys | std::ranges::to<std::vector<types::raptorIdx>>();
-    const auto sourceTimes = validatedSourceStops | std::views::values | std::ranges::to<std::vector<types::raptorInt>>();
-    const auto walkingDurationsToTarget = validatedTargetStops | std::views::values | std::ranges::to<std::vector<types::raptorInt>>();
-#else
     std::vector<types::raptorIdx> sourceStopIndices;
-    std::ranges::transform(validatedSourceStops, std::back_inserter(sourceStopIndices), [](const auto& pair) { return pair.first; });
-
     std::vector<types::raptorIdx> targetStopIndices;
-    std::ranges::transform(validatedTargetStops, std::back_inserter(targetStopIndices), [](const auto& pair) { return pair.first; });
-
     std::vector<types::raptorInt> sourceTimes;
-    std::ranges::transform(validatedSourceStops, std::back_inserter(sourceTimes), [](const auto& pair) { return pair.second; });
-
     std::vector<types::raptorInt> walkingDurationsToTarget;
-    std::ranges::transform(validatedTargetStops, std::back_inserter(walkingDurationsToTarget), [](const auto& pair) { return pair.second; });
-#endif
 
+    sourceStopIndices.reserve(validatedSourceStops.size());
+    targetStopIndices.reserve(validatedTargetStops.size());
+    sourceTimes.reserve(validatedSourceStops.size());
+    walkingDurationsToTarget.reserve(validatedTargetStops.size());
+
+    for (const auto& [key, value] : validatedSourceStops) {
+      sourceStopIndices.push_back(key);
+      sourceTimes.push_back(value);
+    }
+
+    for (const auto& [key, value] : validatedTargetStops) {
+      targetStopIndices.push_back(key);
+      walkingDurationsToTarget.push_back(value);
+    }
 
     const auto queryParams = QueryParams{
       .raptorData = raptorData,
@@ -147,7 +136,7 @@ namespace raptor {
     auto query = Query(queryParams);
     const auto& bestLabelsPerRound = query.run();
 
-    auto referenceDate = std::ranges::min(validatedSourceStops | std::views::values);
+    auto referenceDate = *std::ranges::min_element(sourceTimes);
 
     auto connection = LabelPostprocessor(*this);
     return connection.reconstructParetoOptimalSolutions(bestLabelsPerRound, validatedTargetStops, referenceDate);
@@ -171,11 +160,6 @@ namespace raptor {
 
   std::vector<std::shared_ptr<Connection>> RaptorRouter::getConnections(const std::map<std::string, types::raptorIdx>& sourceStops, const std::map<std::string, types::raptorIdx>& targetStops, const config::QueryConfig& config) const
   {
-    validation::validateSourceStopTimes(sourceStops);
-
-    // Mocked implementation for processing
-    std::vector<std::shared_ptr<Connection>> connections;
-    // Implement actual logic using DateTimeUtils, Query, LabelPostprocessor, etc.
-    return connections;
+    throw std::runtime_error("Not implemented");
   }
 }

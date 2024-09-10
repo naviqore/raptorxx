@@ -33,24 +33,23 @@ namespace converter {
 
   void GtfsToRaptorConverter::addTripsToRouterBuilder(SubRoute const& subRoute)
   {
-    std::set<std::string> addedTripIds; // in future use std::flat_set as cxx23 is released
-    std::ranges::for_each(subRoute.getTrips(), [this, &subRoute, &addedTripIds](const schedule::gtfs::Trip& trip) {
-      if (addedTripIds.contains(trip.tripId)) {
+    std::unordered_set<std::string> addedTripIds; // in future use std::flat_set as cxx23 is released
+    std::ranges::for_each(subRoute.getTrips(), [this, &subRoute, &addedTripIds](const schedule::gtfs::Trip* trip) {
+      if (addedTripIds.contains(trip->tripId)) {
         return;
       }
-      raptorRouterBuilder.addTrip(trip.tripId, subRoute.getSubRouteId());
-      addedTripIds.insert(trip.tripId);
+      raptorRouterBuilder.addTrip(trip->tripId, subRoute.getSubRouteId());
+      addedTripIds.insert(trip->tripId);
 
-      for (const auto& stopTimes = trip.stopTimes;
-           const auto& [index, stopTime] : std::views::enumerate(stopTimes)) {
-        addStopTimesToRouterBuilder(*stopTime, trip.tripId, subRoute.getSubRouteId(), static_cast<int>(index));
+      for (const auto& stopTimes = trip->stopTimes;
+           const auto [index, stopTime] : std::views::enumerate(stopTimes)) {
+        addStopTimesToRouterBuilder(*stopTime, trip->tripId, subRoute.getSubRouteId(), static_cast<int>(index));
       }
     });
   }
 
   void GtfsToRaptorConverter::addStopTimesToRouterBuilder(schedule::gtfs::StopTime const& stopTime, std::string const& tripId, std::string const& subRouteId, const int position)
   {
-    // const auto& routeId = this->timetableManager.getData().trips.at(tripId).routeId;
     raptorRouterBuilder.addStopTime(subRouteId,
                                     tripId,
                                     position,
@@ -63,7 +62,7 @@ namespace converter {
   {
     for (const auto& stopId : addedStopIds) {
       for (const auto& stop = timetableManager.getData().stops.at(stopId);
-           const auto transfer : stop.transferIds) {
+           const auto transfer : stop.transferItems) {
         if (transfer->transferType == schedule::gtfs::Transfer::MINIMUM_TIME && transfer->minTransferTime > 0) {
           try {
             raptorRouterBuilder.addTransfer(transfer->fromStopId, transfer->toStopId, transfer->minTransferTime);
@@ -78,8 +77,7 @@ namespace converter {
 
   void GtfsToRaptorConverter::addRoute(SubRoute const& subRoute)
   {
-    auto stopIds = subRoute.getStopsSequence()
-                   | std::views::transform([](const schedule::gtfs::Stop& stop) { return stop.stopId; });
+    auto stopIds = subRoute.getStopsSequence()| std::views::transform([](const schedule::gtfs::Stop* stop) { return stop->stopId; });
 
     std::ranges::for_each(stopIds, [this](const std::string& stopId) {
       if (!addedStopIds.contains(stopId)) {

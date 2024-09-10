@@ -74,33 +74,32 @@ namespace converter {
 
   std::string RoutePartitioner::generateStopSequenceKey(const std::string& tripId) const
   {
-    const auto range = data->trips.at(tripId).stopTimes;
+    const auto& stopTimesRange = data->trips.at(tripId).stopTimes;
     std::string sequenceKey;
-    sequenceKey.reserve(std::distance(range.begin(), range.end()) * 401); // 400 + 1 for "_"
+    sequenceKey.reserve(std::distance(stopTimesRange.begin(), stopTimesRange.end()) * 401); // 400 + 1 for "_"
 
     bool first = true;
-    for (auto it = range.begin(); it != range.end(); ++it) {
+    for (const auto stopItem : stopTimesRange) {
       if (!first) {
         sequenceKey += "_";
       }
       else {
         first = false;
       }
-      sequenceKey += (*it)->stopId;
+      sequenceKey += stopItem->stopId;
     }
     return sequenceKey;
   }
 
-  std::vector<schedule::gtfs::Stop> RoutePartitioner::extractStopSequence(schedule::gtfs::Trip const& aTrip) const
+  std::vector<const schedule::gtfs::Stop*> RoutePartitioner::extractStopSequence(schedule::gtfs::Trip const& aTrip) const
   {
-    std::vector<schedule::gtfs::Stop> stops;
+    std::vector<const schedule::gtfs::Stop*> stops;
 
-    // const auto& range = data->trips.at(aTrip.tripId).stopTimes;
     const auto& range = aTrip.stopTimes;
     stops.reserve(std::distance(range.begin(), range.end()));
 
     std::ranges::transform(range, std::back_inserter(stops), [&](const schedule::gtfs::StopTime* stopTime) {
-      return data->stops.at(stopTime->stopId);
+      return &data->stops.at(stopTime->stopId);
     });
 
     return stops;

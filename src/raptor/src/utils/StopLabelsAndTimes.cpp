@@ -55,7 +55,7 @@ namespace raptor {
       throw std::out_of_range("Stop index out of range");
     }
 
-    for (auto it = bestLabelsPerRound.rbegin(); it != bestLabelsPerRound.rend(); ++it)
+    for (auto it = bestLabelsPerRound.rbegin(); it != bestLabelsPerRound.rend(); ++it) // check if GCC supports this std::ranges::reverse_view
     {
       if (const auto label = (*it)[stopIdx].get())
       {

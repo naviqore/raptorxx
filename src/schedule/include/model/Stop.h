@@ -38,7 +38,7 @@ namespace schedule::gtfs {
     geometry::CoordinateComponent<geometry::Coordinate<double>> stopPoint;
     std::string parentStation;
     std::vector<std::string> stopIdsChildren;
-    std::vector<const Transfer*> transferIds; //TODO: consider using a map instead of a vector Transfer
+    std::vector<const Transfer*> transferItems;
     std::vector<std::string> stopTimes;
   };
 

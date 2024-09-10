@@ -38,8 +38,6 @@ namespace converter {
     void createRelations() const;
     void buildTripsToRoutesRelations() const;
     void buildStopTimesToTripsAndRoutesRelations() const;
-    void buildStopTransferRelations() const;
-    void buildParentChildrenStationRelations() const;
     void buildStopRelations() const;
   };
 } // gtfs

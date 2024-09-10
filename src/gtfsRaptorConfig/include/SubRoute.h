@@ -15,11 +15,11 @@ namespace converter {
     std::string SubRouteId;
     std::string routeId;
     std::string stopSequenceKey;
-    std::vector<schedule::gtfs::Stop> stopsSequence; //TODO store pointers to the stops
-    std::vector<schedule::gtfs::Trip> trips;
+    std::vector<const schedule::gtfs::Stop*> stopsSequence; // brave attempt with dangling pointer, but we know that the objects are alive and have performance in focus
+    std::vector<const schedule::gtfs::Trip*> trips; // brave attempt with dangling pointer, but we know that the objects are alive and have performance in focus
 
   public:
-    explicit SubRoute(std::string&& subRouteId, std::string routeId, std::string stopSequenceKey, std::vector<schedule::gtfs::Stop>&& stopsSequence);
+    explicit SubRoute(std::string&& subRouteId, std::string routeId, std::string stopSequenceKey, std::vector<const schedule::gtfs::Stop*>&& stopsSequence);
 
     SubRoute(const SubRoute& aSubRoute);
 
@@ -35,11 +35,11 @@ namespace converter {
 
     [[nodiscard]] const std::string& getStopSequenceKey() const;
 
-    [[nodiscard]] const std::vector<schedule::gtfs::Stop>& getStopsSequence() const;
+    [[nodiscard]] const std::vector<const schedule::gtfs::Stop*>& getStopsSequence() const;
 
     [[nodiscard]] size_t stopIndex(std::string_view stopId) const;
 
-    [[nodiscard]] const std::vector<schedule::gtfs::Trip>& getTrips() const;
+    [[nodiscard]] const std::vector<const schedule::gtfs::Trip*>& getTrips() const;
 
     bool operator==(const SubRoute& aSubRoute) const;
 

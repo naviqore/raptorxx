@@ -20,8 +20,6 @@
 #include "LoggerFactory.h"
 #include "TimetableManager.h"
 
-#include <execution>
-
 template<typename T>
 std::string quote(const T& value)
 {
@@ -39,7 +37,9 @@ std::string ensureTrailingSlash(const std::string& path)
   return (!path.empty() && path.back() != '/') ? path + '/' : path;
 }
 
-std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> createReader(std::string&& dataDirectoryPath)
+std::unique_ptr<
+  schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>>
+createReader(std::string&& dataDirectoryPath)
 {
   const auto readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(
     schedule::gtfs::ReaderType::CSV_PARALLEL, std::move(dataDirectoryPath));
@@ -64,40 +64,33 @@ namespace {
     return lhs->stopId == rhs->stopId;
   };
 
-  inline auto stopTimeHash = [](const schedule::gtfs::StopTime* stop) {
-    const auto h1 = std::hash<std::string>{}(stop->stopId);
-    const auto h2 = std::hash<std::string>{}(stop->tripId);
-    const auto h3 = std::hash<unsigned int>{}(stop->arrivalTime.toSeconds());
-    return h1 ^ (h2 << 1) ^ (h3 << 2);
-  };
-
-  inline auto stopTimeEqual = [](const schedule::gtfs::StopTime* lhs, const schedule::gtfs::StopTime* rhs) {
-    return lhs->stopId == rhs->stopId
-           && lhs->tripId == rhs->tripId
-           && lhs->arrivalTime.toSeconds() == rhs->arrivalTime.toSeconds();
-  };
-
   inline auto transferHash = [](const schedule::gtfs::Transfer* transfer) {
     const auto h1 = std::hash<std::string>{}(transfer->fromStopId);
     const auto h2 = std::hash<std::string>{}(transfer->toStopId);
-   const auto h2 = std::hash<int>{}( static_cast<int>());
+    const auto h3 = std::hash<int>{}(static_cast<int>(transfer->transferType));
+    const auto h4 = std::hash<int>{}(transfer->minTransferTime);
+
+    return h1 ^ (h2 << 1) ^ (h3 << 2) ^ (h4 << 3);
   };
 
-  inline auto stopEqual = [](const schedule::gtfs::Stop* lhs, const schedule::gtfs::Transfer* transfer) {
-    return lhs->stopId == rhs->stopId;
+  inline auto transferEqual = [](const schedule::gtfs::Transfer* lhs, const schedule::gtfs::Transfer* rhs) {
+    return lhs->fromStopId == rhs->fromStopId
+           && lhs->toStopId == rhs->toStopId
+           && lhs->transferType == rhs->transferType
+           && lhs->minTransferTime == rhs->minTransferTime;
   };
 }
 
 void writeGtfsFiles(const std::string& gtfsDirectoryForDataSubset,
                     const std::vector<const schedule::gtfs::Route*>& routes,
                     const std::vector<const schedule::gtfs::Trip*>& trips,
-                    const std::unordered_set<const schedule::gtfs::StopTime*,
-                                             decltype(stopTimeHash),
-                                             decltype(stopTimeEqual)>& stopTimes,
+                    const std::vector<const schedule::gtfs::StopTime*>& stopTimes,
                     const std::unordered_set<const schedule::gtfs::Stop*,
-                                             decltype(stopHash),
-                                             decltype(stopEqual)>& stops,
-                    const std::vector<const schedule::gtfs::Transfer*>& transferItems,
+                                             decltype(::stopHash),
+                                             decltype(::stopEqual)>& stops,
+                    const std::unordered_set<const schedule::gtfs::Transfer*,
+                                             decltype(::transferHash),
+                                             decltype(::transferEqual)>& transferItems,
                     const std::vector<const schedule::gtfs::Calendar*>& calendars,
                     const std::vector<const schedule::gtfs::CalendarDate*>& calendarDates)
 {
@@ -209,10 +202,8 @@ int main(int argc, char* argv[])
     getLogger(Target::CONSOLE, LoggerName::GTFS)->info("Could not create directory: " + gtfsDirectoryForDataSubset + " ,it may already exist");
   }
 
-  getConsoleLogger(LoggerName::GTFS)->info("Starting GTFS subset writer");
   auto reader = createReader(std::move(dataDirectoryPath));
   reader->readData();
-  getConsoleLogger(LoggerName::GTFS)->info("GTFS data read successfully");
 
   auto relationManager = converter::TimetableManager(std::move(reader->getData().get()));
   const auto& agency = relationManager.getData().agencies.at(agencyName);
@@ -221,9 +212,9 @@ int main(int argc, char* argv[])
 
   std::vector<const schedule::gtfs::Route*> routes;
   std::vector<const schedule::gtfs::Trip*> trips;
-  std::unordered_set<const schedule::gtfs::StopTime*, decltype(stopTimeHash), decltype(stopTimeEqual)> stopTimes;
-  std::unordered_set<const schedule::gtfs::Stop*, decltype(stopHash), decltype(stopEqual)> stops;
-  std::unordered_set<const schedule::gtfs::Transfer*> transferItems;
+  std::vector<const schedule::gtfs::StopTime*> stopTimes;
+  std::unordered_set<const schedule::gtfs::Stop*, decltype(::stopHash), decltype(::stopEqual)> stops;
+  std::unordered_set<const schedule::gtfs::Transfer*, decltype(::transferHash), decltype(::transferEqual)> transferItems;
   std::vector<const schedule::gtfs::Calendar*> calendars;
   std::vector<const schedule::gtfs::CalendarDate*> calendarDates;
 
@@ -232,17 +223,15 @@ int main(int argc, char* argv[])
   const auto& allCalendars = data.calendars;
   const auto& allCalendarDates = data.calendarDates;
   const auto& allStops = data.stops;
-  const auto& allStopTimes = data.stopTimes;
-  const auto& allTransfers = data.transfers;
+  const auto& allTransfersFrom = data.transfers;
   auto agencyRoutes = allRoutes | std::views::filter([&agency](const auto& routeItem) {
                         return routeItem.second.agencyId == agency.agencyId;
                       });
-
-  getConsoleLogger(LoggerName::GTFS)->info("Start writing GTFS files");
   for (const auto& route : agencyRoutes | std::views::values) {
     routes.push_back(&route);
 
     for (const auto& trip : route.trips) {
+      getConsoleLogger(LoggerName::GTFS)->info(std::format("Processing Trip id: {}", trip));
       const auto& currentTrip = data.trips.at(trip);
       trips.push_back(&currentTrip);
 
@@ -264,51 +253,33 @@ int main(int argc, char* argv[])
       else {
         getConsoleLogger(LoggerName::GTFS)->warn("No calendar found for service id: " + currentTrip.serviceId);
       }
+
+      for (const auto& stopTime : currentTrip.stopTimes) {
+        stopTimes.push_back(stopTime);
+
+        auto stopIterator = allStops.find(stopTime->stopId);
+        if (stopIterator != allStops.end()) {
+          stops.insert(&stopIterator->second);
+        }
+        else {
+          getConsoleLogger(LoggerName::GTFS)
+            ->warn("No stop found for stop id: " + stopTime->stopId);
+        }
+        std::ranges::for_each(stopIterator->second.transferItems, [&](const schedule::gtfs::Transfer* transferItem) {
+          if (const auto transferIterator = allTransfersFrom.find(transferItem->fromStopId);
+              transferIterator != allTransfersFrom.end()) {
+            std::ranges::for_each(transferIterator->second, [&](const auto& transfer) {
+              transferItems.insert(&transfer);
+            });
+          }
+          else {
+            getConsoleLogger(LoggerName::GTFS)
+              ->warn("No transfer found for stop id: " + transferItem->fromStopId);
+          }
+        });
+      }
     }
   }
-
-  stopTimes.reserve(data.stopTimes.size());
-  stops.reserve(allStops.size());
-  transferItems.reserve(allTransfers.size());
-
-  std::ranges::for_each(trips, [&data, &stopTimes, &stops, &allTransfers, &transferItems, &allStops](const auto trip) {
-    auto stopTimesForTrip = data.stopTimes
-                            | std::views::values
-                            | std::views::join
-                            | std::views::filter([&trip](const auto& stopTime) {
-                                return stopTime.tripId == trip->tripId;
-                              });
-
-    for (const auto& stopTimeTrip : stopTimesForTrip) {
-      stopTimes.insert(&stopTimeTrip);
-
-      // if stop is not found, try to find parent station for the stop
-      if (auto stopIterator = allStops.find(stopTimeTrip.stopId);
-          stopIterator != allStops.end()) {
-        stops.insert(&stopIterator->second);
-      }
-      else {
-        getConsoleLogger(LoggerName::GTFS)->warn("No stop found for stop id: " + stopTimeTrip.stopId);
-      }
-
-      if (auto transfersIt = allTransfers.find(stopTimeTrip.stopId);
-          transfersIt != allTransfers.end()) {
-        for (const auto& transfer : transfersIt->second) {
-          if (transfer.fromStopId == stopTimeTrip.stopId) {
-            transferItems.push_back(&transfer);
-          }
-        }
-      }
-    }
-  });
-  std::ranges::for_each(transferItems, [&stops, &allStops, &stopTimes, &allStopTimes](const auto transfer) {
-    stops.insert(&allStops.at(transfer->toStopId));
-    // std::ranges::for_each(allStopTimes.at(transfer->toStopId), [&stopTimes](const auto& stopTime) {
-    //   stopTimes.insert(&stopTime);
-      //TODO TRIPS that serve the stop
-   // });
-  });
-
 
   writeGtfsFiles(gtfsDirectoryForDataSubset, routes, trips, stopTimes, stops, transferItems, calendars, calendarDates);
 

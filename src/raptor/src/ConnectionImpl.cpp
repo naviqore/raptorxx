@@ -6,9 +6,10 @@
 
 namespace raptor {
   ConnectionImpl::ConnectionImpl(std::vector<std::shared_ptr<Leg>>&& legs)
-    : legs(std::move(legs)) {
+    : legs(std::move(legs))
+  {
   }
-  std::vector<std::shared_ptr<Leg>> ConnectionImpl::getLegs() const {
+  const std::vector<std::shared_ptr<Leg>>& ConnectionImpl::getLegs() const {
     return legs;
   }
  types::raptorInt ConnectionImpl::getDepartureTime() const {
