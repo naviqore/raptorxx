@@ -13,6 +13,14 @@
 #include <DataContainer.h>
 #include <gtest/gtest.h>
 
+#ifdef LOGGER
+#pragma message("LOGGER is defined")
+#include "LoggerFactory.h"
+#else
+#pragma message("LOGGER is not defined")
+#endif
+
+
 class GtfsRoutePartitionerTest : public ::testing::Test {
 protected:
   std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> reader;
@@ -22,6 +30,11 @@ protected:
 
   void SetUp() override
   {
+
+#ifdef LOGGER
+    getConsoleLogger(LoggerName::RAPTOR)->info("Setup Raptor");
+#endif
+
     readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(schedule::gtfs::ReaderType::CSV_PARALLEL, std::move(basePath));
 
     const auto calendarStrategy = readerFactory->getStrategy(GtfsStrategyType::CALENDAR);
@@ -54,6 +67,6 @@ TEST_F(GtfsRoutePartitionerTest, shouldConvertGtfsScheduleToRaptor)
   ASSERT_TRUE(false == subRoute.getTrips().empty());
   ASSERT_STREQ(subRoute.getRouteId().c_str(), "92-2-B-j24-1");
   ASSERT_STREQ(subRoute.getStopsSequence().front()->stopId.c_str(), "8580689:0:A"); // St. Gallen, Neudorf/R'str.
-  ASSERT_STREQ(subRoute.getStopsSequence().back()->stopId.c_str(), "8589644"); // St. Gallen, Westcenter
+  ASSERT_STREQ(subRoute.getStopsSequence().back()->stopId.c_str(), "8589644");      // St. Gallen, Westcenter
   ASSERT_TRUE(subRoute.getTrips().size() == 279);
 }

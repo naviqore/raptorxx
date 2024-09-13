@@ -12,8 +12,7 @@
 
 namespace raptor {
 
-  class RaptorConnection final : public Connection
-  {
+  class RaptorConnection final : public Connection {
     std::vector<std::shared_ptr<Leg>> legs;
 
     static void validateLegOrder(const std::shared_ptr<Leg>& current, const std::shared_ptr<Leg>& next);
@@ -42,7 +41,7 @@ namespace raptor {
 
     [[nodiscard]] types::raptorInt getNumberOfTotalTransfers() const override;
 
-    [[nodiscard]] std::vector<std::shared_ptr<Leg>> getLegs() const override;
+    [[nodiscard]] const std::vector<std::shared_ptr<Leg>>& getLegs() const override;
   };
 
 } // raptor

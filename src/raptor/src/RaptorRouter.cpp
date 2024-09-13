@@ -20,6 +20,8 @@
 #include <ranges>
 #include <sstream>
 
+#include "utils/scopedTimer.h"
+
 namespace raptor {
 
   namespace validation {
@@ -72,12 +74,17 @@ namespace raptor {
       for (const auto& [stopId, time] : stops) {
         if (auto it = stopsToIdx.find(stopId);
             it != stopsToIdx.end()) {
+#if LOGGER
           getConsoleLogger(LoggerName::RAPTOR)->info(std::to_string(it->second));
           getConsoleLogger(LoggerName::RAPTOR)->info(std::to_string(time));
+#endif
+
           validStopIds[it->second] = time;
         }
         else {
+#if LOGGER
           getConsoleLogger(LoggerName::RAPTOR)->error(std::format("Stop ID {} not found in lookup, removing from query.", stopId));
+#endif
         }
       }
 
@@ -99,6 +106,9 @@ namespace raptor {
                                                                               const std::map<std::string, types::raptorInt>& arrivalStops,
                                                                               const config::QueryConfig& config) const
   {
+
+    // MEASURE_FUNCTION();
+
     validation::checkNonNullOrEmptyStops(departureStops, "Departure");
     validation::checkNonNullOrEmptyStops(arrivalStops, "Arrival");
 

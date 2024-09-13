@@ -14,14 +14,15 @@
 namespace schedule::gtfs {
 
   GtfsTripReader::GtfsTripReader(std::string filename)
-    : filename(std::move(filename)) {
+    : filename(std::move(filename))
+  {
   }
 
-  void GtfsTripReader::operator()(GtfsReader& aReader) const {
-    MEASURE_FUNCTION(std::source_location().file_name());
+  void GtfsTripReader::operator()(GtfsReader& aReader) const
+  {
+    MEASURE_FUNCTION();
     std::ifstream infile(filename);
-    if (!infile.is_open())
-    {
+    if (!infile.is_open()) {
       throw std::runtime_error("Error opening file: " + std::string(filename));
     }
     getLogger(Target::CONSOLE, LoggerName::GTFS)->info(std::format("Reading file: {}", filename));
@@ -31,11 +32,9 @@ namespace schedule::gtfs {
 
     std::vector<std::string_view> fields;
     fields.reserve(7);
-    while (std::getline(infile, line))
-    {
+    while (std::getline(infile, line)) {
       fields = utils::splitLineAndRemoveQuotes(line);
-      if (fields.size() < 6)
-      {
+      if (fields.size() < 6) {
         // TODO: Handle error
         continue;
       }

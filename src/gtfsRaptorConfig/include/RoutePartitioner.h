@@ -14,8 +14,7 @@
 
 namespace converter {
 
-  class GTFS_RAPTOR_API RoutePartitioner
-  {
+  class GTFS_RAPTOR_API RoutePartitioner {
 
   public:
     explicit RoutePartitioner(schedule::gtfs::GtfsData* data);
@@ -28,7 +27,8 @@ namespace converter {
 
 
   private:
-    std::unordered_map<std::string, std::unordered_map<std::string, SubRoute> /*, decltype(routeHash), decltype(routeEqual)*/> subRoutes{};
+    std::unordered_map<std::string, std::unordered_map<std::string, SubRoute>> subRoutes{};
+
     schedule::gtfs::GtfsData* data;
 
     void processRoute(schedule::gtfs::Route const& route);

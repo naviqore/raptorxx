@@ -19,7 +19,7 @@
 namespace schedule::gtfs {
 
   void GtfsAgencyReader::operator()(GtfsReader& aReader) const {
-    MEASURE_FUNCTION(std::source_location().file_name());
+    MEASURE_FUNCTION();
     std::ifstream infile(filename);
     if (!infile.is_open())
     {

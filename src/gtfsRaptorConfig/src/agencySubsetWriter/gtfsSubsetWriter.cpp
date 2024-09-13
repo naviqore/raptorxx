@@ -28,8 +28,7 @@ std::string quote(const T& value)
 
 void logUsageError(const char* programName)
 {
-  getConsoleLogger(LoggerName::GTFS)
-    ->error("Usage: " + std::string(programName) + " <data_directory_path> <agency_name>");
+  getConsoleLogger(LoggerName::GTFS)->error("Usage: " + std::string(programName) + " <data_directory_path> <agency_name>");
 }
 
 std::string ensureTrailingSlash(const std::string& path)

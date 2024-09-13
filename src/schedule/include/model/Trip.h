@@ -23,7 +23,7 @@ namespace schedule::gtfs {
   };
 
   struct SCHEDULE_API Trip {
-    Trip(std::string&& aRouteId, std::string&& aServiceId, std::string&& aTripId)
+    Trip(std::string aRouteId, std::string&& aServiceId, std::string&& aTripId)
       : routeId(std::move(aRouteId))
       , serviceId(std::move(aServiceId))
       , tripId(std::move(aTripId))

@@ -11,16 +11,15 @@
 #include <schedule_export.h>
 
 namespace schedule::gtfs {
-  struct SCHEDULE_API StopTime
-  {
-    StopTime(std::string&& aTripId, std::string&& aArrivalTime, std::string&& aDepartureTime, std::string&& aStopId, int const aStopSequence)
+  struct SCHEDULE_API StopTime {
+    StopTime(std::string&& aTripId, std::string&& aArrivalTime, std::string&& aDepartureTime, std::string aStopId, int const aStopSequence)
       : tripId(std::move(aTripId))
       , arrivalTime(utils::ServiceDayTime::fromString(std::move(aArrivalTime)))
       , departureTime(utils::ServiceDayTime::fromString(std::move(aDepartureTime)))
       , stopId(std::move(aStopId))
-      , stopSequence(aStopSequence) {
-      if (tripId.empty())
-      {
+      , stopSequence(aStopSequence)
+    {
+      if (tripId.empty()) {
         throw std::invalid_argument("Mandatory stop time fields must not be empty");
       }
     }

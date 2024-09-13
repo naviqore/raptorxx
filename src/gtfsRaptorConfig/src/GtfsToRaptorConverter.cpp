@@ -68,7 +68,12 @@ namespace converter {
             raptorRouterBuilder.addTransfer(transfer->fromStopId, transfer->toStopId, transfer->minTransferTime);
           }
           catch (const std::invalid_argument& e) {
+
+#ifdef LOGGER
             getConsoleLogger(LoggerName::RAPTOR)->error(e.what());
+#else
+            std::ignore = e;
+#endif
           }
         }
       }
@@ -77,7 +82,7 @@ namespace converter {
 
   void GtfsToRaptorConverter::addRoute(SubRoute const& subRoute)
   {
-    auto stopIds = subRoute.getStopsSequence()| std::views::transform([](const schedule::gtfs::Stop* stop) { return stop->stopId; });
+    auto stopIds = subRoute.getStopsSequence() | std::views::transform([](const schedule::gtfs::Stop* stop) { return stop->stopId; });
 
     std::ranges::for_each(stopIds, [this](const std::string& stopId) {
       if (!addedStopIds.contains(stopId)) {

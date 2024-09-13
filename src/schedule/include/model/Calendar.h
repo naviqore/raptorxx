@@ -22,7 +22,7 @@ namespace schedule::gtfs {
   {
     using WeekdayServiceHashMap = std::unordered_map<std::chrono::weekday, int, decltype(weekdayHash), std::equal_to<>>;
 
-    Calendar(std::string&& aServiceId, WeekdayServiceHashMap&& aWeekdayService, std::string&& aStartDate, std::string&& aEndDate)
+    Calendar(std::string aServiceId, WeekdayServiceHashMap&& aWeekdayService, std::string&& aStartDate, std::string&& aEndDate)
       : serviceId(std::move(aServiceId))
       , weekdayService(std::move(aWeekdayService))
       , startDate(schedule::utils::parseDate(aStartDate))

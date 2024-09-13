@@ -18,18 +18,15 @@
 
 namespace raptor {
 
-  class StopLabelsAndTimes
-  {
+  class StopLabelsAndTimes {
   public:
-    enum class LabelType
-    {
+    enum class LabelType {
       INITIAL,
       ROUTE,
       TRANSFER
     };
 
-    struct Label
-    {
+    struct Label {
       types::raptorInt sourceTime;
       types::raptorInt targetTime;
       LabelType type;
@@ -45,7 +42,9 @@ namespace raptor {
         , routeOrTransferIdx(routeOrTransferIdx)
         , tripOffset(tripOffset)
         , stopIdx(stopIdx)
-        , previous(previous) {}
+        , previous(previous)
+      {
+      }
 
       Label(const Label&) = delete;
       Label& operator=(const Label&) = delete;

@@ -22,7 +22,7 @@
 namespace schedule::gtfs {
   struct SCHEDULE_API Stop {
     // TODO consider float instead of double for lat/lon
-    Stop(std::string&& aStopId, std::string&& aStopName, const geometry::Coordinate<double> aStopLat, const geometry::Coordinate<double> aStopLon, std::string&& aParentStation)
+    Stop(std::string aStopId, std::string&& aStopName, const geometry::Coordinate<double> aStopLat, const geometry::Coordinate<double> aStopLon, std::string&& aParentStation)
       : stopId(std::move(aStopId))
       , stopName(std::move(aStopName))
       , stopPoint(aStopLat, aStopLon)

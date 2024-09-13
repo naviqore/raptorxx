@@ -9,8 +9,7 @@
 #include <ranges>
 
 namespace schedule::gtfs {
-  struct TempRoute
-  {
+  struct TempRoute {
     std::string routeId;
     std::string agencyId;
     std::string routeShortName;
@@ -20,21 +19,22 @@ namespace schedule::gtfs {
   };
 
   GtfsRouteReaderCsvParser::GtfsRouteReaderCsvParser(std::string&& filename)
-    : filename(std::move(filename)) {
-    if (this->filename.empty())
-    {
+    : filename(std::move(filename))
+  {
+    if (this->filename.empty()) {
       throw std::invalid_argument("Filename is empty");
     }
   }
   GtfsRouteReaderCsvParser::GtfsRouteReaderCsvParser(std::string const& filename)
-    : filename(filename) {
-    if (this->filename.empty())
-    {
+    : filename(filename)
+  {
+    if (this->filename.empty()) {
       throw std::invalid_argument("Filename is empty");
     }
   }
 
-  void GtfsRouteReaderCsvParser::operator()(GtfsReader& aReader) const {
+  void GtfsRouteReaderCsvParser::operator()(GtfsReader& aReader) const
+  {
     auto reader = io::CSVReader<6, io::trim_chars<'"'>, io::double_quote_escape<',', '\"'>>(filename); // , io::trim_chars<'"'>
     reader.set_header("route_id", "agency_id", "route_short_name", "route_long_name", "route_desc", "route_type");
 
@@ -46,14 +46,12 @@ namespace schedule::gtfs {
     int routeType{};
 
     reader.read_header(io::ignore_no_column, "route_id", "agency_id", "route_short_name", "route_long_name", "route_desc", "route_type");
-    while (reader.read_row(routeId, agencyId, routeShortName, routeLongName, routeDesc, routeType))
-    {
+    while (reader.read_row(routeId, agencyId, routeShortName, routeLongName, routeDesc, routeType)) {
       std::ignore = routeDesc;
-      auto temp = routeId;
 
       aReader.getData().get().routes.try_emplace(
-        temp,
-        Route{std::move(routeId),
+        routeId,
+        Route{routeId,
               std::move(routeShortName),
               std::move(routeLongName),
               static_cast<Route::RouteType>(routeType), // TODO handle exception

@@ -15,7 +15,7 @@ namespace converter {
   RoutePartitioner::RoutePartitioner(schedule::gtfs::GtfsData* data)
     : data(data)
   {
-    std::ranges::for_each(data->routes | std::views::values, [this](schedule::gtfs::Route const& route) {
+    std::ranges::for_each(this->data->routes | std::views::values, [this](schedule::gtfs::Route const& route) {
       this->processRoute(route);
     });
   }
@@ -106,4 +106,4 @@ namespace converter {
   }
 
 } // gtfs
-  // schedule
+// schedule

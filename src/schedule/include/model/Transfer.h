@@ -23,7 +23,7 @@ namespace schedule::gtfs {
       NOT_POSSIBLE
     };
 
-    Transfer(std::string&& aFromStopId, std::string&& aToStopId, TransferType const aTransferType, const int minTransferTime)
+    Transfer(std::string aFromStopId, std::string&& aToStopId, TransferType const aTransferType, const int minTransferTime)
       : fromStopId(std::move(aFromStopId))
       , toStopId(std::move(aToStopId))
       , transferType(aTransferType)

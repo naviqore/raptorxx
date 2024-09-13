@@ -13,6 +13,7 @@
 #include <limits>
 #include <utility>
 
+#include "utils/scopedTimer.h"
 
 
 namespace raptor {
@@ -25,15 +26,14 @@ namespace raptor {
     , walkingDurationsToTarget(params.walkingDurationsToTarget)
     , raptorData(params.raptorData)
     , config(params.config)
-    , stopLabelsAndTimes(static_cast<int>(this->raptorData.getStopContext().stops.size())) {
+    , stopLabelsAndTimes(static_cast<int>(this->raptorData.getStopContext().stops.size()))
+  {
 
-    if (sourceStopIndices.size() != sourceTimes.size())
-    {
+    if (sourceStopIndices.size() != sourceTimes.size()) {
       throw std::invalid_argument("Source stops and departure/arrival times must have the same size.");
     }
 
-    if (targetStopIndices.size() != walkingDurationsToTarget.size())
-    {
+    if (targetStopIndices.size() != walkingDurationsToTarget.size()) {
       throw std::invalid_argument("Target stops and walking durations to target must have the same size.");
     }
 
@@ -41,19 +41,18 @@ namespace raptor {
     cutoffTime = determineCutoffTime();
   }
 
-  const std::vector<std::vector<std::unique_ptr<StopLabelsAndTimes::Label>>>& Query::run() {
-
+  const std::vector<std::vector<std::unique_ptr<StopLabelsAndTimes::Label>>>& Query::run()
+  {
+   // MEASURE_FUNCTION();
     const auto footpathRelaxer = FootpathRelaxer(stopLabelsAndTimes, raptorData, config.getMinimumTransferDuration(), config.getMaximumWalkingDuration());
     const auto routeScanner = RouteScanner(stopLabelsAndTimes, raptorData, config.getMinimumTransferDuration());
-
-    auto markedStops = initialize();
+    std::unordered_set<types::raptorIdx> markedStops(sourceStopIndices.size());
+    initialize(markedStops);
     auto newStops = footpathRelaxer.relaxInitial(sourceStopIndices);
     markedStops.insert(newStops.begin(), newStops.end());
     markedStops = removeSuboptimalLabelsForRound(0, markedStops);
-
     types::raptorInt round = 1;
-    while (!markedStops.empty() && (round - 1) <= config.getMaximumTransferNumber())
-    {
+    while (!markedStops.empty() && (round - 1) <= config.getMaximumTransferNumber()) {
       stopLabelsAndTimes.addNewRound();
 
       auto markedStopsNext = routeScanner.scan(round, markedStops);
@@ -67,18 +66,20 @@ namespace raptor {
     return stopLabelsAndTimes.getBestLabelsPerRound();
   }
 
-  std::unordered_set<types::raptorIdx> Query::initialize() {
+  void Query::initialize(std::unordered_set<types::raptorIdx>& markedStops)
+  {
+   // MEASURE_FUNCTION();
+#if LOGGER
     getConsoleLogger(LoggerName::RAPTOR)->info("Initializing global best times per stop and best labels per round");
+#endif
 
-    for (size_t i = 0; i < targetStopIndices.size(); ++i)
-    {
+
+    for (size_t i = 0; i < targetStopIndices.size(); ++i) {
       targetStops[i * 2] = targetStopIndices[i];
       targetStops[i * 2 + 1] = walkingDurationsToTarget[i];
     }
 
-    std::unordered_set<types::raptorIdx> markedStops{};
-    for (size_t i = 0; i < sourceStopIndices.size(); ++i)
-    {
+    for (size_t i = 0; i < sourceStopIndices.size(); ++i) {
       auto currentStopIdx = sourceStopIndices[i];
       auto targetTime = sourceTimes[i];
 
@@ -88,47 +89,41 @@ namespace raptor {
 
       markedStops.insert(currentStopIdx);
     }
-
-    return markedStops;
   }
 
-  std::unordered_set<types::raptorIdx> Query::removeSuboptimalLabelsForRound(const types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops) {
+  std::unordered_set<types::raptorIdx> Query::removeSuboptimalLabelsForRound(const types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops)
+  {
+    // MEASURE_FUNCTION();
     const auto bestTime = getBestTimeForAllTargetStops();
-    if (bestTime == types::INFINITY_VALUE_MAX)
-    {
+    if (bestTime == types::INFINITY_VALUE_MAX) {
+
       return markedStops;
     }
 
     std::unordered_set<types::raptorIdx> markedStopsClean;
-    for (const auto stopIdx : markedStops)
-    {
-      if (const auto label = stopLabelsAndTimes.getLabel(round, stopIdx))
-      {
-        if (label->targetTime > bestTime)
-        {
+    for (const auto stopIdx : markedStops) {
+      if (const auto label = stopLabelsAndTimes.getLabel(round, stopIdx)) {
+        if (label->targetTime > bestTime) {
           stopLabelsAndTimes.setLabel(round, stopIdx, nullptr);
         }
-        else
-        {
+        else {
           markedStopsClean.insert(stopIdx);
         }
       }
     }
-
     return markedStopsClean;
   }
 
-  types::raptorIdx Query::getBestTimeForAllTargetStops() const {
+  types::raptorIdx Query::getBestTimeForAllTargetStops() const
+  {
     auto bestTime = cutoffTime;
 
-    for (auto i = 0; i < targetStops.size(); i += 2)
-    {
+    for (auto i = 0; i < targetStops.size(); i += 2) {
       const auto targetStopIdx = targetStops[i];
       const auto walkDurationToTarget = targetStops[i + 1];
 
       if (auto bestTimeForStop = stopLabelsAndTimes.getActualBestTime(targetStopIdx);
-          bestTimeForStop != types::INFINITY_VALUE_MAX)
-      {
+          bestTimeForStop != types::INFINITY_VALUE_MAX) {
         bestTimeForStop += walkDurationToTarget;
         bestTime = std::min(bestTime, bestTimeForStop);
       }
@@ -137,9 +132,9 @@ namespace raptor {
     return bestTime;
   }
 
-  types::raptorIdx Query::determineCutoffTime() const {
-    if (config.getMaximumTravelTime() == types::INFINITY_VALUE_MAX)
-    {
+  types::raptorIdx Query::determineCutoffTime() const
+  {
+    if (config.getMaximumTravelTime() == types::INFINITY_VALUE_MAX) {
       return types::INFINITY_VALUE_MAX;
     }
     const auto latestArrival = *std::ranges::max_element(sourceTimes);

@@ -14,8 +14,7 @@
 
 namespace raptor {
 
-  class FootpathRelaxer
-  {
+  class FootpathRelaxer {
   public:
     FootpathRelaxer(StopLabelsAndTimes& stopLabelsAndTimes, const RaptorData& raptorData, types::raptorInt minimumTransferDuration, types::raptorInt maximumWalkingDuration);
 

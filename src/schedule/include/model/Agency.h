@@ -12,16 +12,15 @@
 #include <schedule_export.h>
 
 namespace schedule::gtfs {
-  struct SCHEDULE_API Agency
-  {
-    Agency(std::string&& aAgencyId, std::string&& aName, std::string&& aTimezone)
+  struct SCHEDULE_API Agency {
+    Agency(std::string&& aAgencyId, std::string aName, std::string&& aTimezone)
       : agencyId(std::move(aAgencyId))
       , name(std::move(aName))
-      , timezone(std::move(aTimezone)) {
+      , timezone(std::move(aTimezone))
+    {
       if (agencyId.empty()
           || name.empty()
-          || timezone.empty())
-      {
+          || timezone.empty()) {
         throw std::invalid_argument("Mandatory agency fields must not be empty");
       }
     }

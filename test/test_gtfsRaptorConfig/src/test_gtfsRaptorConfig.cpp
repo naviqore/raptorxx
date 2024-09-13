@@ -9,7 +9,11 @@
 #include "GtfsToRaptorConverter.h"
 #include "Leg.h"
 #include "LocalDateTime.h"
+
+#if LOGGER
 #include "LoggerFactory.h"
+#endif
+
 
 #include <DataContainer.h>
 #include <gtest/gtest.h>
@@ -89,11 +93,18 @@ TEST_F(GtfsRaptorConfigTest, routeFromAbtwilDorfToWestcenter)
   const auto queryConfig = raptor::config::QueryConfig();
   const auto raptorRouter = raptor::RaptorRouter(std::move(*raptor));
   // Act
+  const auto startTime = std::chrono::high_resolution_clock::now();
   const auto connections = raptorRouter.routeEarliestArrival(
     {{"8588889", static_cast<raptor::types::raptorInt>(EIGHT_AM.secondsOfDay())}},
     {{"8589644", 0}},
     queryConfig);
 
+  const auto endTime = std::chrono::high_resolution_clock::now();
+  const std::chrono::duration<double, std::milli> fp_ms = endTime - startTime;
+  const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+
+  std::cout << "Time spent for routing fpms: " << fp_ms << " milliseconds" << '\n';
+  std::cout << "Time spent for routing: " << duration << " milliseconds" << '\n';
 
   ASSERT_TRUE(raptor != nullptr);
 }
@@ -137,12 +148,12 @@ TEST_F(GtfsRaptorConfigTest, routeFromHeiligkreuzToErlenbach)
 // "8579885","Mels, Bahnhof"
 TEST_F(GtfsRaptorConfigTest, routeStGallenVonwilToMels)
 {
-
+#if LOGGER
   getConsoleLogger(LoggerName::RAPTOR)->setLevel(LoggerBridge::OFF);
+#endif
 
   auto mapper = converter::GtfsToRaptorConverter(std::move(data), 120);
   const auto raptor = mapper.convert();
-
 
   const auto queryConfig = raptor::config::QueryConfig();
   const auto raptorRouter = raptor::RaptorRouter(std::move(*raptor));
@@ -150,20 +161,20 @@ TEST_F(GtfsRaptorConfigTest, routeStGallenVonwilToMels)
   const auto startTime = std::chrono::high_resolution_clock::now();
   const auto connections = raptorRouter.routeEarliestArrival(
     {{"8589640", static_cast<raptor::types::raptorInt>(EIGHT_AM.secondsOfDay())}},
-    {{"8579885", static_cast<raptor::types::raptorInt>(EIGHT_AM.secondsOfDay() + 60 * 60 * 2)}},
+    {{"8579885", 0}},
     queryConfig);
 
   const auto endTime = std::chrono::high_resolution_clock::now();
   const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
 
-  std::cout << "Time spent for routing: " << duration << " milliseconds" << std::endl;
+  std::cout << "Time spent for routing: " << duration << " milliseconds" << '\n';
 
 
   for (const auto& connection : connections) {
 
     for (const auto& leg : connection->getLegs()) {
       std::string type = leg->getType().has_value() ? leg->getType().value() == raptor::Leg::Type::WALK_TRANSFER ? "WALK_TRANSFER" : "ROUTE" : "UNKNOWN";
-      std::cout << leg->getFromStopId() << " -> " << leg->getToStopId() << type << std::endl;
+      std::cout << leg->getFromStopId() << " -> " << leg->getToStopId() << type << '\n';
     }
     std::cout << "\n";
   }

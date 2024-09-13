@@ -38,7 +38,7 @@ namespace schedule::gtfs {
       Undefined = 9'999
     };
 
-    Route(std::string&& aRouteId, std::string&& aRouteShortName, std::string&& aRouteLongName, const RouteType aRouteType, std::string&& aAgencyId)
+    Route(std::string aRouteId, std::string&& aRouteShortName, std::string&& aRouteLongName, const RouteType aRouteType, std::string&& aAgencyId)
       : routeId(std::move(aRouteId))
       , routeShortName(std::move(aRouteShortName))
       , routeLongName(std::move(aRouteLongName))

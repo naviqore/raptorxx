@@ -17,12 +17,15 @@ class GtfsRaptorFixture : public benchmark::Fixture {
 protected:
   std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> reader;
   std::unique_ptr<schedule::gtfs::IGtfsReaderStrategyFactory> readerFactory;
+  std::unique_ptr<raptor::RaptorRouter> raptorRouter;
   std::string basePath = TEST_DATA_DIR;
   schedule::gtfs::GtfsData data;
 
   raptor::utils::LocalDateTime START_OF_DAY{raptor::utils::LocalDateTime{2024y, std::chrono::January, 11d, 0h, 0min, 0s}};
   raptor::utils::LocalDateTime EIGHT_AM;
   raptor::utils::LocalDateTime NINE_AM;
+
+  raptor::config::QueryConfig queryConfig = {};
 
 public:
   void SetUp(::benchmark::State& state) override
@@ -45,6 +48,10 @@ public:
 
     EIGHT_AM = START_OF_DAY.addHours(std::chrono::hours(8));
     NINE_AM = START_OF_DAY.addHours(std::chrono::hours(9));
+
+    auto mapper = converter::GtfsToRaptorConverter(std::move(data), 120);
+    const auto raptor = mapper.convert();
+    raptorRouter = std::make_unique<raptor::RaptorRouter>(std::move(*raptor));
   }
 
   void TearDown(::benchmark::State& state) override
@@ -67,32 +74,18 @@ void BenchmarkRoute(benchmark::State& state, const std::string& fromStop, const 
 BENCHMARK_F(GtfsRaptorFixture, BM_route_vonwilSG_mels)
 (benchmark::State& state)
 {
-  getConsoleLogger(LoggerName::RAPTOR)->setLevel(LoggerBridge::OFF);
-
-  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 120);
-  const auto raptor = mapper.convert();
-  const auto queryConfig = raptor::config::QueryConfig();
-  const auto raptorRouter = raptor::RaptorRouter(std::move(*raptor));
-
   // Route 1: vonwilSG -> mels
-  BenchmarkRoute(state, "8589640", "8579885", EIGHT_AM.secondsOfDay(), EIGHT_AM.secondsOfDay() + 60 * 60 * 2, raptorRouter, queryConfig);
+  BenchmarkRoute(state, "8589640", "8579885", EIGHT_AM.secondsOfDay(), EIGHT_AM.secondsOfDay() + 60 * 60 * 2, *raptorRouter, queryConfig);
 }
 
 BENCHMARK_F(GtfsRaptorFixture, BM_route_AbtwilDorf_Westcenter)
 (benchmark::State& state)
 {
-  getConsoleLogger(LoggerName::RAPTOR)->setLevel(LoggerBridge::OFF);
-
-  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 120);
-  const auto raptor = mapper.convert();
-  const auto queryConfig = raptor::config::QueryConfig();
-  const auto raptorRouter = raptor::RaptorRouter(std::move(*raptor));
-
-  BenchmarkRoute(state, "8588889", "8589644", EIGHT_AM.secondsOfDay(), EIGHT_AM.secondsOfDay() + 60 * 60 * 2, raptorRouter, queryConfig);
+  BenchmarkRoute(state, "8588889", "8589644", EIGHT_AM.secondsOfDay(), EIGHT_AM.secondsOfDay() + 60 * 60 * 2, *raptorRouter, queryConfig);
 }
 
-BENCHMARK_REGISTER_F(GtfsRaptorFixture, BM_route_vonwilSG_mels);
-BENCHMARK_REGISTER_F(GtfsRaptorFixture, BM_route_AbtwilDorf_Westcenter);
+BENCHMARK_REGISTER_F(GtfsRaptorFixture, BM_route_vonwilSG_mels)->Iterations(10);
+BENCHMARK_REGISTER_F(GtfsRaptorFixture, BM_route_AbtwilDorf_Westcenter)->Iterations(10);
 
 int main(int argc, char** argv)
 {

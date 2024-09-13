@@ -16,7 +16,7 @@
 namespace schedule::gtfs {
   void GtfsStopTimeReader::operator()(GtfsReader& aReader) const {
     using namespace std::string_literals;
-    MEASURE_FUNCTION(std::source_location().file_name());
+    MEASURE_FUNCTION();
 
     std::ifstream infile(filename, std::ios::in | std::ios::binary);
     if (!infile.is_open())

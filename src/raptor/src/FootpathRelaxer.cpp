@@ -11,6 +11,8 @@
 #include <iostream>
 #include <format>
 
+#include "utils/scopedTimer.h"
+
 namespace raptor {
 
   FootpathRelaxer::FootpathRelaxer(StopLabelsAndTimes& stopLabelsAndTimes, const RaptorData& raptorData, const types::raptorInt minimumTransferDuration, const types::raptorInt maximumWalkingDuration)
@@ -24,27 +26,32 @@ namespace raptor {
 
   std::unordered_set<types::raptorIdx> FootpathRelaxer::relaxInitial(const std::vector<types::raptorIdx>& stopIndices) const
   {
+    MEASURE_FUNCTION();
 
     std::unordered_set<types::raptorIdx> newlyMarkedStops;
 
+#if LOGGER
     getConsoleLogger(LoggerName::RAPTOR)->info("Initial relaxing of footpaths for source stops");
+#endif
+
 
     for (const auto sourceStopIdx : stopIndices) {
       expandFootpathsFromStop(sourceStopIdx, 0, newlyMarkedStops);
     }
-
     return newlyMarkedStops;
   }
 
   std::unordered_set<types::raptorIdx> FootpathRelaxer::relax(const types::raptorInt round, const std::unordered_set<types::raptorIdx>& stopIndices) const
   {
     std::unordered_set<types::raptorIdx> newlyMarkedStops;
+#if LOGGER
     getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Relaxing footpaths for round {}", round));
+#endif
+
 
     for (const auto sourceStopIdx : stopIndices) {
       expandFootpathsFromStop(sourceStopIdx, round, newlyMarkedStops);
     }
-
     return newlyMarkedStops;
   }
 
@@ -79,7 +86,10 @@ namespace raptor {
       if (comparableTargetTime >= bestTimeToCompareTo) {
         continue;
       }
+#if LOGGER
       getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Stop {} was improved by transfer from stop {}", stop.id, targetStop.id));
+#endif
+
 
       stopLabelsAndTimes.setBestTime(transfer.targetStopIndex, comparableTargetTime);
 

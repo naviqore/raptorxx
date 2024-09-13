@@ -26,7 +26,7 @@ namespace schedule::gtfs {
       SERVICE_REMOVED = 2
     };
 
-    CalendarDate(std::string&& aServiceId, std::string&& aDate, ExceptionType const aExceptionType)
+    CalendarDate(std::string aServiceId, std::string&& aDate, ExceptionType const aExceptionType)
       : serviceId(std::move(aServiceId))
       , date(schedule::utils::parseDate(aDate))
       , exceptionType(aExceptionType) {
