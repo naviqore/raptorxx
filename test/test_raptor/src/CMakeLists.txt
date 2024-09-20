@@ -4,4 +4,5 @@ target_sources(${PROJECT_NAME}
         RaptorRouterTestBuilder.h
         test_raptorAlgorithm.cpp
         test_routeBuilder.cpp
+        test_localDateTime.cpp
 )

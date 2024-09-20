@@ -51,11 +51,11 @@ namespace schedule::gtfs {
 
       aReader.getData().get().routes.try_emplace(
         routeId,
-        Route{routeId,
-              std::move(routeShortName),
-              std::move(routeLongName),
-              static_cast<Route::RouteType>(routeType), // TODO handle exception
-              std::move(agencyId)});
+        std::make_shared<Route>(routeId,
+                                std::move(routeShortName),
+                                std::move(routeLongName),
+                                static_cast<Route::RouteType>(routeType), // TODO handle exception
+                                std::move(agencyId)));
     }
   }
 }

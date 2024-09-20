@@ -59,7 +59,8 @@ protected:
 
 TEST_F(GtfsRoutePartitionerTest, shouldConvertGtfsScheduleToRaptor)
 {
-  const auto timeTableManager = converter::TimetableManager(std::move(data));
+  const auto START_OF_DAY{raptor::utils::LocalDateTime{2024y, std::chrono::January, 11d, 0h, 0min, 0s}};
+  const auto timeTableManager = converter::TimetableManager(std::move(data), START_OF_DAY);
   const auto& routePartitioner = timeTableManager.getRoutePartitioner();
 
   const auto& subRoute = routePartitioner.getSubRoute("229.TA.92-2-B-j24-1.22.H");

@@ -44,10 +44,10 @@ namespace schedule::gtfs {
     reader.read_header(io::ignore_extra_column, "from_stop_id", "to_stop_id", "transfer_type", "min_transfer_time");
     while (reader.read_row(fromStopId, toStopId, transferType, minTransferTime)) {
       aReader.getData().get().transfers[fromStopId].emplace_back(
-        fromStopId,
-        std::move(toStopId),
-        static_cast<Transfer::TransferType>(transferType),
-        minTransferTime);
+        std::make_shared<Transfer>(fromStopId,
+                                   std::move(toStopId),
+                                   static_cast<Transfer::TransferType>(transferType),
+                                   minTransferTime));
     }
   }
 } // gtfs

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "GtfsData.h"
+#include "LocalDateTime.h"
 #include "RoutePartitioner.h"
 #include <vector>
 #include "model/StopTime.h"
@@ -21,8 +22,12 @@ namespace converter {
 
     std::unique_ptr<RoutePartitioner> routePartitioner;
 
+    raptor::utils::LocalDateTime localDateTime;
+
+    std::vector<schedule::gtfs::Trip*> activeTrips;
+
   public:
-    explicit TimetableManager(schedule::gtfs::GtfsData&& data);
+    explicit TimetableManager(schedule::gtfs::GtfsData&& data, const raptor::utils::LocalDateTime& localDateTime);
 
     [[nodiscard]] const schedule::gtfs::GtfsData& getData() const;
 
@@ -32,12 +37,15 @@ namespace converter {
 
     [[nodiscard]] const RoutePartitioner& getRoutePartitioner() const;
 
-    [[nodiscard]] std::vector<schedule::gtfs::Route> getRoutes() const;
+    [[nodiscard]] std::unordered_set<schedule::gtfs::Route*> getRoutes();
 
   private:
-    void createRelations() const;
+    void createRelations();
     void buildTripsToRoutesRelations() const;
     void buildStopTimesToTripsAndRoutesRelations() const;
     void buildStopRelations() const;
+    void getActiveTrips(const raptor::utils::LocalDateTime& localDateTime);
+    [[nodiscard]] bool isServiceAvailable(const std::string& serviceId, const raptor::utils::LocalDateTime& localDateTime) const;
+    [[nodiscard]] std::unordered_set<schedule::gtfs::Route*> getRoutesForActiveTrips();
   };
 } // gtfs

@@ -43,11 +43,11 @@ namespace schedule::gtfs {
 
       aReader.getData().get().stops.try_emplace(
         stopId,
-        Stop{stopId,
-             std::move(stopName),
-             geometry::Coordinate<double>((stopLat)),
-             geometry::Coordinate<double>((stopLon)),
-             std::move(parentStation)});
+        std::make_shared<Stop>(stopId,
+                               std::move(stopName),
+                               geometry::Coordinate<double>((stopLat)),
+                               geometry::Coordinate<double>((stopLon)),
+                               std::move(parentStation)));
     }
   }
 

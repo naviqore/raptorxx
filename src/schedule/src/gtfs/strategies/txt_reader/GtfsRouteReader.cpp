@@ -13,11 +13,11 @@
 #include <map>
 
 namespace schedule::gtfs {
-  void GtfsRouteReader::operator()(GtfsReader& aReader) const {
+  void GtfsRouteReader::operator()(GtfsReader& aReader) const
+  {
     MEASURE_FUNCTION();
     std::ifstream infile(filename);
-    if (!infile.is_open())
-    {
+    if (!infile.is_open()) {
       throw std::runtime_error("Error opening file: " + std::string(filename));
     }
     getLogger(Target::CONSOLE, LoggerName::GTFS)->info(std::format("Reading file: {}", filename));
@@ -28,25 +28,21 @@ namespace schedule::gtfs {
 
     std::vector<std::string_view> fields;
     fields.reserve(7);
-    while (std::getline(infile, line))
-    {
+    while (std::getline(infile, line)) {
       fields = utils::splitLineAndRemoveQuotes(line);
-      //if (fields.size() < 6)
-      //{
-      //  // TODO: Handle error
-      //  continue;
-      //}
+
 
       aReader.getData().get().routes.emplace(std::string(fields[headerMap["route_id"]]),
-                                             Route{std::string(fields[headerMap["route_id"]]),
-                                                   std::string(fields[headerMap["route_short_name"]]),
-                                                   std::string(fields[headerMap["route_long_name"]]),
-                                                   static_cast<Route::RouteType>(std::stoi(std::string(fields[headerMap["route_type"]]))),
-                                                   std::string(fields[headerMap["agency_id"]])});
+                                             std::make_shared<Route>(std::string(fields[headerMap["route_id"]]),
+                                                                     std::string(fields[headerMap["route_short_name"]]),
+                                                                     std::string(fields[headerMap["route_long_name"]]),
+                                                                     static_cast<Route::RouteType>(std::stoi(std::string(fields[headerMap["route_type"]]))),
+                                                                     std::string(fields[headerMap["agency_id"]])));
     }
   }
 
   GtfsRouteReader::GtfsRouteReader(std::string filename)
-    : filename(std::move(filename)) {
+    : filename(std::move(filename))
+  {
   }
 } // gtfs

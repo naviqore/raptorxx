@@ -15,8 +15,12 @@ namespace converter {
   RoutePartitioner::RoutePartitioner(schedule::gtfs::GtfsData* data)
     : data(data)
   {
-    std::ranges::for_each(this->data->routes | std::views::values, [this](schedule::gtfs::Route const& route) {
-      this->processRoute(route);
+  }
+
+  void RoutePartitioner::processActiveRoutes(const std::unordered_set<schedule::gtfs::Route*>& activeRoutes)
+  {
+    std::ranges::for_each(activeRoutes, [this](const schedule::gtfs::Route* route) {
+      this->processRoute(*route);
     });
   }
 
@@ -36,9 +40,9 @@ namespace converter {
 
   const SubRoute& RoutePartitioner::getSubRoute(std::string const& tripId) const
   {
-    const auto& trip = data->trips.at(tripId);
+    const auto trip = data->getTrip(tripId);
     //const auto route = data->routes.at(trip.routeId);
-    const auto& subRoutesForRoute = subRoutes.at(trip.routeId);
+    const auto& subRoutesForRoute = subRoutes.at(trip->routeId);
     const auto key = generateStopSequenceKey(tripId);
     if (!subRoutesForRoute.contains(key)) {
       throw std::invalid_argument("SubRoute for trip " + tripId + " not found");
@@ -48,7 +52,8 @@ namespace converter {
 
   const std::vector<std::string>& RoutePartitioner::getTrips(std::string const& routeId) const
   {
-    return data->routes.at(routeId).trips;
+    //TODO just handle needed trips
+    return data->getRoute(routeId)->trips;
   }
 
   void RoutePartitioner::processRoute(schedule::gtfs::Route const& route)
@@ -57,16 +62,16 @@ namespace converter {
     sequenceKeyToSubRouteHashMap.reserve(getTrips(route.routeId).size());
 
     for (const auto& tripId : getTrips(route.routeId)) {
-      const schedule::gtfs::Trip& trip = data->trips.at(tripId);
+      const auto trip = data->getTrip(tripId);
       auto key = this->generateStopSequenceKey(tripId);
 
       auto [it, inserted] = sequenceKeyToSubRouteHashMap.try_emplace(key,
                                                                      SubRoute(std::format("{}_sr{}", route.routeId, sequenceKeyToSubRouteHashMap.size() + 1),
                                                                               route.routeId,
                                                                               key,
-                                                                              extractStopSequence(trip)));
+                                                                              extractStopSequence(*trip)));
       if (!inserted) {
-        it->second.addTrip(trip);
+        it->second.addTrip(*trip);
       }
     }
     subRoutes.insert_or_assign(route.routeId, std::move(sequenceKeyToSubRouteHashMap));
@@ -74,7 +79,7 @@ namespace converter {
 
   std::string RoutePartitioner::generateStopSequenceKey(const std::string& tripId) const
   {
-    const auto& stopTimesRange = data->trips.at(tripId).stopTimes;
+    const auto& stopTimesRange = data->getTrip(tripId)->stopTimes;
     std::string sequenceKey;
     sequenceKey.reserve(std::distance(stopTimesRange.begin(), stopTimesRange.end()) * 401); // 400 + 1 for "_"
 
@@ -99,7 +104,7 @@ namespace converter {
     stops.reserve(std::distance(range.begin(), range.end()));
 
     std::ranges::transform(range, std::back_inserter(stops), [&](const schedule::gtfs::StopTime* stopTime) {
-      return &data->stops.at(stopTime->stopId);
+      return data->getStop(stopTime->stopId);
     });
 
     return stops;

@@ -50,9 +50,9 @@ namespace schedule::gtfs {
         std::ignore = agencyPhone;
 
         aReader.getData().get().agencies.try_emplace(agencyName,
-                                                     Agency{std::move(agencyId),
-                                                            agencyName,
-                                                            std::move(agencyTimezone)});
+                                                     std::make_shared<Agency>(std::move(agencyId),
+                                                                              agencyName,
+                                                                              std::move(agencyTimezone)));
       }
     }
     catch (const io::error::too_many_columns& e) {

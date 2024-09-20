@@ -21,9 +21,7 @@ protected:
   std::string basePath = TEST_DATA_DIR;
   schedule::gtfs::GtfsData data;
 
-  raptor::utils::LocalDateTime START_OF_DAY{raptor::utils::LocalDateTime{2024y, std::chrono::January, 11d, 0h, 0min, 0s}};
-  raptor::utils::LocalDateTime EIGHT_AM;
-  raptor::utils::LocalDateTime NINE_AM;
+  raptor::utils::LocalDateTime time {raptor::utils::LocalDateTime{std::chrono::year{2024}, std::chrono::month{2}, std::chrono::day{1}, std::chrono::hours{0}, std::chrono::minutes{0}, std::chrono::seconds{0}}};
 
   raptor::config::QueryConfig queryConfig = {};
 
@@ -46,10 +44,10 @@ public:
     reader->readData();
     this->data = reader->getData().get();
 
-    EIGHT_AM = START_OF_DAY.addHours(std::chrono::hours(8));
-    NINE_AM = START_OF_DAY.addHours(std::chrono::hours(9));
-
-    auto mapper = converter::GtfsToRaptorConverter(std::move(data), 120);
+   // EIGHT_AM = START_OF_DAY.addHours(std::chrono::hours(8));
+   // NINE_AM = START_OF_DAY.addHours(std::chrono::hours(9));
+    // const auto dateTime = raptor::utils::LocalDateTime{std::chrono::year{2024}, std::chrono::month{2}, std::chrono::day{1}, std::chrono::hours{0}, std::chrono::minutes{0}, std::chrono::seconds{0}};
+    auto mapper = converter::GtfsToRaptorConverter(std::move(data), 120, time);
     const auto raptor = mapper.convert();
     raptorRouter = std::make_unique<raptor::RaptorRouter>(std::move(*raptor));
   }
@@ -75,13 +73,13 @@ BENCHMARK_F(GtfsRaptorFixture, BM_route_vonwilSG_mels)
 (benchmark::State& state)
 {
   // Route 1: vonwilSG -> mels
-  BenchmarkRoute(state, "8589640", "8579885", EIGHT_AM.secondsOfDay(), EIGHT_AM.secondsOfDay() + 60 * 60 * 2, *raptorRouter, queryConfig);
+  BenchmarkRoute(state, "8589640", "8579885", time.secondsOfDay(), time.secondsOfDay() + 60 * 60 * 2, *raptorRouter, queryConfig);
 }
 
 BENCHMARK_F(GtfsRaptorFixture, BM_route_AbtwilDorf_Westcenter)
 (benchmark::State& state)
 {
-  BenchmarkRoute(state, "8588889", "8589644", EIGHT_AM.secondsOfDay(), EIGHT_AM.secondsOfDay() + 60 * 60 * 2, *raptorRouter, queryConfig);
+  BenchmarkRoute(state, "8588889", "8589644", time.secondsOfDay(), time.secondsOfDay() + 60 * 60 * 2, *raptorRouter, queryConfig);
 }
 
 BENCHMARK_REGISTER_F(GtfsRaptorFixture, BM_route_vonwilSG_mels)->Iterations(10);

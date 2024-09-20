@@ -35,10 +35,10 @@ namespace schedule::gtfs {
     while (reader.read_row(serviceId, date, exceptionType)) {
 
       aReader.getData().get().calendarDates[serviceId].emplace_back(
-        serviceId,
-        std::move(date),
-        exceptionType == "1" ? CalendarDate::SERVICE_ADDED
-                             : CalendarDate::SERVICE_REMOVED);
+        std::make_shared<CalendarDate>(serviceId,
+                                       std::move(date),
+                                       exceptionType == "1" ? CalendarDate::SERVICE_ADDED
+                                                            : CalendarDate::SERVICE_REMOVED));
     }
   }
 }

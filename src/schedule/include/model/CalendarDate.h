@@ -28,7 +28,7 @@ namespace schedule::gtfs {
 
     CalendarDate(std::string aServiceId, std::string&& aDate, ExceptionType const aExceptionType)
       : serviceId(std::move(aServiceId))
-      , date(schedule::utils::parseDate(aDate))
+      , date(utils::parseDate(aDate))
       , exceptionType(aExceptionType) {
       if (serviceId.empty()
           || aDate.empty())

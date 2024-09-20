@@ -50,9 +50,9 @@ TEST_F(GtfsCsvReaderStrategiesTest, testAgencyReaderTxt) {
   std::cout << "agencies: " << data.agencies.size() << std::endl;
 
   ASSERT_TRUE(data.agencies.empty() == false);
-  EXPECT_STREQ(data.agencies.at("Schweizerische Bundesbahnen SBB").name.c_str(), "Schweizerische Bundesbahnen SBB");
-  EXPECT_STREQ(data.agencies.at("Schweizerische Bundesbahnen SBB").agencyId.c_str(), "11");
-  EXPECT_STREQ(data.agencies.at("Schweizerische Bundesbahnen SBB").timezone.c_str(), "Europe/Berlin");
+  EXPECT_STREQ(data.getAgency("Schweizerische Bundesbahnen SBB")->name.c_str(), "Schweizerische Bundesbahnen SBB");
+  EXPECT_STREQ(data.getAgency("Schweizerische Bundesbahnen SBB")->agencyId.c_str(), "11");
+  EXPECT_STREQ(data.getAgency("Schweizerische Bundesbahnen SBB")->timezone.c_str(), "Europe/Berlin");
 }
 
 TEST_F(GtfsCsvReaderStrategiesTest, testCalendarDateReaderTxt) {
@@ -65,14 +65,14 @@ TEST_F(GtfsCsvReaderStrategiesTest, testCalendarDateReaderTxt) {
   std::cout << "calendarDates: " << data.get().calendarDates.size() << '\n';
   ASSERT_TRUE(data.get().calendarDates.empty() == false);
 
-  const auto calendarDate = data.get().calendarDates.at("TA+00060");
+  const auto calendarDate = data.get().getCalendarDates("TA+00060");
 
-  std::ranges::for_each(calendarDate, [](const schedule::gtfs::CalendarDate& calendarDate) {
-    ASSERT_TRUE(calendarDate.serviceId.empty() == false);
-    ASSERT_TRUE(calendarDate.date.day().ok());
-    ASSERT_TRUE(calendarDate.date.month().ok());
-    ASSERT_TRUE(calendarDate.date.year().ok());
-    ASSERT_TRUE(calendarDate.exceptionType == schedule::gtfs::CalendarDate::SERVICE_ADDED || calendarDate.exceptionType == schedule::gtfs::CalendarDate::SERVICE_REMOVED);
+  std::ranges::for_each(calendarDate, [](const std::shared_ptr<schedule::gtfs::CalendarDate>& calendarDate) {
+    ASSERT_TRUE(calendarDate->serviceId.empty() == false);
+    ASSERT_TRUE(calendarDate->date.day().ok());
+    ASSERT_TRUE(calendarDate->date.month().ok());
+    ASSERT_TRUE(calendarDate->date.year().ok());
+    ASSERT_TRUE(calendarDate->exceptionType == schedule::gtfs::CalendarDate::SERVICE_ADDED || calendarDate->exceptionType == schedule::gtfs::CalendarDate::SERVICE_REMOVED);
   });
 
   const std::string date_str = "20231216";
@@ -82,9 +82,9 @@ TEST_F(GtfsCsvReaderStrategiesTest, testCalendarDateReaderTxt) {
 
   const std::chrono::year_month_day date = std::chrono::year{year} / month / day;
 
-  ASSERT_EQ(calendarDate[0].serviceId, "TA+00060");
-  ASSERT_EQ(calendarDate[0].date, date);
-  ASSERT_TRUE(calendarDate[0].exceptionType == schedule::gtfs::CalendarDate::SERVICE_REMOVED);
+  ASSERT_EQ(calendarDate[0]->serviceId, "TA+00060");
+  ASSERT_EQ(calendarDate[0]->date, date);
+  ASSERT_TRUE(calendarDate[0]->exceptionType == schedule::gtfs::CalendarDate::SERVICE_REMOVED);
 }
 
 TEST_F(GtfsCsvReaderStrategiesTest, testCalendarReaderTxt) {
@@ -94,13 +94,13 @@ TEST_F(GtfsCsvReaderStrategiesTest, testCalendarReaderTxt) {
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
   const schedule::gtfs::GtfsData& data = reader->getData().get();
-  const auto calender = data.calendars.at("TA");
-  ASSERT_TRUE(calender.serviceId.empty() == false);
-  ASSERT_EQ(calender.serviceId, "TA");
-  ASSERT_EQ(calender.weekdayService.at(std::chrono::Monday), 1);
-  ASSERT_EQ(static_cast<unsigned>(calender.startDate.day()), 10);
-  ASSERT_EQ(static_cast<unsigned>(calender.startDate.month()), 12);
-  ASSERT_EQ(static_cast<int>(calender.startDate.year()), 2023);
+  const auto calender = data.getCalendar("TA");
+  ASSERT_TRUE(calender->serviceId.empty() == false);
+  ASSERT_EQ(calender->serviceId, "TA");
+  ASSERT_EQ(calender->weekdayService.at(std::chrono::Monday), 1);
+  ASSERT_EQ(static_cast<unsigned>(calender->startDate.day()), 10);
+  ASSERT_EQ(static_cast<unsigned>(calender->startDate.month()), 12);
+  ASSERT_EQ(static_cast<int>(calender->startDate.year()), 2023);
 }
 
 TEST_F(GtfsCsvReaderStrategiesTest, testStopReaderTxt) {
@@ -110,13 +110,13 @@ TEST_F(GtfsCsvReaderStrategiesTest, testStopReaderTxt) {
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
   const schedule::gtfs::GtfsData& data = reader->getData().get();
-  const auto stop = data.stops.at("1100013");
-  ASSERT_TRUE(stop.stopId.empty() == false);
-  ASSERT_EQ(stop.stopId, "1100013");
-  ASSERT_EQ(stop.stopName, "Mambach, Silbersau");
-  ASSERT_NEAR(stop.stopPoint.getFirstCoordinate(), 47.7395192233867, 1e-6);
-  ASSERT_NEAR(stop.stopPoint.getSecondCoordinate(), 7.88223152899259, 1e-6);
-  ASSERT_EQ(stop.parentStation, "Parent1100013");
+  const auto stop = data.getStop("1100013");
+  ASSERT_TRUE(stop->stopId.empty() == false);
+  ASSERT_EQ(stop->stopId, "1100013");
+  ASSERT_EQ(stop->stopName, "Mambach, Silbersau");
+  ASSERT_NEAR(stop->stopPoint.getFirstCoordinate(), 47.7395192233867, 1e-6);
+  ASSERT_NEAR(stop->stopPoint.getSecondCoordinate(), 7.88223152899259, 1e-6);
+  ASSERT_EQ(stop->parentStation, "Parent1100013");
 }
 
 TEST_F(GtfsCsvReaderStrategiesTest, testStopTimeReaderTxt) {
@@ -126,14 +126,14 @@ TEST_F(GtfsCsvReaderStrategiesTest, testStopTimeReaderTxt) {
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
   const schedule::gtfs::GtfsData& data = reader->getData().get();
-  const auto stopTimes = data.stopTimes.at("8503054:0:1");
+  const auto stopTimes = data.getStopTimes("8503054:0:1");
 
-  ASSERT_TRUE(stopTimes[0].stopId.empty() == false);
-  ASSERT_EQ(stopTimes[0].tripId, "1.TA.91-10-A-j24-1.1.H");
-  ASSERT_EQ(stopTimes[0].arrivalTime, schedule::gtfs::utils::ServiceDayTime(18, 27, 0));
-  ASSERT_EQ(stopTimes[0].departureTime, schedule::gtfs::utils::ServiceDayTime(18, 27, 0));
-  ASSERT_EQ(stopTimes[0].stopId, "8503054:0:1");
-  ASSERT_EQ(stopTimes[0].stopSequence, 1);
+  ASSERT_TRUE(stopTimes[0]->stopId.empty() == false);
+  ASSERT_EQ(stopTimes[0]->tripId, "1.TA.91-10-A-j24-1.1.H");
+  ASSERT_EQ(stopTimes[0]->arrivalTime, schedule::gtfs::utils::ServiceDayTime(18, 27, 0));
+  ASSERT_EQ(stopTimes[0]->departureTime, schedule::gtfs::utils::ServiceDayTime(18, 27, 0));
+  ASSERT_EQ(stopTimes[0]->stopId, "8503054:0:1");
+  ASSERT_EQ(stopTimes[0]->stopSequence, 1);
 }
 
 TEST_F(GtfsCsvReaderStrategiesTest, testTransferReaderTxt) {
@@ -143,8 +143,8 @@ TEST_F(GtfsCsvReaderStrategiesTest, testTransferReaderTxt) {
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
   const schedule::gtfs::GtfsData& data = reader->getData().get();
-  const auto transferFrom = data.transfers.at("1100079");
-  ASSERT_EQ(transferFrom[0].toStopId, "8014441");
+  const auto transferFrom = data.getTransfers("1100079");
+  ASSERT_EQ(transferFrom[0]->toStopId, "8014441");
 }
 
 TEST_F(GtfsCsvReaderStrategiesTest, testTripReaderTxt) {
@@ -158,10 +158,10 @@ TEST_F(GtfsCsvReaderStrategiesTest, testTripReaderTxt) {
 
   ASSERT_TRUE(data.trips.empty() == false);
 
-  const auto trip = data.trips.at("106.TA.91-10-A-j24-1.7.H");
+  const auto trip = data.getTrip("106.TA.91-10-A-j24-1.7.H");
 
-  ASSERT_EQ(trip.routeId, "91-10-A-j24-1");
-  ASSERT_EQ(trip.serviceId, "TA+p60e0");
+  ASSERT_EQ(trip->routeId, "91-10-A-j24-1");
+  ASSERT_EQ(trip->serviceId, "TA+p60e0");
 }
 
 TEST_F(GtfsCsvReaderStrategiesTest, testrouteReaderTxt) {
@@ -171,10 +171,10 @@ TEST_F(GtfsCsvReaderStrategiesTest, testrouteReaderTxt) {
   reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   reader->readData();
   const schedule::gtfs::GtfsData& data = reader->getData().get();
-  const auto route = data.routes.at("91-10-E-j24-1");
-  ASSERT_TRUE(route.routeId.empty() == false);
-  ASSERT_EQ(route.routeId, "91-10-E-j24-1");
-  ASSERT_EQ(static_cast<int>(route.routeType), 900);
+  const auto route = data.getRoute("91-10-E-j24-1");
+  ASSERT_TRUE(route->routeId.empty() == false);
+  ASSERT_EQ(route->routeId, "91-10-E-j24-1");
+  ASSERT_EQ(static_cast<int>(route->routeType), 900);
 }
 
 TEST(GTFS, TestStrategyReader) {

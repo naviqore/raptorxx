@@ -14,11 +14,11 @@
 
 namespace schedule::gtfs {
 
-  void GtfsStopReader::operator()(GtfsReader& aReader) const {
+  void GtfsStopReader::operator()(GtfsReader& aReader) const
+  {
     MEASURE_FUNCTION();
     std::ifstream infile(filename);
-    if (!infile.is_open())
-    {
+    if (!infile.is_open()) {
       throw std::runtime_error("Error opening file: " + std::string(filename));
     }
     getLogger(Target::CONSOLE, LoggerName::GTFS)->info(std::format("Reading file: {}", filename));
@@ -28,8 +28,7 @@ namespace schedule::gtfs {
 
     std::vector<std::string_view> fields;
     fields.reserve(6);
-    while (std::getline(infile, line))
-    {
+    while (std::getline(infile, line)) {
 
       fields = utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 6) // due to different file format of the open data zurich dataset
@@ -39,16 +38,16 @@ namespace schedule::gtfs {
 
       aReader.getData().get().stops.emplace(
         std::string(fields[headerMap["stop_id"]]),
-        Stop{
-          std::string(fields[headerMap["stop_id"]]),
-          std::string(fields[headerMap["stop_name"]]),
-          geometry::Coordinate<double>(std::stod(std::string(fields[headerMap["stop_lat"]]))),
-          geometry::Coordinate<double>(std::stod(std::string(fields[headerMap["stop_lon"]]))),
-          std::string(fields[headerMap["parent_station"]])});
+        std::make_shared<Stop>(std::string(fields[headerMap["stop_id"]]),
+                               std::string(fields[headerMap["stop_name"]]),
+                               geometry::Coordinate<double>(std::stod(std::string(fields[headerMap["stop_lat"]]))),
+                               geometry::Coordinate<double>(std::stod(std::string(fields[headerMap["stop_lon"]]))),
+                               std::string(fields[headerMap["parent_station"]])));
     }
   }
 
   GtfsStopReader::GtfsStopReader(std::string filename)
-    : filename(std::move(filename)) {
+    : filename(std::move(filename))
+  {
   }
 } // gtfs

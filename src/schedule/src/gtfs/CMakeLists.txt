@@ -8,6 +8,7 @@ target_sources(${PROJECT_NAME}
         GtfsReaderStrategyFactory.cpp
         GtfsTxtReaderStrategyFactory.cpp
         GtfsTxtReaderStrategyFactory.h
+        GtfsData.cpp
 )
 
 add_subdirectory(strategies)

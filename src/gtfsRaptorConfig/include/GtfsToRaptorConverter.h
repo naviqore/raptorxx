@@ -24,7 +24,7 @@ namespace converter {
     std::unique_ptr<RoutePartitioner> routePartitioner;
 
   public:
-    explicit GtfsToRaptorConverter(schedule::gtfs::GtfsData&& data, int defaultSameStopTransferTime);
+    explicit GtfsToRaptorConverter(schedule::gtfs::GtfsData&& data, int defaultSameStopTransferTime, const raptor::utils::LocalDateTime& localDateTime);
 
     std::shared_ptr<raptor::RaptorData> convert();
 

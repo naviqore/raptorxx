@@ -35,13 +35,12 @@ namespace schedule::gtfs {
     while (std::getline(infile, line)) {
       fields = utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 6) {
-        // TODO: Handle error
         continue;
       }
       aReader.getData().get().trips.emplace(std::string(fields[headerMap["trip_id"]]),
-                                            Trip{std::string(fields[headerMap["route_id"]]),
-                                                 std::string(fields[headerMap["service_id"]]),
-                                                 std::string(fields[headerMap["trip_id"]])});
+                                            std::make_shared<Trip>(std::string(fields[headerMap["route_id"]]),
+                                                                   std::string(fields[headerMap["service_id"]]),
+                                                                   std::string(fields[headerMap["trip_id"]])));
     }
   }
 } // gtfs

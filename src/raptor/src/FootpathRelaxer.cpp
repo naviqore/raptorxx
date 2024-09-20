@@ -26,7 +26,7 @@ namespace raptor {
 
   std::unordered_set<types::raptorIdx> FootpathRelaxer::relaxInitial(const std::vector<types::raptorIdx>& stopIndices) const
   {
-    MEASURE_FUNCTION();
+    // MEASURE_FUNCTION();
 
     std::unordered_set<types::raptorIdx> newlyMarkedStops;
 

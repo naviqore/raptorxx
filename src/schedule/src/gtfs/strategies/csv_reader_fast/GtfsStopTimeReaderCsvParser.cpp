@@ -51,11 +51,11 @@ namespace schedule::gtfs {
       std::ignore = dropOffType;
 
       aReader.getData().get().stopTimes[stopId].emplace_back(
-        std::move(tripId),
-        std::move(arrivalTime),
-        std::move(departureTime),
-        stopId,
-        stopSequence);
+        std::make_shared<StopTime>(std::move(tripId),
+                                   std::move(arrivalTime),
+                                   std::move(departureTime),
+                                   stopId,
+                                   stopSequence));
     }
   }
 }

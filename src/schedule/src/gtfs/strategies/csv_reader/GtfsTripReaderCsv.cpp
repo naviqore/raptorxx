@@ -11,32 +11,31 @@
 
 namespace schedule::gtfs {
 
-  struct TempTrip
-  {
+  struct TempTrip {
     std::string tripId;
     std::string routeId;
     std::string serviceId;
   };
 
   GtfsTripReaderCsv::GtfsTripReaderCsv(std::string&& filename)
-    : filename(std::move(filename)) {
-    if (this->filename.empty())
-    {
+    : filename(std::move(filename))
+  {
+    if (this->filename.empty()) {
       throw std::invalid_argument("Filename is empty");
     }
   }
   GtfsTripReaderCsv::GtfsTripReaderCsv(std::string const& filename)
-    : filename(filename) {
-    if (this->filename.empty())
-    {
+    : filename(filename)
+  {
+    if (this->filename.empty()) {
       throw std::invalid_argument("Filename is empty");
     }
   }
 
-  void GtfsTripReaderCsv::operator()(GtfsReader& aReader) const {
+  void GtfsTripReaderCsv::operator()(GtfsReader& aReader) const
+  {
     auto reader = csv2::Reader();
-    if (!reader.mmap(filename))
-    {
+    if (!reader.mmap(filename)) {
       throw std::runtime_error("Cannot read file");
     }
     const auto header = reader.header();
@@ -45,12 +44,10 @@ namespace schedule::gtfs {
     std::map<size_t, std::string> headerMap = utils::createHeaderMap(headerItems);
 
     int index = 0;
-    for (const auto& row : reader)
-    {
+    for (const auto& row : reader) {
       TempTrip tempTrip;
       index = 0;
-      for (const auto& cell : row)
-      {
+      for (const auto& cell : row) {
         auto columnName = headerMap[index];
 
         std::string value;
@@ -65,20 +62,18 @@ namespace schedule::gtfs {
           {"service_id", [](TempTrip& transfer, const std::string& val) { transfer.serviceId = val; }},
         };
 
-        if (columnActions.contains(columnName))
-        {
+        if (columnActions.contains(columnName)) {
           columnActions.at(columnName)(tempTrip, value);
         }
         ++index;
       }
-      if (!tempTrip.tripId.empty())
-      {
+      if (!tempTrip.tripId.empty()) {
         auto tripId = tempTrip.tripId;
 
         aReader.getData().get().trips.emplace(tripId,
-                                              Trip{std::move(tempTrip.routeId),
-                                                   std::move(tempTrip.serviceId),
-                                                   std::move(tempTrip.tripId)});
+                                              std::make_shared<Trip>(std::move(tempTrip.routeId),
+                                                                     std::move(tempTrip.serviceId),
+                                                                     std::move(tempTrip.tripId)));
       }
     }
   }

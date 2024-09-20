@@ -19,6 +19,8 @@ namespace converter {
   public:
     explicit RoutePartitioner(schedule::gtfs::GtfsData* data);
 
+    void processActiveRoutes(const std::unordered_set<schedule::gtfs::Route*>& activeRoutes);
+
     [[nodiscard]] std::vector<SubRoute> getSubRoutes(std::string const& routeId) const;
 
     [[nodiscard]] const SubRoute& getSubRoute(std::string const& tripId) const;

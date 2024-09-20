@@ -10,8 +10,7 @@
 #include <ranges>
 
 namespace schedule::gtfs {
-  struct TempRoute
-  {
+  struct TempRoute {
     std::string routeId;
     std::string agencyId;
     std::string routeShortName;
@@ -21,24 +20,24 @@ namespace schedule::gtfs {
   };
 
   GtfsRouteReaderCsv::GtfsRouteReaderCsv(std::string&& filename)
-    : filename(std::move(filename)) {
-    if (this->filename.empty())
-    {
+    : filename(std::move(filename))
+  {
+    if (this->filename.empty()) {
       throw std::invalid_argument("Filename is empty");
     }
   }
   GtfsRouteReaderCsv::GtfsRouteReaderCsv(std::string const& filename)
-    : filename(filename) {
-    if (this->filename.empty())
-    {
+    : filename(filename)
+  {
+    if (this->filename.empty()) {
       throw std::invalid_argument("Filename is empty");
     }
   }
 
-  void GtfsRouteReaderCsv::operator()(GtfsReader& aReader) const {
+  void GtfsRouteReaderCsv::operator()(GtfsReader& aReader) const
+  {
     auto reader = csv2::Reader();
-    if (!reader.mmap(filename))
-    {
+    if (!reader.mmap(filename)) {
       throw std::runtime_error("Cannot read file");
     }
     const auto header = reader.header();
@@ -47,12 +46,10 @@ namespace schedule::gtfs {
     std::map<size_t, std::string> headerMap = utils::createHeaderMap(headerItems);
 
     int index = 0;
-    for (const auto& row : reader)
-    {
+    for (const auto& row : reader) {
       TempRoute tempRoute;
       index = 0;
-      for (const auto& cell : row)
-      {
+      for (const auto& cell : row) {
         auto columnName = headerMap[index];
 
         std::string value;
@@ -71,25 +68,21 @@ namespace schedule::gtfs {
 
         };
 
-        if (columnActions.contains(columnName))
-        {
+        if (columnActions.contains(columnName)) {
           columnActions.at(columnName)(tempRoute, value);
         }
         ++index;
       }
-      if (!tempRoute.routeId.empty())
-      {
+      if (!tempRoute.routeId.empty()) {
         auto routeId = tempRoute.routeId;
 
 
         aReader.getData().get().routes.emplace(routeId,
-                                               Route{
-                                                 std::move(tempRoute.routeId),
-                                                 std::move(tempRoute.routeShortName),
-                                                 std::move(tempRoute.routeLongName),
-                                                 static_cast<Route::RouteType>(std::stoi(tempRoute.routeType.empty() == false ? tempRoute.routeType : "99999")), // defined 99999 as undefined
-                                                 std::move(tempRoute.agencyId),
-                                               });
+                                               std::make_shared<Route>(std::move(tempRoute.routeId),
+                                                                       std::move(tempRoute.routeShortName),
+                                                                       std::move(tempRoute.routeLongName),
+                                                                       static_cast<Route::RouteType>(std::stoi(tempRoute.routeType.empty() == false ? tempRoute.routeType : "99999")), // defined 99999 as undefined
+                                                                       std::move(tempRoute.agencyId)));
       }
     }
   }

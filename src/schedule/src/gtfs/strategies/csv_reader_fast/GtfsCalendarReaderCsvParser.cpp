@@ -52,10 +52,10 @@ namespace schedule::gtfs {
 
       aReader.getData().get().calendars.try_emplace(
         serviceId,
-        Calendar{serviceId,
-                 std::move(weekdayService),
-                 std::move(start_date),
-                 std::move(end_date)});
+        std::make_shared<Calendar>(serviceId,
+                                   std::move(weekdayService),
+                                   std::move(start_date),
+                                   std::move(end_date)));
     }
   }
   // gtfs

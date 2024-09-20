@@ -13,8 +13,7 @@
 
 namespace schedule::gtfs {
 
-  struct TempCalendar
-  {
+  struct TempCalendar {
     std::string serviceId;
     std::string monday;
     std::string tuesday;
@@ -28,24 +27,24 @@ namespace schedule::gtfs {
   };
 
   GtfsCalendarReaderCsv::GtfsCalendarReaderCsv(std::string&& filename)
-    : filename(std::move(filename)) {
-    if (this->filename.empty())
-    {
+    : filename(std::move(filename))
+  {
+    if (this->filename.empty()) {
       throw std::invalid_argument("Filename is empty");
     }
   }
   GtfsCalendarReaderCsv::GtfsCalendarReaderCsv(std::string const& filename)
-  : filename(filename) {
-    if (this->filename.empty())
-    {
+    : filename(filename)
+  {
+    if (this->filename.empty()) {
       throw std::invalid_argument("Filename is empty");
     }
   }
 
-  void GtfsCalendarReaderCsv::operator()(GtfsReader& aReader) const {
+  void GtfsCalendarReaderCsv::operator()(GtfsReader& aReader) const
+  {
     auto reader = csv2::Reader();
-    if (!reader.mmap(filename))
-    {
+    if (!reader.mmap(filename)) {
       throw std::runtime_error("Cannot read file");
     }
     const auto header = reader.header();
@@ -54,12 +53,10 @@ namespace schedule::gtfs {
     std::map<size_t, std::string> headerMap = utils::createHeaderMap(headerItems);
 
     int index = 0;
-    for (const auto& row : reader)
-    {
+    for (const auto& row : reader) {
       TempCalendar tempCalendarDate;
       index = 0;
-      for (const auto& cell : row)
-      {
+      for (const auto& cell : row) {
         auto columnName = headerMap[index];
 
         std::string value;
@@ -81,14 +78,12 @@ namespace schedule::gtfs {
           {"end_date", [](TempCalendar& calendar, const std::string& val) { calendar.end_date = val; }},
         };
 
-        if (columnActions.contains(columnName))
-        {
+        if (columnActions.contains(columnName)) {
           columnActions.at(columnName)(tempCalendarDate, value);
         }
         ++index;
       }
-      if (!tempCalendarDate.serviceId.empty())
-      {
+      if (!tempCalendarDate.serviceId.empty()) {
         auto serviceId = tempCalendarDate.serviceId;
 
         Calendar::WeekdayServiceHashMap weekdayService = {
@@ -101,10 +96,10 @@ namespace schedule::gtfs {
           {std::chrono::Sunday, std::stoi(tempCalendarDate.sunday)}};
 
         aReader.getData().get().calendars.emplace(serviceId,
-                                                      Calendar{std::move(tempCalendarDate.serviceId),
-                                                               std::move(weekdayService),
-                                                               std::move(tempCalendarDate.start_date),
-                                                               std::move(tempCalendarDate.end_date)});
+                                                  std::make_shared<Calendar>(std::move(tempCalendarDate.serviceId),
+                                                                             std::move(weekdayService),
+                                                                             std::move(tempCalendarDate.start_date),
+                                                                             std::move(tempCalendarDate.end_date)));
       }
     }
   }

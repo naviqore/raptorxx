@@ -59,7 +59,7 @@ protected:
 
 TEST_F(GtfsRaptorConfigTest, shouldConvertGtfsScheduleToRaptor)
 {
-  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0);
+  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0, EIGHT_AM);
   const auto raptor = mapper.convert();
 
   ASSERT_TRUE(raptor != nullptr);
@@ -67,7 +67,7 @@ TEST_F(GtfsRaptorConfigTest, shouldConvertGtfsScheduleToRaptor)
 
 TEST_F(GtfsRaptorConfigTest, routeFromVonwilToStephanshorn)
 {
-  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0);
+  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0, EIGHT_AM);
   const auto raptor = mapper.convert();
 
   const auto queryConfig = raptor::config::QueryConfig();
@@ -87,7 +87,7 @@ TEST_F(GtfsRaptorConfigTest, routeFromVonwilToStephanshorn)
 
 TEST_F(GtfsRaptorConfigTest, routeFromAbtwilDorfToWestcenter)
 {
-  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0);
+  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0, EIGHT_AM);
   const auto raptor = mapper.convert();
 
   const auto queryConfig = raptor::config::QueryConfig();
@@ -111,7 +111,7 @@ TEST_F(GtfsRaptorConfigTest, routeFromAbtwilDorfToWestcenter)
 
 TEST_F(GtfsRaptorConfigTest, routeFromSpeicherArToHaggen)
 {
-  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0);
+  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0, EIGHT_AM);
   const auto raptor = mapper.convert();
 
   const auto queryConfig = raptor::config::QueryConfig();
@@ -130,7 +130,7 @@ TEST_F(GtfsRaptorConfigTest, routeFromSpeicherArToHaggen)
 // "8587965","Erlenbach ZH, Bahnhof","47.305818015385","8.5912448333883","","Parent8587965"
 TEST_F(GtfsRaptorConfigTest, routeFromHeiligkreuzToErlenbach)
 {
-  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0);
+  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0, EIGHT_AM);
   const auto raptor = mapper.convert();
 
   const auto queryConfig = raptor::config::QueryConfig();
@@ -152,7 +152,8 @@ TEST_F(GtfsRaptorConfigTest, routeStGallenVonwilToMels)
   getConsoleLogger(LoggerName::RAPTOR)->setLevel(LoggerBridge::OFF);
 #endif
 
-  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 120);
+  const auto dateTime = raptor::utils::LocalDateTime{std::chrono::year{2024}, std::chrono::month{1}, std::chrono::day{1}, std::chrono::hours{8}, std::chrono::minutes{0}, std::chrono::seconds{0}};
+  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 120, dateTime);
   const auto raptor = mapper.convert();
 
   const auto queryConfig = raptor::config::QueryConfig();
@@ -160,7 +161,7 @@ TEST_F(GtfsRaptorConfigTest, routeStGallenVonwilToMels)
   // Act
   const auto startTime = std::chrono::high_resolution_clock::now();
   const auto connections = raptorRouter.routeEarliestArrival(
-    {{"8589640", static_cast<raptor::types::raptorInt>(EIGHT_AM.secondsOfDay())}},
+    {{"8589640", static_cast<raptor::types::raptorInt>(dateTime.secondsOfDay())}},
     {{"8579885", 0}},
     queryConfig);
 

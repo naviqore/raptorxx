@@ -57,18 +57,15 @@ namespace schedule::gtfs {
           break;
         case '2':
           exceptionType = CalendarDate::ExceptionType::SERVICE_REMOVED;
-          //[[fallthrough]]; // TODO maybe add [[fallthrough]] in the future again
           break;
         default:
-          //continue;
-          //TODO lets discuss this - throw std::runtime_error("Error: invalid exception type.");
           exceptionType = CalendarDate::ExceptionType::SERVICE_REMOVED;
       }
 
       aReader.getData().get().calendarDates[std::string(fields[headerMap["service_id"]])].emplace_back(
-        std::string(fields[headerMap["service_id"]]),
-        std::string(fields[headerMap["date"]]),
-        exceptionType);
+        std::make_shared<CalendarDate>(std::string(fields[headerMap["service_id"]]),
+                                       std::string(fields[headerMap["date"]]),
+                                       exceptionType));
     }
   }
 } // gtfs

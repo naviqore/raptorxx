@@ -8,17 +8,19 @@
 
 namespace converter {
 
-  GtfsToRaptorConverter::GtfsToRaptorConverter(schedule::gtfs::GtfsData&& data, const int defaultSameStopTransferTime)
+  GtfsToRaptorConverter::GtfsToRaptorConverter(schedule::gtfs::GtfsData&& data, const int defaultSameStopTransferTime, const raptor::utils::LocalDateTime& localDateTime)
     : raptorRouterBuilder(defaultSameStopTransferTime)
-    , timetableManager(std::move(data))
+    , timetableManager(std::move(data), localDateTime)
   {
     routePartitioner = std::make_unique<RoutePartitioner>(&timetableManager.getData());
   }
 
   std::shared_ptr<raptor::RaptorData> GtfsToRaptorConverter::convert()
   {
-    for (const auto& route : timetableManager.getRoutes()) {
-      std::ranges::for_each(routePartitioner->getSubRoutes(route.routeId), [this](const SubRoute& subRoute) {
+    routePartitioner->processActiveRoutes(timetableManager.getRoutes());
+
+    for (const auto route : timetableManager.getRoutes()) {
+      std::ranges::for_each(routePartitioner->getSubRoutes(route->routeId), [this](const SubRoute& subRoute) {
         addRoute(subRoute);
       });
     }
@@ -62,7 +64,7 @@ namespace converter {
   {
     for (const auto& stopId : addedStopIds) {
       for (const auto& stop = timetableManager.getData().stops.at(stopId);
-           const auto transfer : stop.transferItems) {
+           const auto transfer : stop->transferItems) {
         if (transfer->transferType == schedule::gtfs::Transfer::MINIMUM_TIME && transfer->minTransferTime > 0) {
           try {
             raptorRouterBuilder.addTransfer(transfer->fromStopId, transfer->toStopId, transfer->minTransferTime);
