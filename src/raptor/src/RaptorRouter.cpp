@@ -135,18 +135,20 @@ namespace raptor {
       walkingDurationsToTarget.push_back(value);
     }
 
-    const auto queryParams = QueryParams{
-      .raptorData = raptorData,
-      .sourceStopIndices = sourceStopIndices,
-      .targetStopIndices = targetStopIndices,
-      .sourceTimes = sourceTimes,
-      .walkingDurationsToTarget = walkingDurationsToTarget,
-      .config = config};
+    QueryParams queryParams{
+      raptorData,
+      std::move(sourceStopIndices),
+      std::move(targetStopIndices),
+      std::move(sourceTimes),
+      std::move(walkingDurationsToTarget),
+      config};
 
-    auto query = Query(queryParams);
+    auto referenceDate = *std::ranges::min_element(queryParams.sourceTimes);
+
+    auto query = Query(std::move(queryParams));
+
+    // MEASURE_FUNCTION();
     const auto& bestLabelsPerRound = query.run();
-
-    auto referenceDate = *std::ranges::min_element(sourceTimes);
 
     auto connection = LabelPostprocessor(*this);
     return connection.reconstructParetoOptimalSolutions(bestLabelsPerRound, validatedTargetStops, referenceDate);

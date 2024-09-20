@@ -19,11 +19,11 @@
 namespace raptor {
 
 
-  Query::Query(const QueryParams& params)
-    : sourceStopIndices(params.sourceStopIndices)
-    , targetStopIndices(params.targetStopIndices)
-    , sourceTimes(params.sourceTimes)
-    , walkingDurationsToTarget(params.walkingDurationsToTarget)
+  Query::Query(QueryParams params)
+    : sourceStopIndices(std::move(params.sourceStopIndices))
+    , targetStopIndices(std::move(params.targetStopIndices))
+    , sourceTimes(std::move(params.sourceTimes))
+    , walkingDurationsToTarget(std::move(params.walkingDurationsToTarget))
     , raptorData(params.raptorData)
     , config(params.config)
     , stopLabelsAndTimes(static_cast<int>(this->raptorData.getStopContext().stops.size()))
@@ -43,32 +43,27 @@ namespace raptor {
 
   const std::vector<std::vector<std::unique_ptr<StopLabelsAndTimes::Label>>>& Query::run()
   {
-   // MEASURE_FUNCTION();
+    // MEASURE_FUNCTION();
     const auto footpathRelaxer = FootpathRelaxer(stopLabelsAndTimes, raptorData, config.getMinimumTransferDuration(), config.getMaximumWalkingDuration());
-    const auto routeScanner = RouteScanner(stopLabelsAndTimes, raptorData, config.getMinimumTransferDuration());
-    std::unordered_set<types::raptorIdx> markedStops(sourceStopIndices.size());
-    initialize(markedStops);
-    auto newStops = footpathRelaxer.relaxInitial(sourceStopIndices);
-    markedStops.insert(newStops.begin(), newStops.end());
-    markedStops = removeSuboptimalLabelsForRound(0, markedStops);
-    types::raptorInt round = 1;
-    while (!markedStops.empty() && (round - 1) <= config.getMaximumTransferNumber()) {
+    auto routeScanner = RouteScanner(stopLabelsAndTimes, raptorData, config.getMinimumTransferDuration());
+
+    initialize();
+    footpathRelaxer.relaxInitial();
+    removeSuboptimalLabelsForRound(0);
+
+    while (stopLabelsAndTimes.hasMarkedStops() && static_cast<unsigned int>(stopLabelsAndTimes.getRound()) < config.getMaximumTransferNumber()) {
       stopLabelsAndTimes.addNewRound();
-
-      auto markedStopsNext = routeScanner.scan(round, markedStops);
-      auto relaxedStops = footpathRelaxer.relax(round, markedStopsNext);
-      markedStopsNext.insert(relaxedStops.begin(), relaxedStops.end());
-
-      markedStops = removeSuboptimalLabelsForRound(round, markedStopsNext);
-      round++;
+      routeScanner.scan(stopLabelsAndTimes.getRound());
+      footpathRelaxer.relax(stopLabelsAndTimes.getRound());
+      removeSuboptimalLabelsForRound(stopLabelsAndTimes.getRound());
     }
 
     return stopLabelsAndTimes.getBestLabelsPerRound();
   }
 
-  void Query::initialize(std::unordered_set<types::raptorIdx>& markedStops)
+  void Query::initialize()
   {
-   // MEASURE_FUNCTION();
+    // MEASURE_FUNCTION();
 #if LOGGER
     getConsoleLogger(LoggerName::RAPTOR)->info("Initializing global best times per stop and best labels per round");
 #endif
@@ -86,32 +81,34 @@ namespace raptor {
       auto label = std::make_unique<StopLabelsAndTimes::Label>(0, targetTime, StopLabelsAndTimes::LabelType::INITIAL, types::NO_INDEX, types::NO_INDEX, currentStopIdx, nullptr);
       stopLabelsAndTimes.setLabel(0, currentStopIdx, std::move(label));
       stopLabelsAndTimes.setBestTime(currentStopIdx, targetTime);
-
-      markedStops.insert(currentStopIdx);
+      stopLabelsAndTimes.mark(currentStopIdx);
     }
   }
 
-  std::unordered_set<types::raptorIdx> Query::removeSuboptimalLabelsForRound(const types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops)
+  void Query::removeSuboptimalLabelsForRound(const int round)
   {
     // MEASURE_FUNCTION();
     const auto bestTime = getBestTimeForAllTargetStops();
     if (bestTime == types::INFINITY_VALUE_MAX) {
 
-      return markedStops;
+      return;
     }
 
-    std::unordered_set<types::raptorIdx> markedStopsClean;
-    for (const auto stopIdx : markedStops) {
-      if (const auto label = stopLabelsAndTimes.getLabel(round, stopIdx)) {
+    for (auto stopIndex{0}; stopIndex < raptorData.getStopContext().stops.size(); stopIndex++) {
+
+      if (false == stopLabelsAndTimes.isMarkedNextRound(stopIndex)) {
+        continue;
+      }
+
+      if (const auto label = stopLabelsAndTimes.getLabel(round, stopIndex);
+          label != nullptr) {
+
         if (label->targetTime > bestTime) {
-          stopLabelsAndTimes.setLabel(round, stopIdx, nullptr);
-        }
-        else {
-          markedStopsClean.insert(stopIdx);
+          stopLabelsAndTimes.setLabel(round, stopIndex, nullptr);
+          stopLabelsAndTimes.unmark(stopIndex);
         }
       }
     }
-    return markedStopsClean;
   }
 
   types::raptorIdx Query::getBestTimeForAllTargetStops() const

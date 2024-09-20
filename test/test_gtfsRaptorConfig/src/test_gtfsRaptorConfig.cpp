@@ -87,7 +87,8 @@ TEST_F(GtfsRaptorConfigTest, routeFromVonwilToStephanshorn)
 
 TEST_F(GtfsRaptorConfigTest, routeFromAbtwilDorfToWestcenter)
 {
-  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0, EIGHT_AM);
+  const auto dateTime = raptor::utils::LocalDateTime{std::chrono::year{2024}, std::chrono::month{1}, std::chrono::day{1}, std::chrono::hours{8}, std::chrono::minutes{0}, std::chrono::seconds{0}};
+  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0, dateTime);
   const auto raptor = mapper.convert();
 
   const auto queryConfig = raptor::config::QueryConfig();
@@ -95,7 +96,7 @@ TEST_F(GtfsRaptorConfigTest, routeFromAbtwilDorfToWestcenter)
   // Act
   const auto startTime = std::chrono::high_resolution_clock::now();
   const auto connections = raptorRouter.routeEarliestArrival(
-    {{"8588889", static_cast<raptor::types::raptorInt>(EIGHT_AM.secondsOfDay())}},
+    {{"8588889", static_cast<raptor::types::raptorInt>(dateTime.secondsOfDay())}},
     {{"8589644", 0}},
     queryConfig);
 
@@ -169,7 +170,7 @@ TEST_F(GtfsRaptorConfigTest, routeStGallenVonwilToMels)
   const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
 
   std::cout << "Time spent for routing: " << duration << " milliseconds" << '\n';
-
+  std::cout << "Connections: " << connections.size() << '\n';
 
   for (const auto& connection : connections) {
 

@@ -6,7 +6,7 @@ add_subdirectory(src)
 add_subdirectory(include)
 
 # subset writer - helper tool to write a subset of the GTFS data
-add_subdirectory(src/agencySubsetWriter)
+# add_subdirectory(src/agencySubsetWriter)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/schedule/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/raptor/include)

@@ -51,7 +51,7 @@ class GtfsReaderFixture : public benchmark::Fixture {
  public:
   void SetUp(::benchmark::State& state) override {
     readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(
-        schedule::gtfs::ReaderType::CSV_PARALLEL, TEST_DATA_DIR);
+      schedule::gtfs::ReaderType::CSV_PARALLEL, TEST_DATA_DIR);
   }
 
   void TearDown(::benchmark::State& state) override {}
