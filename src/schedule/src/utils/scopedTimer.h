@@ -9,7 +9,7 @@
 #include <iostream>
 #include <source_location>
 
-#define USE_TIMER 1
+#define USE_TIMER 0
 
 #if USE_TIMER
 #define MEASURE_FUNCTION()          \

@@ -109,10 +109,6 @@ namespace converter {
 
   void TimetableManager::markActiveTrips(const raptor::utils::LocalDateTime& localDateTime) const
   {
-    /////////////////////
-    std::vector<std::shared_ptr<schedule::gtfs::Trip>> activeTrips;
-
-    // Filter calendars that have service available on the given date
     auto filteredCalendars = data->calendars | std::views::values
                              | std::views::filter([&localDateTime, this](const std::shared_ptr<schedule::gtfs::Calendar>& calendar) {
                                  return this->isServiceAvailable(calendar->serviceId, localDateTime);
@@ -121,27 +117,13 @@ namespace converter {
     for (const auto& item : filteredCalendars) {
       serviceIds.insert(item->serviceId);
     }
-
-    // Collect trips from the filtered calendars
+    std::vector<std::shared_ptr<schedule::gtfs::Trip>> activeTrips;
 
     for (const auto& trip : data->trips | std::views::values) {
       if (serviceIds.contains(trip->serviceId)) {
         activeTrips.push_back(trip);
       }
     }
-    ////////////////////////
-
-
-    /* const auto servedDates = data->calendarDates
-                             | std::views::values
-                             | std::views::join
-                             | std::views::filter([this, &localDateTime](const std::shared_ptr<schedule::gtfs::CalendarDate>& date) {
-                                 return this->isServiceAvailable(date->serviceId, localDateTime);
-                               })
-                             | std::views::transform([](const std::shared_ptr<schedule::gtfs::CalendarDate>& date) {
-                                 return date->serviceId;
-                               })
-                             | std::ranges::to<std::set<std::string>>();*/
 
     for (const auto& trip : std::views::filter(data->trips
                                                  | std::views::values,
@@ -151,11 +133,6 @@ namespace converter {
       trip->isTripActive = true;
       this->data->getRoute(trip->routeId)->isRouteActive = true;
     }
-    std::cout << "availableServices" << serviceIds.size() << std::endl;
-    std::cout << "All Trips: " << data->trips.size() << std::endl;
-    std::cout << "Active Trips: " << std::ranges::count_if(data->trips | std::views::values, [](const std::shared_ptr<schedule::gtfs::Trip>& trip) {
-      return trip->isTripActive;
-    }) << std::endl;
   }
 
 } // gtfs

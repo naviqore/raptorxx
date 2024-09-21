@@ -107,7 +107,7 @@ namespace raptor {
                                                                               const config::QueryConfig& config) const
   {
 
-    // MEASURE_FUNCTION();
+    MEASURE_FUNCTION();
 
     validation::checkNonNullOrEmptyStops(departureStops, "Departure");
     validation::checkNonNullOrEmptyStops(arrivalStops, "Arrival");
@@ -147,7 +147,7 @@ namespace raptor {
 
     auto query = Query(std::move(queryParams));
 
-    // MEASURE_FUNCTION();
+    MEASURE_FUNCTION();
     const auto& bestLabelsPerRound = query.run();
 
     auto connection = LabelPostprocessor(*this);

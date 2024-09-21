@@ -63,7 +63,7 @@ namespace raptor {
 
   void Query::initialize()
   {
-    // MEASURE_FUNCTION();
+    MEASURE_FUNCTION();
 #if LOGGER
     getConsoleLogger(LoggerName::RAPTOR)->info("Initializing global best times per stop and best labels per round");
 #endif
@@ -87,7 +87,7 @@ namespace raptor {
 
   void Query::removeSuboptimalLabelsForRound(const int round)
   {
-    // MEASURE_FUNCTION();
+    MEASURE_FUNCTION();
     const auto bestTime = getBestTimeForAllTargetStops();
     if (bestTime == types::INFINITY_VALUE_MAX) {
 

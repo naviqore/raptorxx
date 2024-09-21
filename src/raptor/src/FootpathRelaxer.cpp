@@ -26,8 +26,7 @@ namespace raptor {
 
   void FootpathRelaxer::relaxInitial() const
   {
-    // MEASURE_FUNCTION();
-
+    MEASURE_FUNCTION();
     relax(0);
   }
 

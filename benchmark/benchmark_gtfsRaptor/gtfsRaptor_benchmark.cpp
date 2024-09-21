@@ -15,38 +15,40 @@
 
 class GtfsRaptorFixture : public benchmark::Fixture {
 protected:
-  std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> reader;
-  std::unique_ptr<schedule::gtfs::IGtfsReaderStrategyFactory> readerFactory;
-  std::unique_ptr<raptor::RaptorRouter> raptorRouter;
-  schedule::gtfs::GtfsData data;
-
-  raptor::utils::LocalDateTime time{raptor::utils::LocalDateTime{std::chrono::year{2024}, std::chrono::month{1}, std::chrono::day{1}, std::chrono::hours{8}, std::chrono::minutes{0}, std::chrono::seconds{0}}};
-
-  raptor::config::QueryConfig queryConfig = {};
+  static std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> reader;
+  static std::unique_ptr<schedule::gtfs::IGtfsReaderStrategyFactory> readerFactory;
+  static std::unique_ptr<raptor::RaptorRouter> raptorRouter;
+  static schedule::gtfs::GtfsData data;
+  static bool initialized;
+  static raptor::utils::LocalDateTime time;
+  static raptor::config::QueryConfig queryConfig;
 
 public:
   void SetUp(::benchmark::State& state) override
   {
-    const std::string basePath = TEST_DATA_DIR;
-    readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(schedule::gtfs::ReaderType::CSV_PARALLEL, basePath);
+    if (!initialized) {
+      const std::string basePath = TEST_DATA_DIR;
+      readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(schedule::gtfs::ReaderType::CSV_PARALLEL, basePath);
 
-    const auto calendarStrategy = readerFactory->getStrategy(GtfsStrategyType::CALENDAR);
-    const auto calendarDatesStrategy = readerFactory->getStrategy(GtfsStrategyType::CALENDAR_DATE);
-    const auto routesStrategy = readerFactory->getStrategy(GtfsStrategyType::ROUTE);
-    const auto stopStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP);
-    const auto stopTimeStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP_TIME);
-    const auto transferStrategy = readerFactory->getStrategy(GtfsStrategyType::TRANSFER);
-    const auto tripStrategy = readerFactory->getStrategy(GtfsStrategyType::TRIP);
+      const auto calendarStrategy = readerFactory->getStrategy(GtfsStrategyType::CALENDAR);
+      const auto calendarDatesStrategy = readerFactory->getStrategy(GtfsStrategyType::CALENDAR_DATE);
+      const auto routesStrategy = readerFactory->getStrategy(GtfsStrategyType::ROUTE);
+      const auto stopStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP);
+      const auto stopTimeStrategy = readerFactory->getStrategy(GtfsStrategyType::STOP_TIME);
+      const auto transferStrategy = readerFactory->getStrategy(GtfsStrategyType::TRANSFER);
+      const auto tripStrategy = readerFactory->getStrategy(GtfsStrategyType::TRIP);
 
-    std::vector strategies = {calendarStrategy, calendarDatesStrategy, routesStrategy, stopStrategy, stopTimeStrategy, transferStrategy, tripStrategy};
+      std::vector strategies = {calendarStrategy, calendarDatesStrategy, routesStrategy, stopStrategy, stopTimeStrategy, transferStrategy, tripStrategy};
 
-    reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategies));
-    reader->readData();
-    this->data = reader->getData().get();
+      reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategies));
+      reader->readData();
+      GtfsRaptorFixture::data = reader->getData().get();
 
-    auto mapper = converter::GtfsToRaptorConverter(std::move(data), 120, time);
-    const auto raptor = mapper.convert();
-    raptorRouter = std::make_unique<raptor::RaptorRouter>(std::move(*raptor));
+      auto mapper = converter::GtfsToRaptorConverter(std::move(data), 120, time);
+      const auto raptor = mapper.convert();
+      raptorRouter = std::make_unique<raptor::RaptorRouter>(std::move(*raptor));
+      initialized = true;
+    }
   }
 
   void TearDown(::benchmark::State& state) override
@@ -54,6 +56,14 @@ public:
     reader.reset(nullptr);
   }
 };
+
+bool GtfsRaptorFixture::initialized = false;
+raptor::utils::LocalDateTime GtfsRaptorFixture::time{raptor::utils::LocalDateTime{std::chrono::year{2024}, std::chrono::month{1}, std::chrono::day{1}, std::chrono::hours{8}, std::chrono::minutes{0}, std::chrono::seconds{0}}};
+std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> GtfsRaptorFixture::reader = nullptr;
+std::unique_ptr<schedule::gtfs::IGtfsReaderStrategyFactory> GtfsRaptorFixture::readerFactory = nullptr;
+std::unique_ptr<raptor::RaptorRouter> GtfsRaptorFixture::raptorRouter = nullptr;
+schedule::gtfs::GtfsData GtfsRaptorFixture::data = {};
+raptor::config::QueryConfig GtfsRaptorFixture::queryConfig = {};
 
 void BenchmarkRoute(benchmark::State& state, const std::string& fromStop, const std::string& toStop, const long long departureTime, const long long arrivalTime, const raptor::RaptorRouter& raptorRouter, const raptor::config::QueryConfig& queryConfig)
 {
@@ -86,5 +96,8 @@ int main(int argc, char** argv)
 {
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
+
+  ::benchmark::Shutdown();
+
   return 0;
 }
