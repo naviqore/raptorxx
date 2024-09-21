@@ -46,8 +46,7 @@ static void BM_read_gtfs_schedule(benchmark::State& state) {
   strategy.push_back(transferStrategy);
   strategy.push_back(tripStrategy);
 
-  const auto reader =
-      std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
+  const auto reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   for (auto _ : state) {
     reader->readData();
   }

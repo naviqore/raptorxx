@@ -17,7 +17,6 @@
 #include "GtfsReaderStrategyFactory.h"
 
 static void BM_pointer(benchmark::State& state) {
-  // auto ptr = std::make_shared<int>(12);
   auto vec = std::vector<int*>();
 
   vec.resize(10'000, new int(12));

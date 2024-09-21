@@ -37,7 +37,6 @@ namespace geometry::kd_tree {
     std::shared_ptr<Node> buildTree(std::vector<T>& points, const int depth = 0) {
       if (points.empty())
       {
-        // base case
         return nullptr;
       }
       int axis = axisFunc(depth, kDimensions);

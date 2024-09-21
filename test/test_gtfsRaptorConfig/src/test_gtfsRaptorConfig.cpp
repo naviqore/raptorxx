@@ -18,6 +18,17 @@
 #include <DataContainer.h>
 #include <gtest/gtest.h>
 
+
+auto getTestLocalDateTime()
+{
+  return raptor::utils::LocalDateTime{std::chrono::year{2024},
+                                      std::chrono::month{4},
+                                      std::chrono::day{26},
+                                      std::chrono::hours{8},
+                                      std::chrono::minutes{0},
+                                      std::chrono::seconds{0}};
+}
+
 class GtfsRaptorConfigTest : public ::testing::Test {
 protected:
   std::unique_ptr<schedule::DataReader<schedule::DataContainer<schedule::gtfs::GtfsData>>> reader;
@@ -59,7 +70,10 @@ protected:
 
 TEST_F(GtfsRaptorConfigTest, shouldConvertGtfsScheduleToRaptor)
 {
-  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0, EIGHT_AM);
+  const auto dateTime = raptor::utils::LocalDateTime{std::chrono::year{2024}, std::chrono::month{4}, std::chrono::day{26}, std::chrono::hours{8}, std::chrono::minutes{0}, std::chrono::seconds{0}};
+
+  auto timetableManager = std::make_unique<converter::TimetableManager>(std::move(data), dateTime);
+  auto mapper = converter::GtfsToRaptorConverter(120, std::move(timetableManager));
   const auto raptor = mapper.convert();
 
   ASSERT_TRUE(raptor != nullptr);
@@ -67,7 +81,10 @@ TEST_F(GtfsRaptorConfigTest, shouldConvertGtfsScheduleToRaptor)
 
 TEST_F(GtfsRaptorConfigTest, routeFromVonwilToStephanshorn)
 {
-  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0, EIGHT_AM);
+  const auto dateTime = raptor::utils::LocalDateTime{std::chrono::year{2024}, std::chrono::month{4}, std::chrono::day{26}, std::chrono::hours{8}, std::chrono::minutes{0}, std::chrono::seconds{0}};
+
+  auto timetableManager = std::make_unique<converter::TimetableManager>(std::move(data), dateTime);
+  auto mapper = converter::GtfsToRaptorConverter(120, std::move(timetableManager));
   const auto raptor = mapper.convert();
 
   const auto queryConfig = raptor::config::QueryConfig();
@@ -87,8 +104,10 @@ TEST_F(GtfsRaptorConfigTest, routeFromVonwilToStephanshorn)
 
 TEST_F(GtfsRaptorConfigTest, routeFromAbtwilDorfToWestcenter)
 {
-  const auto dateTime = raptor::utils::LocalDateTime{std::chrono::year{2024}, std::chrono::month{1}, std::chrono::day{1}, std::chrono::hours{8}, std::chrono::minutes{0}, std::chrono::seconds{0}};
-  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0, dateTime);
+  const auto dateTime = raptor::utils::LocalDateTime{std::chrono::year{2024}, std::chrono::month{4}, std::chrono::day{26}, std::chrono::hours{8}, std::chrono::minutes{0}, std::chrono::seconds{0}};
+
+  auto timetableManager = std::make_unique<converter::TimetableManager>(std::move(data), dateTime);
+  auto mapper = converter::GtfsToRaptorConverter(120, std::move(timetableManager));
   const auto raptor = mapper.convert();
 
   const auto queryConfig = raptor::config::QueryConfig();
@@ -112,7 +131,10 @@ TEST_F(GtfsRaptorConfigTest, routeFromAbtwilDorfToWestcenter)
 
 TEST_F(GtfsRaptorConfigTest, routeFromSpeicherArToHaggen)
 {
-  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0, EIGHT_AM);
+  const auto dateTime = raptor::utils::LocalDateTime{std::chrono::year{2024}, std::chrono::month{4}, std::chrono::day{26}, std::chrono::hours{8}, std::chrono::minutes{0}, std::chrono::seconds{0}};
+
+  auto timetableManager = std::make_unique<converter::TimetableManager>(std::move(data), dateTime);
+  auto mapper = converter::GtfsToRaptorConverter(120, std::move(timetableManager));
   const auto raptor = mapper.convert();
 
   const auto queryConfig = raptor::config::QueryConfig();
@@ -131,7 +153,10 @@ TEST_F(GtfsRaptorConfigTest, routeFromSpeicherArToHaggen)
 // "8587965","Erlenbach ZH, Bahnhof","47.305818015385","8.5912448333883","","Parent8587965"
 TEST_F(GtfsRaptorConfigTest, routeFromHeiligkreuzToErlenbach)
 {
-  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 0, EIGHT_AM);
+  const auto dateTime = raptor::utils::LocalDateTime{std::chrono::year{2024}, std::chrono::month{4}, std::chrono::day{26}, std::chrono::hours{8}, std::chrono::minutes{0}, std::chrono::seconds{0}};
+
+  auto timetableManager = std::make_unique<converter::TimetableManager>(std::move(data), dateTime);
+  auto mapper = converter::GtfsToRaptorConverter(120, std::move(timetableManager));
   const auto raptor = mapper.convert();
 
   const auto queryConfig = raptor::config::QueryConfig();
@@ -153,18 +178,20 @@ TEST_F(GtfsRaptorConfigTest, routeStGallenVonwilToMels)
   getConsoleLogger(LoggerName::RAPTOR)->setLevel(LoggerBridge::OFF);
 #endif
 
-  const auto dateTime = raptor::utils::LocalDateTime{std::chrono::year{2024}, std::chrono::month{4}, std::chrono::day{26}, std::chrono::hours{8}, std::chrono::minutes{0}, std::chrono::seconds{0}};
-  auto mapper = converter::GtfsToRaptorConverter(std::move(data), 120, dateTime);
-  const auto raptor = mapper.convert();
+  const auto dateTime = getTestLocalDateTime();
 
-  const auto queryConfig = raptor::config::QueryConfig();
+  auto timetableManager = std::make_unique<converter::TimetableManager>(std::move(data), dateTime);
+  constexpr int defaultSameStopTransferTime = 120;
+  auto mapper = converter::GtfsToRaptorConverter(defaultSameStopTransferTime, std::move(timetableManager));
+  const auto raptor = mapper.convert();
   const auto raptorRouter = raptor::RaptorRouter(std::move(*raptor));
+
   // Act
   const auto startTime = std::chrono::high_resolution_clock::now();
   const auto connections = raptorRouter.routeEarliestArrival(
     {{"8589640", static_cast<raptor::types::raptorInt>(dateTime.secondsOfDay())}},
     {{"8579885", 0}},
-    queryConfig);
+    {});
 
   const auto endTime = std::chrono::high_resolution_clock::now();
   const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
