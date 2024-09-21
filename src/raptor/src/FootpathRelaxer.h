@@ -18,9 +18,9 @@ namespace raptor {
   public:
     FootpathRelaxer(StopLabelsAndTimes& stopLabelsAndTimes, const RaptorData& raptorData, types::raptorInt minimumTransferDuration, types::raptorInt maximumWalkingDuration);
 
-    [[nodiscard]] void relaxInitial() const;
+    void relaxInitial() const;
 
-    [[nodiscard]] void relax(int round) const;
+    void relax(int round) const;
 
   private:
     void expandFootpathsFromStop(types::raptorIdx stopIdx, types::raptorInt round) const;

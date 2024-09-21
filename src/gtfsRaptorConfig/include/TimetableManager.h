@@ -24,8 +24,6 @@ namespace converter {
 
     raptor::utils::LocalDateTime localDateTime;
 
-    std::vector<schedule::gtfs::Trip*> activeTrips;
-
   public:
     explicit TimetableManager(schedule::gtfs::GtfsData&& data, const raptor::utils::LocalDateTime& localDateTime);
 
@@ -37,15 +35,12 @@ namespace converter {
 
     [[nodiscard]] const RoutePartitioner& getRoutePartitioner() const;
 
-    [[nodiscard]] std::unordered_set<schedule::gtfs::Route*> getRoutes();
-
   private:
-    void createRelations();
+    void createRelations() const;
     void buildTripsToRoutesRelations() const;
     void buildStopTimesToTripsAndRoutesRelations() const;
     void buildStopRelations() const;
-    void getActiveTrips(const raptor::utils::LocalDateTime& localDateTime);
+    void markActiveTrips(const raptor::utils::LocalDateTime& localDateTime) const;
     [[nodiscard]] bool isServiceAvailable(const std::string& serviceId, const raptor::utils::LocalDateTime& localDateTime) const;
-    [[nodiscard]] std::unordered_set<schedule::gtfs::Route*> getRoutesForActiveTrips();
   };
 } // gtfs

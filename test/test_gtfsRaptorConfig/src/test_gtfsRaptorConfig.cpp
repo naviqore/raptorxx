@@ -153,7 +153,7 @@ TEST_F(GtfsRaptorConfigTest, routeStGallenVonwilToMels)
   getConsoleLogger(LoggerName::RAPTOR)->setLevel(LoggerBridge::OFF);
 #endif
 
-  const auto dateTime = raptor::utils::LocalDateTime{std::chrono::year{2024}, std::chrono::month{1}, std::chrono::day{1}, std::chrono::hours{8}, std::chrono::minutes{0}, std::chrono::seconds{0}};
+  const auto dateTime = raptor::utils::LocalDateTime{std::chrono::year{2024}, std::chrono::month{4}, std::chrono::day{26}, std::chrono::hours{8}, std::chrono::minutes{0}, std::chrono::seconds{0}};
   auto mapper = converter::GtfsToRaptorConverter(std::move(data), 120, dateTime);
   const auto raptor = mapper.convert();
 

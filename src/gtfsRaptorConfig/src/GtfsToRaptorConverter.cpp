@@ -17,13 +17,35 @@ namespace converter {
 
   std::shared_ptr<raptor::RaptorData> GtfsToRaptorConverter::convert()
   {
-    routePartitioner->processActiveRoutes(timetableManager.getRoutes());
+    auto activeTrips = timetableManager.getData().trips
+                       | std::views::values
+                       | std::views::filter([](const std::shared_ptr<schedule::gtfs::Trip>& trip) { return trip->isTripActive; });
 
-    for (const auto route : timetableManager.getRoutes()) {
-      std::ranges::for_each(routePartitioner->getSubRoutes(route->routeId), [this](const SubRoute& subRoute) {
-        addRoute(subRoute);
-      });
+    for (const auto& trip : activeTrips) {
+      const auto subRoute = routePartitioner->getSubRoute(trip->tripId);
+      if (!addedSubRoutes.contains(subRoute)) {
+        const auto stopIds = subRoute.getStopsSequence() | std::views::transform([](const schedule::gtfs::Stop* stop) { return stop->stopId; });
+
+        for (const auto& stopId : stopIds) {
+          if (!addedStopIds.contains(stopId)) {
+            raptorRouterBuilder.addStop(stopId);
+            addedStopIds.insert(stopId);
+          }
+        }
+        raptorRouterBuilder.addRoute(subRoute.getSubRouteId(), std::vector<std::string>{stopIds.begin(), stopIds.end()});
+        addedSubRoutes.insert(subRoute);
+      }
+      raptorRouterBuilder.addTrip(trip->tripId, subRoute.getSubRouteId());
+
+      const auto& stopTimes = trip->stopTimes;
+      std::vector<const schedule::gtfs::StopTime*> stopTimesArray;
+      stopTimesArray.reserve(stopTimes.size());
+      std::ranges::transform(trip->stopTimes, std::back_inserter(stopTimesArray), [](const auto stopTime) { return stopTime; });
+      for (const auto [index, stopTime] : std::views::enumerate(stopTimesArray)) {
+        addStopTimesToRouterBuilder(*stopTime, trip->tripId, subRoute.getSubRouteId(), static_cast<int>(index));
+      }
     }
+
     addTransfers();
     return raptorRouterBuilder.build();
   }

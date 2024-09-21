@@ -79,8 +79,8 @@ BENCHMARK_F(GtfsRaptorFixture, BM_route_AbtwilDorf_Westcenter)
   BenchmarkRoute(state, "8588889", "8589644", time.secondsOfDay(), time.secondsOfDay() + 60 * 60 * 2, *raptorRouter, queryConfig);
 }
 
-BENCHMARK_REGISTER_F(GtfsRaptorFixture, BM_route_vonwilSG_mels)->Iterations(1);
-BENCHMARK_REGISTER_F(GtfsRaptorFixture, BM_route_AbtwilDorf_Westcenter)->Iterations(10);
+BENCHMARK_REGISTER_F(GtfsRaptorFixture, BM_route_vonwilSG_mels)->Iterations(15);
+BENCHMARK_REGISTER_F(GtfsRaptorFixture, BM_route_AbtwilDorf_Westcenter)->Iterations(15);
 
 int main(int argc, char** argv)
 {

@@ -38,7 +38,7 @@ namespace schedule::gtfs {
     }
     std::string serviceId;
     std::chrono::year_month_day date;
-    ExceptionType exceptionType;
+    ExceptionType exceptionType{SERVICE_REMOVED};
   };
 
   inline auto calendarDateHash = [](const Calendar& calendarDate) {

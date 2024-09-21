@@ -32,8 +32,7 @@ namespace raptor {
                                                                                                  const std::map<types::raptorIdx, types::raptorIdx>& targetStops,
                                                                                                  const types::raptorInt& referenceDate) const
   {
-    // MEASURE_FUNCTION();
-
+    MEASURE_FUNCTION();
     std::vector<std::unique_ptr<Connection>> connections{};
     for (const auto& labels : bestLabelsPerRound) {
       const StopLabelsAndTimes::Label* bestLabel = nullptr;

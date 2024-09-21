@@ -43,7 +43,7 @@ namespace raptor {
 
   const std::vector<std::vector<std::unique_ptr<StopLabelsAndTimes::Label>>>& Query::run()
   {
-    // MEASURE_FUNCTION();
+    MEASURE_FUNCTION();
     const auto footpathRelaxer = FootpathRelaxer(stopLabelsAndTimes, raptorData, config.getMinimumTransferDuration(), config.getMaximumWalkingDuration());
     auto routeScanner = RouteScanner(stopLabelsAndTimes, raptorData, config.getMinimumTransferDuration());
 

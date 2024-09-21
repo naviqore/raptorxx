@@ -21,10 +21,8 @@ namespace schedule::gtfs {
   struct Trip;
 }
 namespace schedule::gtfs {
-  struct SCHEDULE_API Route
-  {
-    enum RouteType : uint16_t
-    {
+  struct SCHEDULE_API Route {
+    enum RouteType : uint16_t {
       Tram = 0,
       Subway = 1,
       Rail = 2,
@@ -43,13 +41,13 @@ namespace schedule::gtfs {
       , routeShortName(std::move(aRouteShortName))
       , routeLongName(std::move(aRouteLongName))
       , routeType(aRouteType)
-      , agencyId(std::move(aAgencyId)) {
+      , agencyId(std::move(aAgencyId))
+    {
       if (routeId.empty()) // || routeShortName.empty()  || routeLongName.empty()
       {
         throw std::invalid_argument("Mandatory route fields must not be empty");
       }
-      if (routeType > 12)
-      {
+      if (routeType > 12) {
         // TODO Log error - there are some route types that are not defined in the GTFS standard
         // throw std::invalid_argument("Invalid route type");
       }
@@ -59,7 +57,8 @@ namespace schedule::gtfs {
     std::string routeLongName;
     RouteType routeType;
     std::string agencyId;
-    std::vector<std::string> trips;
+    std::unordered_set<std::string> trips;
+    bool isRouteActive = false;
   };
 
   inline auto routeHash = [](const Route& route) {
