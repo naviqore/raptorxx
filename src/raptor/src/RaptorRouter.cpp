@@ -143,7 +143,7 @@ namespace raptor {
       std::move(walkingDurationsToTarget),
       config};
 
-    auto referenceDate = *std::ranges::min_element(queryParams.sourceTimes);
+    const auto referenceDate = *std::ranges::min_element(queryParams.sourceTimes);
 
     auto query = Query(std::move(queryParams));
 

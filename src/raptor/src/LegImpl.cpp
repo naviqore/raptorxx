@@ -13,27 +13,35 @@ namespace raptor {
     , toStopId(std::move(toStopId))
     , departureTime(departureTime)
     , arrivalTime(arrivalTime)
-    , type(type) {
+    , type(type)
+  {
   }
-  std::string const& LegImpl::getRouteId() const {
+  std::string const& LegImpl::getRouteId() const
+  {
     return routeId;
   }
-  std::string const& LegImpl::getTripId() const {
+  std::string const& LegImpl::getTripId() const
+  {
     return tripId;
   }
-  std::string const& LegImpl::getFromStopId() const {
+  std::string const& LegImpl::getFromStopId() const
+  {
     return fromStopId;
   }
-  std::string const& LegImpl::getToStopId() const {
+  std::string const& LegImpl::getToStopId() const
+  {
     return toStopId;
   }
-  int LegImpl::getDepartureTime() const {
-    return departureTime;
+  int LegImpl::getDepartureTime() const
+  {
+    return static_cast<int>(departureTime);
   }
-  int LegImpl::getArrivalTime() const {
-    return arrivalTime;
+  int LegImpl::getArrivalTime() const
+  {
+    return static_cast<int>(arrivalTime);
   }
-  std::optional<Leg::Type> LegImpl::getType() const {
+  std::optional<Leg::Type> LegImpl::getType() const
+  {
     return type;
   }
 } // raptor

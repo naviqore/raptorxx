@@ -16,14 +16,13 @@
 namespace raptor {
   class RaptorRouter;
 
-  class LabelPostprocessor
-  {
-    std::vector<Stop> stops;
-    std::vector<StopTime> stopTimes;
-    std::vector<Route> routes;
-    std::vector<RouteStop> routeStops;
+  class LabelPostprocessor {
+    const std::vector<Stop>& stops;
+    const std::vector<StopTime>& stopTimes;
+    const std::vector<Route>& routes;
+    const std::vector<RouteStop>& routeStops;
 
-    std::unique_ptr<Connection> reconstructConnectionFromLabel(const StopLabelsAndTimes::Label* label, const types::raptorInt& referenceDate) const;
+    std::unique_ptr<Connection> reconstructConnectionFromLabel(const StopLabelsAndTimes::Label* label) const;
 
   public:
     explicit LabelPostprocessor(const RaptorRouter& raptorData);
