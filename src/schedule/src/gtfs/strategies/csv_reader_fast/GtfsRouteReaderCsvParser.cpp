@@ -54,7 +54,7 @@ namespace schedule::gtfs {
         std::make_shared<Route>(routeId,
                                 std::move(routeShortName),
                                 std::move(routeLongName),
-                                static_cast<Route::RouteType>(routeType), // TODO handle exception
+                                static_cast<Route::RouteType>(routeType),
                                 std::move(agencyId)));
     }
   }

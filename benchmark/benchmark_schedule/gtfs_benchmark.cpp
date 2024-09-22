@@ -17,7 +17,6 @@
 #include "GtfsReaderStrategyFactory.h"
 
 static void BM_pointer(benchmark::State& state) {
-  // auto ptr = std::make_shared<int>(12);
   auto vec = std::vector<int*>();
 
   vec.resize(10'000, new int(12));
@@ -51,7 +50,7 @@ class GtfsReaderFixture : public benchmark::Fixture {
  public:
   void SetUp(::benchmark::State& state) override {
     readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(
-        schedule::gtfs::ReaderType::CSV_PARALLEL, TEST_DATA_DIR);
+      schedule::gtfs::ReaderType::CSV_PARALLEL, TEST_DATA_DIR);
   }
 
   void TearDown(::benchmark::State& state) override {}

@@ -20,7 +20,7 @@ static void BM_read_gtfs_schedule(benchmark::State& state) {
   std::string basePath = TEST_DATA_DIR;
 
   const auto readerFactory = schedule::gtfs::createGtfsReaderStrategyFactory(
-      schedule::gtfs::ReaderType::CSV_PARALLEL, std::move(basePath));
+    schedule::gtfs::ReaderType::CSV_PARALLEL, std::move(basePath));
 
   const auto agencyStrategy =
       readerFactory->getStrategy(GtfsStrategyType::AGENCY);
@@ -46,8 +46,7 @@ static void BM_read_gtfs_schedule(benchmark::State& state) {
   strategy.push_back(transferStrategy);
   strategy.push_back(tripStrategy);
 
-  const auto reader =
-      std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
+  const auto reader = std::make_unique<schedule::gtfs::GtfsReader>(std::move(strategy));
   for (auto _ : state) {
     reader->readData();
   }

@@ -23,7 +23,6 @@ namespace schedule::gtfs {
     MEASURE_FUNCTION();
     std::ifstream infile(filename);
     if (!infile.is_open()) {
-      // TODO log error
       throw std::runtime_error("Error opening file: " + std::string(filename));
     }
     getLogger(Target::CONSOLE, LoggerName::GTFS)->info(std::format("Reading file: {}", filename));
@@ -35,7 +34,6 @@ namespace schedule::gtfs {
     while (std::getline(infile, line)) {
       fields = utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 4) {
-        // TODO: Handle error
         continue;
       }
       aReader.getData().get().agencies.emplace(std::string(fields[headerMap["agency_name"]]),

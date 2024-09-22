@@ -51,20 +51,44 @@ namespace raptor {
     };
 
     explicit StopLabelsAndTimes(int stopSize);
+
     ~StopLabelsAndTimes();
 
     void addNewRound();
+
     [[nodiscard]] const Label* getLabel(types::raptorInt round, types::raptorIdx stopIdx) const;
+
     void setLabel(types::raptorInt round, types::raptorIdx stopIdx, std::unique_ptr<Label>&& label);
+
     [[nodiscard]] types::raptorInt getComparableBestTime(types::raptorIdx stopIdx) const;
+
     [[nodiscard]] types::raptorInt getActualBestTime(types::raptorIdx stopIdx) const;
+
     void setBestTime(types::raptorIdx stopIdx, types::raptorInt time);
+
     [[nodiscard]] const std::vector<std::vector<std::unique_ptr<Label>>>& getBestLabelsPerRound() const;
+
+    [[nodiscard]] bool isMarkedThisRound(types::raptorIdx stopIdx) const;
+
+    [[nodiscard]] bool isMarkedNextRound(types::raptorIdx stopIdx) const;
+
+    void mark(types::raptorIdx stopIdx);
+
+    void unmark(types::raptorIdx stopIdx);
+
+    [[nodiscard]] bool hasMarkedStops() const;
+
+    [[nodiscard]] const std::vector<bool>& getMarkedStopsMaskNextRound() const;
+
+    [[nodiscard]] int getRound() const;
 
   private:
     std::vector<std::vector<std::unique_ptr<Label>>> bestLabelsPerRound;
     std::vector<types::raptorInt> bestTimeForStops;
     int stopSize;
+    std::vector<bool> markedStopsMaskThisRound;
+    std::vector<bool> markedStopsMaskNextRound;
+    int round{-1};
   };
 
 } // raptor

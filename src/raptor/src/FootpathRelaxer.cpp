@@ -24,38 +24,30 @@ namespace raptor {
   {
   }
 
-  std::unordered_set<types::raptorIdx> FootpathRelaxer::relaxInitial(const std::vector<types::raptorIdx>& stopIndices) const
+  void FootpathRelaxer::relaxInitial() const
   {
-    // MEASURE_FUNCTION();
-
-    std::unordered_set<types::raptorIdx> newlyMarkedStops;
-
-#if LOGGER
-    getConsoleLogger(LoggerName::RAPTOR)->info("Initial relaxing of footpaths for source stops");
-#endif
-
-
-    for (const auto sourceStopIdx : stopIndices) {
-      expandFootpathsFromStop(sourceStopIdx, 0, newlyMarkedStops);
-    }
-    return newlyMarkedStops;
+    MEASURE_FUNCTION();
+    relax(0);
   }
 
-  std::unordered_set<types::raptorIdx> FootpathRelaxer::relax(const types::raptorInt round, const std::unordered_set<types::raptorIdx>& stopIndices) const
+  void FootpathRelaxer::relax(const int round) const
   {
-    std::unordered_set<types::raptorIdx> newlyMarkedStops;
+
 #if LOGGER
     getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Relaxing footpaths for round {}", round));
 #endif
 
+    auto routeMarkedStops = stopLabelsAndTimes.getMarkedStopsMaskNextRound();
+    for (auto sourceStopIndex{0}; sourceStopIndex < routeMarkedStops.size(); sourceStopIndex++) {
+      if (!routeMarkedStops[sourceStopIndex]) {
+        continue;
+      }
 
-    for (const auto sourceStopIdx : stopIndices) {
-      expandFootpathsFromStop(sourceStopIdx, round, newlyMarkedStops);
+      expandFootpathsFromStop(sourceStopIndex, round);
     }
-    return newlyMarkedStops;
   }
 
-  void FootpathRelaxer::expandFootpathsFromStop(const types::raptorIdx stopIdx, const types::raptorInt round, std::unordered_set<types::raptorInt>& markedStops) const
+  void FootpathRelaxer::expandFootpathsFromStop(const types::raptorIdx stopIdx, const types::raptorInt round) const
   {
     if (stops[stopIdx].numberOfTransfers == 0) {
       return;
@@ -105,7 +97,7 @@ namespace raptor {
                                     transfer.targetStopIndex,
                                     stopLabelsAndTimes.getLabel(round, stopIdx)));
 
-      markedStops.insert(transfer.targetStopIndex);
+      stopLabelsAndTimes.mark(transfer.targetStopIndex);
     }
   }
 } // raptor

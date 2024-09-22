@@ -37,9 +37,9 @@ namespace schedule::gtfs {
     std::string routeId;
     std::string serviceId;
     std::string tripId;
+    bool isTripActive = false;
 
     std::set<const StopTime*, decltype(stopTimeCompare)> stopTimes{};
-    // std::vector<StopTime> stopTimes{}; //TODO: think about storing pointers to StopTime objects
   };
 
 
@@ -52,6 +52,19 @@ namespace schedule::gtfs {
   inline auto tripEqual = [](const Trip& lhs, const Trip& rhs) {
     return lhs.tripId == rhs.tripId && lhs.routeId == rhs.routeId;
   };
+
+  // hash and equal for pointer
+  namespace detail {
+    inline auto tripHash = [](const Trip* trip) {
+      const auto h1 = std::hash<std::string>{}(trip->tripId);
+      const auto h2 = std::hash<std::string>{}(trip->routeId);
+      return h1 ^ (h2 << 1);
+    };
+
+    inline auto tripEqual = [](const Trip* lhs, const Trip* rhs) {
+      return lhs->tripId == rhs->tripId && lhs->routeId == rhs->routeId;
+    };
+  }
 
 } // gtfs
 

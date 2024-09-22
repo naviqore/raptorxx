@@ -15,12 +15,16 @@ namespace converter {
   RoutePartitioner::RoutePartitioner(schedule::gtfs::GtfsData* data)
     : data(data)
   {
+    processActiveRoutes();
   }
 
-  void RoutePartitioner::processActiveRoutes(const std::unordered_set<schedule::gtfs::Route*>& activeRoutes)
+  void RoutePartitioner::processActiveRoutes()
   {
-    std::ranges::for_each(activeRoutes, [this](const schedule::gtfs::Route* route) {
-      this->processRoute(*route);
+    std::ranges::for_each(data->routes | std::views::values, [this](const std::shared_ptr<schedule::gtfs::Route>& route) {
+      if (route->isRouteActive && !processedRoutes.contains(route->routeId)) {
+        this->processRoute(*route);
+        processedRoutes.insert(route->routeId);
+      }
     });
   }
 
@@ -41,7 +45,6 @@ namespace converter {
   const SubRoute& RoutePartitioner::getSubRoute(std::string const& tripId) const
   {
     const auto trip = data->getTrip(tripId);
-    //const auto route = data->routes.at(trip.routeId);
     const auto& subRoutesForRoute = subRoutes.at(trip->routeId);
     const auto key = generateStopSequenceKey(tripId);
     if (!subRoutesForRoute.contains(key)) {
@@ -50,9 +53,8 @@ namespace converter {
     return subRoutesForRoute.at(key);
   }
 
-  const std::vector<std::string>& RoutePartitioner::getTrips(std::string const& routeId) const
+  const std::unordered_set<std::string>& RoutePartitioner::getTrips(std::string const& routeId) const
   {
-    //TODO just handle needed trips
     return data->getRoute(routeId)->trips;
   }
 
@@ -63,6 +65,9 @@ namespace converter {
 
     for (const auto& tripId : getTrips(route.routeId)) {
       const auto trip = data->getTrip(tripId);
+      if (!trip->isTripActive) {
+        continue;
+      }
       auto key = this->generateStopSequenceKey(tripId);
 
       auto [it, inserted] = sequenceKeyToSubRouteHashMap.try_emplace(key,

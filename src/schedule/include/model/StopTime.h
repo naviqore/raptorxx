@@ -29,17 +29,13 @@ namespace schedule::gtfs {
     std::string stopId{};
     int stopSequence{};
   };
-  // TODO create hash with tripId and stopSequence
 
   inline auto stopTimeHash = [](StopTime const& stopTime) noexcept {
     return std::hash<std::string>{}(stopTime.stopId);
-    // const std::size_t tripIdHash = std::hash<std::string>{}(stopTime.tripId);
-
-    //  return stopIdHash ^ (tripIdHash << 1);
   };
 
   inline auto stopTimeEqual = [](StopTime const& lhs, StopTime const& rhs) noexcept {
-    return lhs.stopId == rhs.stopId; // && lhs.tripId == rhs.tripId;
+    return lhs.stopId == rhs.stopId;
   };
 
   inline auto stopTimeLessByStopSequence = [](StopTime const& lhs, StopTime const& rhs) noexcept {

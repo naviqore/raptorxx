@@ -15,6 +15,12 @@ namespace raptor {
     // Initialize best times to initial value
     std::ranges::fill(bestTimeForStops, std::numeric_limits<int>::max());
 
+    this->markedStopsMaskNextRound.resize(stopSize);
+    this->markedStopsMaskThisRound.resize(stopSize);
+
+    std::ranges::fill(markedStopsMaskThisRound, false);
+    std::ranges::fill(markedStopsMaskNextRound, false);
+
     // Set empty labels for first round
     addNewRound();
   }
@@ -22,6 +28,11 @@ namespace raptor {
 
   void StopLabelsAndTimes::addNewRound()
   {
+    std::swap(markedStopsMaskThisRound, markedStopsMaskNextRound);
+    std::ranges::fill(markedStopsMaskNextRound, false);
+
+    this->round++;
+
     bestLabelsPerRound.emplace_back(stopSize);
     for (auto& label : bestLabelsPerRound.back()) {
       label = nullptr;
@@ -58,8 +69,7 @@ namespace raptor {
       throw std::out_of_range("Stop index out of range");
     }
 
-    for (const auto& it : std::ranges::reverse_view(bestLabelsPerRound))
-    {
+    for (const auto& it : std::ranges::reverse_view(bestLabelsPerRound)) {
       if (const auto label = it[stopIdx].get()) {
         return label->targetTime;
       }
@@ -79,5 +89,41 @@ namespace raptor {
   const std::vector<std::vector<std::unique_ptr<StopLabelsAndTimes::Label>>>& StopLabelsAndTimes::getBestLabelsPerRound() const
   {
     return bestLabelsPerRound;
+  }
+
+  bool StopLabelsAndTimes::isMarkedThisRound(const types::raptorIdx stopIdx) const
+  {
+    return markedStopsMaskThisRound[stopIdx];
+  }
+  bool StopLabelsAndTimes::isMarkedNextRound(const types::raptorIdx stopIdx) const
+  {
+    return markedStopsMaskNextRound[stopIdx];
+  }
+  void StopLabelsAndTimes::mark(const types::raptorIdx stopIdx)
+  {
+    markedStopsMaskNextRound[stopIdx] = true;
+  }
+  void StopLabelsAndTimes::unmark(const types::raptorIdx stopIdx)
+  {
+    markedStopsMaskNextRound[stopIdx] = false;
+  }
+  bool StopLabelsAndTimes::hasMarkedStops() const
+  {
+    for (auto i{0}; i < stopSize; ++i) {
+      if (markedStopsMaskNextRound[i]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  const std::vector<bool>& StopLabelsAndTimes::getMarkedStopsMaskNextRound() const
+  {
+    return markedStopsMaskNextRound;
+  }
+
+  int StopLabelsAndTimes::getRound() const
+  {
+    return round;
   }
 } // raptor

@@ -32,16 +32,12 @@ namespace schedule::gtfs {
     std::getline(infile, line); // Skip header line
     std::map<std::string, size_t> headerMap = utils::getGtfsColumnIndices(line);
 
-    constexpr size_t expectedSizec = 16'891'069; // TODO this is a guess
+    constexpr size_t expectedSizec = 16'891'069; // size guessed from data
     aReader.getData().get().stopTimes.reserve(expectedSizec);
     std::vector<std::string_view> fields;
     fields.reserve(7);
 
     while (std::getline(infile, line)) {
-      /*if (!line.empty() && line.back() == '\r')
-      {
-        line.pop_back();
-      }*/
       fields = utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 5) {
         continue;

@@ -55,57 +55,45 @@ namespace raptor {
     , routeStops(raptorData.getRouteTraversal().routeStops)
     , stopLabelsAndTimes(const_cast<StopLabelsAndTimes&>(stopLabelsAndTimes))
     , minTransferDuration(minimumTransferDuration)
+    , routesToScanMask(this->routes.size(), false)
   {
   }
 
-  std::unordered_set<types::raptorIdx> RouteScanner::scan(const types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops) const
+  void RouteScanner::scan(const int round)
   {
 #if LOGGER
-    getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Scanning routes for round {} ({} routes)", round, routesToScan.size()));
+    getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Scanning routes for round {} ({} routes)", round, this->routesToScanMask.size()));
 #endif
-    const std::unordered_set<types::raptorIdx> routesToScan = getRoutesToScan(markedStops);
+    setRoutesToScan();
 
-    std::unordered_set<types::raptorIdx> markedStopsNext;
-
-    for (const auto currentRouteIdx : routesToScan) {
-      scanRoute(currentRouteIdx, round, markedStops, markedStopsNext);
-    }
-
-    return markedStopsNext;
-
-    /*  std::unordered_set<types::raptorIdx> markedStopsNext;
-
-    for (const auto stopIdx : markedStops) {
-      const Stop& currentStop = stops[stopIdx];
-      auto stopRouteIdx = currentStop.stopRouteIndex;
-      const auto stopRouteEndIdx = stopRouteIdx + currentStop.numberOfRoutes;
-
-      while (stopRouteIdx < stopRouteEndIdx) {
-        markedStopsNext.insert(stopRoutes[stopRouteIdx]);
-        ++stopRouteIdx;
+    for (auto currentRouteIndex{0}; currentRouteIndex < routesToScanMask.size(); currentRouteIndex++) {
+      if (routesToScanMask[currentRouteIndex]) {
+        scanRoute(currentRouteIndex, round);
       }
-    }*/
+    }
   }
 
 
-  std::unordered_set<types::raptorIdx> RouteScanner::getRoutesToScan(const std::unordered_set<types::raptorIdx>& markedStops) const
+  std::unordered_set<types::raptorIdx> RouteScanner::getRoutesToScan(const std::vector<bool>& markedStops) const
   {
     std::unordered_set<types::raptorIdx> routesToScan(stopRoutes.size());
 
-    for (const auto stopIdx : markedStops) {
-      const Stop& currentStop = stops[stopIdx];
-      auto stopRouteIdx = currentStop.stopRouteIndex;
-      const auto stopRouteEndIdx = stopRouteIdx + currentStop.numberOfRoutes;
+    for (size_t stopIdx = 0; stopIdx < markedStops.size(); ++stopIdx) {
+      if (markedStops[stopIdx]) {
+        const Stop& currentStop = stops[stopIdx];
+        auto stopRouteIdx = currentStop.stopRouteIndex;
+        const auto stopRouteEndIdx = stopRouteIdx + currentStop.numberOfRoutes;
 
-      while (stopRouteIdx < stopRouteEndIdx) {
-        routesToScan.insert(stopRoutes[stopRouteIdx]);
-        ++stopRouteIdx;
+        while (stopRouteIdx < stopRouteEndIdx) {
+          routesToScan.insert(stopRoutes[stopRouteIdx]);
+          ++stopRouteIdx;
+        }
       }
     }
     return routesToScan;
   }
 
-  void RouteScanner::scanRoute(const types::raptorIdx currentRouteIdx, const types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops, std::unordered_set<types::raptorIdx>& markedStopsNext) const
+  void RouteScanner::scanRoute(const types::raptorIdx currentRouteIdx, const types::raptorInt round) const
   {
     const auto lastRound = round - 1;
 
@@ -118,7 +106,7 @@ namespace raptor {
     const auto firstStopTimeIdx = currentRoute.firstStopTimeIndex;
     const auto numberOfStops = currentRoute.numberOfStops;
 
-    std::shared_ptr<ActiveTrip> activeTrip = nullptr;
+    std::optional<ActiveTrip> activeTrip = std::nullopt;
 
     for (auto stopOffset = 0u; stopOffset < numberOfStops; ++stopOffset) {
       const auto stopIdx = routeStops[firstRouteStopIdx + stopOffset].stopIndex;
@@ -127,7 +115,7 @@ namespace raptor {
 
       if (!activeTrip) {
         // replace this "unclean code" with canEnterAtStop (performance...)
-        if (bestStopTime == types::INFINITY_VALUE_MAX || !markedStops.contains(stopIdx) || stopOffset + 1 == numberOfStops) {
+        if (bestStopTime == types::INFINITY_VALUE_MAX || !stopLabelsAndTimes.isMarkedThisRound(stopIdx) || stopOffset + 1 == numberOfStops) {
 #if LOGGER
           getConsoleLogger(LoggerName::RAPTOR)->info(std::format("Stop {} cannot be entered", stop.id));
 #endif
@@ -136,7 +124,7 @@ namespace raptor {
       }
       else {
         const StopTime& stopTimeObj = stopTimes[firstStopTimeIdx + activeTrip->tripOffset * numberOfStops + stopOffset];
-        if (!checkIfTripIsPossibleAndUpdateMarks(stopTimeObj, activeTrip, stop, bestStopTime, stopIdx, round, lastRound, markedStopsNext, currentRouteIdx)) {
+        if (!checkIfTripIsPossibleAndUpdateMarks(stopTimeObj, activeTrip.value(), stop, bestStopTime, stopIdx, round, lastRound, currentRouteIdx)) {
           continue;
         }
       }
@@ -145,7 +133,7 @@ namespace raptor {
     }
   }
 
-  bool RouteScanner::checkIfTripIsPossibleAndUpdateMarks(const StopTime& stopTime, const std::shared_ptr<ActiveTrip>& activeTrip, const Stop& stop, const types::raptorInt bestStopTime, types::raptorIdx stopIdx, const types::raptorInt thisRound, const types::raptorInt lastRound, std::unordered_set<types::raptorIdx>& markedStopsNext, types::raptorIdx currentRouteIdx) const
+  bool RouteScanner::checkIfTripIsPossibleAndUpdateMarks(const StopTime& stopTime, const ActiveTrip& activeTrip, const Stop& stop, const types::raptorInt bestStopTime, types::raptorIdx stopIdx, const types::raptorInt thisRound, const types::raptorInt lastRound, types::raptorIdx currentRouteIdx) const
   {
 
     if (const bool isImproved = stopTime.arrival < bestStopTime) {
@@ -155,16 +143,16 @@ namespace raptor {
 
       stopLabelsAndTimes.setBestTime(stopIdx, stopTime.arrival);
 
-      auto label = std::make_unique<StopLabelsAndTimes::Label>(activeTrip->entryTime,
+      auto label = std::make_unique<StopLabelsAndTimes::Label>(activeTrip.entryTime,
                                                                stopTime.arrival,
                                                                StopLabelsAndTimes::LabelType::ROUTE,
                                                                currentRouteIdx,
-                                                               activeTrip->tripOffset,
+                                                               activeTrip.tripOffset,
                                                                stopIdx,
-                                                               activeTrip->previousLabel);
+                                                               activeTrip.previousLabel);
 
       stopLabelsAndTimes.setLabel(thisRound, stopIdx, std::move(label));
-      markedStopsNext.insert(stopIdx);
+      stopLabelsAndTimes.mark(stopIdx);
 
       return false;
     }
@@ -189,7 +177,7 @@ namespace raptor {
     return true;
   }
 
-  std::shared_ptr<ActiveTrip> RouteScanner::findPossibleTrip(const types::raptorIdx stopIdx, const Stop& stop, const types::raptorInt stopOffset, const Route& route, const types::raptorInt lastRound) const
+  std::optional<ActiveTrip> RouteScanner::findPossibleTrip(const types::raptorIdx stopIdx, const Stop& stop, const types::raptorInt stopOffset, const Route& route, const types::raptorInt lastRound) const
   {
     const auto firstStopTimeIdx = route.firstStopTimeIndex;
     const auto numberOfStops = route.numberOfStops;
@@ -211,7 +199,7 @@ namespace raptor {
 #endif
 
         types::raptorInt entryTime = currentStopTime.departure;
-        return std::make_shared<ActiveTrip>(tripOffset, entryTime, previousLabel);
+        return ActiveTrip(tripOffset, entryTime, previousLabel);
       }
       if (tripOffset < numberOfTrips - 1) {
         tripOffset += 1;
@@ -221,10 +209,26 @@ namespace raptor {
         getConsoleLogger(LoggerName::RAPTOR)->info(std::format("No active trip found on route {}", route.id));
 #endif
 
-        return nullptr;
+        return std::nullopt;
       }
     }
 
-    return nullptr;
+    return std::nullopt;
+  }
+  void RouteScanner::setRoutesToScan()
+  {
+
+    for (auto stopIdx{0}; stopIdx < stops.size(); stopIdx++) {
+      if (false == stopLabelsAndTimes.isMarkedThisRound(stopIdx)) {
+        continue;
+      }
+      const auto& currentStop = stops[stopIdx];
+      auto stopRouteIdx = currentStop.stopRouteIndex;
+      const auto stopRouteEndIdx = stopRouteIdx + currentStop.numberOfRoutes;
+      while (stopRouteIdx < stopRouteEndIdx) {
+        routesToScanMask[stopRoutes[stopRouteIdx]] = true;
+        stopRouteIdx++;
+      }
+    }
   }
 } // raptor

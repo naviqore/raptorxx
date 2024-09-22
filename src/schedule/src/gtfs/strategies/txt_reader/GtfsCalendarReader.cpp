@@ -21,7 +21,6 @@ namespace schedule::gtfs {
     MEASURE_FUNCTION();
     std::ifstream infile(filename);
     if (!infile.is_open()) {
-      // TODO log error
       throw std::runtime_error("Error opening file: " + std::string(filename));
     }
     getLogger(Target::CONSOLE, LoggerName::GTFS)->info(std::format("Reading file: {}", filename));
