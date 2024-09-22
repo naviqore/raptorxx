@@ -2,8 +2,6 @@
 // Created by MichaelBrunner on 04/08/2024.
 //
 
-// TODO create a Utils library??
-
 #pragma once
 
 #include <chrono>

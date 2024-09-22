@@ -65,8 +65,6 @@ namespace raptor {
 
   RouteContainer RouteBuilder::build()
   {
-    validate();
-    //TODO I GET TOO MANY ROUTES!!
     std::vector<std::pair<std::string, std::vector<StopTime>>> sortedEntries(trips.begin(), trips.end());
     std::ranges::sort(sortedEntries, [](const auto& a, const auto& b) {
       return a.second[0].departure < b.second[0].departure;
@@ -80,21 +78,5 @@ namespace raptor {
     return {routeId, stopSequence, sortedTrips};
   }
 
-  void RouteBuilder::validate() const
-  {
-    //TODO check if this can even be used for validation
-    for (const auto& routeStopTimes : trips | std::views::values) {
-      for (const auto& [key, value] : stopSequence) {
-      }
-    }
-
-    // for (const auto& [tripId, routeStopTimes] : trips) {
-    //   for (const auto& stopSequenceIndex : stopSequence | std::views::keys) {
-    //     if (routeStopTimes[stopSequenceIndex].arrival == 0 && routeStopTimes[stopSequenceIndex].departure == 0) {
-    //       throw std::runtime_error("Stop time at stop " + std::to_string(stopSequenceIndex) + " on trip " + tripId + " not set.");
-    //     }
-    //   }
-    // }
-  }
 
 } // namespace raptor

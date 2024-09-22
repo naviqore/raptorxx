@@ -35,7 +35,6 @@ namespace schedule::gtfs {
     while (std::getline(infile, line)) {
       fields = utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 4) {
-        // TODO: Handle error
         continue;
       }
 

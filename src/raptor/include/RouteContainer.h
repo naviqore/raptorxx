@@ -22,8 +22,6 @@ namespace raptor {
 
     [[nodiscard]] const std::string& id() const;
 
-    //bool operator<(const RouteContainer& other) const; //TODO remove operator<  and use a function instead
-
     [[nodiscard]] const std::map<int, std::string>& stopSequence() const;
 
     [[nodiscard]] const std::map<std::string, std::vector<StopTime>>& trips() const;

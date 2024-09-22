@@ -26,8 +26,7 @@ namespace schedule::gtfs {
     MEASURE_FUNCTION();
     std::ifstream infile(filename);
     if (!infile.is_open()) {
-      // throw std::runtime_error("Error opening file: " + std::string(filename));
-      return;
+      throw std::runtime_error("Error opening file: " + std::string(filename));
     }
     getLogger(Target::CONSOLE, LoggerName::GTFS)->info(std::format("Reading file: {}", filename));
     constexpr size_t bufferSize = 1 << 20; // 1 MB buffer size
@@ -38,15 +37,11 @@ namespace schedule::gtfs {
     std::getline(infile, line); // Skip header line
     std::map<std::string, size_t> headerMap = utils::getGtfsColumnIndices(line);
 
-    // Reserve memory for vector
-    //constexpr size_t expectedSize = 5'600'000;
-    // aReader.getData().get().calendarDates.reserve(expectedSize);
     std::vector<std::string_view> fields;
     fields.reserve(3);
     while (std::getline(infile, line)) {
       fields = utils::splitLineAndRemoveQuotes(line);
       if (fields.size() < 3) {
-        // TODO: Handle error
         continue;
       }
 

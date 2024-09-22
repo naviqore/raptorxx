@@ -9,6 +9,11 @@
 #include "GtfsToRaptorConverter.h"
 #include "LocalDateTime.h"
 #include <DataContainer.h>
+#include <chrono>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
 
 class SimpleRaptorBenchmark {
 protected:
@@ -51,17 +56,25 @@ public:
     }
   }
 
-  static void benchmarkRoute(const std::string& fromStop, const std::string& toStop)
+  static long long routeEarliestArrival(const std::string& fromStopId, const std::string& toStopId)
   {
     const auto startTime = std::chrono::high_resolution_clock::now();
     std::ignore = raptorRouter->routeEarliestArrival(
-      {{fromStop, static_cast<raptor::types::raptorInt>(time.secondsOfDay())}},
-      {{toStop, static_cast<raptor::types::raptorInt>(0)}},
+      {{fromStopId, static_cast<raptor::types::raptorInt>(time.secondsOfDay())}},
+      {{toStopId, static_cast<raptor::types::raptorInt>(0)}},
       queryConfig);
     const auto endTime = std::chrono::high_resolution_clock::now();
-    const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+  }
 
-    std::cout << "Route from " << fromStop << " to " << toStop << " took " << duration << " milliseconds" << '\n';
+  static void benchmarkRoute(const std::string& fromStopId, const std::string& toStopId, const int iterations)
+  {
+    long long totalTime = 0;
+    for (int i = 0; i < iterations; ++i) {
+      totalTime += routeEarliestArrival(fromStopId, toStopId);
+    }
+    const long long averageTime = totalTime / iterations;
+    std::cout << "Average time for routing from " << fromStopId << " to " << toStopId << " over " << iterations << " iterations: " << averageTime << " ms\n";
   }
 };
 
@@ -73,12 +86,19 @@ std::unique_ptr<raptor::RaptorRouter> SimpleRaptorBenchmark::raptorRouter = null
 schedule::gtfs::GtfsData SimpleRaptorBenchmark::data = {};
 raptor::config::QueryConfig SimpleRaptorBenchmark::queryConfig = {};
 
-
 int main(int argc, char** argv)
 {
   SimpleRaptorBenchmark::setUp();
-  SimpleRaptorBenchmark::benchmarkRoute("8589640", "8579885");
-  SimpleRaptorBenchmark::benchmarkRoute("8588889", "8589644");
+  // "8589640" "St. Gallen, Vonwil" to "8579885" "Mels, Bahnhof"
+  SimpleRaptorBenchmark::benchmarkRoute("8589640", "8579885", 100);
+  // "8574563","Maienfeld, Bahnhof" to "8587276" "Biel/Bienne, Taubenloch"
+  SimpleRaptorBenchmark::benchmarkRoute("8574563", "8587276", 100);
+  // "8588524","Sion, Hôpital Sud" to "8508896","Stans, Bahnhof"
+  SimpleRaptorBenchmark::benchmarkRoute("8588524", "8508896", 100);
+  // "8510709","Lugano, Via Domenico Fontana" to "8579255","Lausanne, Pont-de-Chailly"
+  SimpleRaptorBenchmark::benchmarkRoute("8510709", "8579255", 100);
+  // "8574848","Davos Dorf, Bahnhof" to "8576079","Rapperswil SG, Sonnenhof"
+  SimpleRaptorBenchmark::benchmarkRoute("8574848", "8576079", 100);
 
   return 0;
 }

@@ -40,7 +40,6 @@ namespace schedule::gtfs {
     bool isTripActive = false;
 
     std::set<const StopTime*, decltype(stopTimeCompare)> stopTimes{};
-    // std::vector<StopTime> stopTimes{}; //TODO: think about storing pointers to StopTime objects
   };
 
 
