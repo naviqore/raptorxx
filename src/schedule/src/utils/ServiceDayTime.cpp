@@ -41,35 +41,28 @@ namespace schedule::gtfs::utils {
     return totalSeconds != 0;
   }
 
-  ServiceDayTime ServiceDayTime::fromString(std::string_view timeString) {
+  ServiceDayTime ServiceDayTime::fromString(std::string_view str) {
     size_t start = 0;
-    size_t end = timeString.find(':');
+    size_t end = str.find(':');
     if (end == std::string_view::npos)
     {
       throw std::invalid_argument("Invalid time format");
     }
-    const unsigned int hour = std::stoi(std::string(timeString.substr(start, end - start)));
+    const unsigned int hour = std::stoi(std::string(str.substr(start, end - start)));
 
     start = end + 1;
-    end = timeString.find(':', start);
+    end = str.find(':', start);
     if (end == std::string_view::npos)
     {
       throw std::invalid_argument("Invalid time format");
     }
-    const unsigned int minute = std::stoi(std::string(timeString.substr(start, end - start)));
+    const unsigned int minute = std::stoi(std::string(str.substr(start, end - start)));
 
     start = end + 1;
-    const unsigned int second = std::stoi(std::string(timeString.substr(start)));
+    const unsigned int second = std::stoi(std::string(str.substr(start)));
 
     return ServiceDayTime(Hour(hour), Minute(minute), Second(second));
   }
-
-  // std::string ServiceDayTime::toString() const {
-  //   const unsigned int hour = totalSeconds / SECONDS_PER_HOUR;
-  //   const unsigned int minute = (totalSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE;
-  //   const unsigned int second = totalSeconds % SECONDS_PER_MINUTE;
-  //   return std::string(std::to_string(hour) + ":" + std::to_string(minute) + ":" + std::to_string(second));
-  // }
 
   std::string ServiceDayTime::toString() const {
     auto seconds = std::chrono::seconds(totalSeconds);

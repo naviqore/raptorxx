@@ -25,7 +25,6 @@ namespace schedule::gtfs::utils {
     {
       fields.push_back(field);
     }
-    // TODO think about returning an expected instead of a vector
     // auto result = std::unexpected("Error: insufficient number of fields.");
     return fields;
   }

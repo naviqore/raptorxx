@@ -15,13 +15,14 @@
 
 namespace schedule::gtfs {
   GtfsTransferReader::GtfsTransferReader(std::string filename)
-    : filename(std::move(filename)) {
+    : filename(std::move(filename))
+  {
   }
-  void GtfsTransferReader::operator()(GtfsReader& aReader) const {
-    MEASURE_FUNCTION(std::source_location().file_name());
+  void GtfsTransferReader::operator()(GtfsReader& aReader) const
+  {
+    MEASURE_FUNCTION();
     std::ifstream infile(filename);
-    if (!infile.is_open())
-    {
+    if (!infile.is_open()) {
       throw std::runtime_error("Error opening file: " + std::string(filename));
     }
     getLogger(Target::CONSOLE, LoggerName::GTFS)->info(std::format("Reading file: {}", filename));
@@ -31,21 +32,17 @@ namespace schedule::gtfs {
 
     std::vector<std::string_view> fields;
     fields.reserve(4);
-    while (std::getline(infile, line))
-    {
+    while (std::getline(infile, line)) {
       fields = utils::splitLineAndRemoveQuotes(line);
-      if (fields.size() < 4)
-      {
-        // TODO: Handle error
+      if (fields.size() < 4) {
         continue;
       }
 
-      aReader.getData().get().transfer[std::string(fields[headerMap["from_stop_id"]])].emplace_back(
-        std::string(fields[headerMap["from_stop_id"]]),
-        std::string(fields[headerMap["to_stop_id"]]),
-        static_cast<Transfer::TransferType>(std::stoi(std::string(fields[headerMap["transfer_type"]]))),
-        std::stoi(std::string(fields[headerMap["min_transfer_time"]])));
-
+      aReader.getData().get().transfers[std::string(fields[headerMap["from_stop_id"]])].emplace_back(
+        std::make_shared<Transfer>(std::string(fields[headerMap["from_stop_id"]]),
+                                   std::string(fields[headerMap["to_stop_id"]]),
+                                   static_cast<Transfer::TransferType>(std::stoi(std::string(fields[headerMap["transfer_type"]]))),
+                                   std::stoi(std::string(fields[headerMap["min_transfer_time"]]))));
     }
   }
 } // gtfs

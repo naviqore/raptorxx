@@ -15,6 +15,7 @@ enum class LOGGER_API LoggerName
   GTFS,
   RAPTOR,
   GEOMETRY,
+  GTFS_TO_RAPTOR_CONVERTER,
 };
 
 enum class LOGGER_API Target

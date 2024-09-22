@@ -14,13 +14,13 @@
 
 
 namespace schedule::gtfs {
-  void GtfsStopTimeReader::operator()(GtfsReader& aReader) const {
+  void GtfsStopTimeReader::operator()(GtfsReader& aReader) const
+  {
     using namespace std::string_literals;
-    MEASURE_FUNCTION(std::source_location().file_name());
+    MEASURE_FUNCTION();
 
     std::ifstream infile(filename, std::ios::in | std::ios::binary);
-    if (!infile.is_open())
-    {
+    if (!infile.is_open()) {
       throw std::runtime_error("Error opening file: " + std::string(filename));
     }
     getLogger(Target::CONSOLE, LoggerName::GTFS)->info(std::format("Reading file: {}", filename));
@@ -32,34 +32,28 @@ namespace schedule::gtfs {
     std::getline(infile, line); // Skip header line
     std::map<std::string, size_t> headerMap = utils::getGtfsColumnIndices(line);
 
-    constexpr size_t expectedSizec = 16'891'069; // TODO this is a guess
+    constexpr size_t expectedSizec = 16'891'069; // size guessed from data
     aReader.getData().get().stopTimes.reserve(expectedSizec);
     std::vector<std::string_view> fields;
     fields.reserve(7);
 
-    while (std::getline(infile, line))
-    {
-      /*if (!line.empty() && line.back() == '\r')
-      {
-        line.pop_back();
-      }*/
+    while (std::getline(infile, line)) {
       fields = utils::splitLineAndRemoveQuotes(line);
-      if (fields.size() < 5)
-      {
-        // TODO: Handle error
+      if (fields.size() < 5) {
         continue;
       }
 
       aReader.getData().get().stopTimes[std::string(fields[headerMap["stop_id"]])].emplace_back(
-        std::string(fields[headerMap["trip_id"]]),
-        std::string(fields[headerMap["arrival_time"]]),
-        std::string(fields[headerMap["departure_time"]]),
-        std::string(fields[headerMap["stop_id"]]),
-        std::stoi(std::string(fields[headerMap["stop_sequence"]])));
+        std::make_shared<StopTime>(std::string(fields[headerMap["trip_id"]]),
+                                   std::string(fields[headerMap["arrival_time"]]),
+                                   std::string(fields[headerMap["departure_time"]]),
+                                   std::string(fields[headerMap["stop_id"]]),
+                                   std::stoi(std::string(fields[headerMap["stop_sequence"]]))));
     }
   }
 
   GtfsStopTimeReader::GtfsStopTimeReader(std::string filename)
-    : filename(std::move(filename)) {
+    : filename(std::move(filename))
+  {
   }
 } // gtfs

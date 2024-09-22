@@ -12,8 +12,7 @@
 #include <ranges>
 
 namespace schedule::gtfs {
-  struct TempCalendarDate
-  {
+  struct TempCalendarDate {
     std::string serviceId;
     std::string date;
     CalendarDate::ExceptionType exceptionType = CalendarDate::SERVICE_REMOVED;
@@ -21,24 +20,24 @@ namespace schedule::gtfs {
 
 
   GtfsCalendarDateReaderCsv::GtfsCalendarDateReaderCsv(std::string&& filename)
-    : filename(std::move(filename)) {
-    if (filename.empty())
-    {
+    : filename(std::move(filename))
+  {
+    if (filename.empty()) {
       throw std::invalid_argument("Filename is empty");
     }
   }
   GtfsCalendarDateReaderCsv::GtfsCalendarDateReaderCsv(std::string const& filename)
-    : filename(filename) {
-    if (this->filename.empty())
-    {
+    : filename(filename)
+  {
+    if (this->filename.empty()) {
       throw std::invalid_argument("Filename is empty");
     }
   }
-  void GtfsCalendarDateReaderCsv::operator()(GtfsReader& aReader) const {
+  void GtfsCalendarDateReaderCsv::operator()(GtfsReader& aReader) const
+  {
     auto reader = csv2::Reader();
 
-    if (false == reader.mmap(filename))
-    {
+    if (false == reader.mmap(filename)) {
       throw std::runtime_error("can not read file");
     }
     const auto header = reader.header();
@@ -47,12 +46,10 @@ namespace schedule::gtfs {
     std::map<size_t, std::string> headerMap = utils::createHeaderMap(headerItems);
 
     int index = 0;
-    for (const auto& row : reader)
-    {
+    for (const auto& row : reader) {
       TempCalendarDate tempCalendarDate;
       index = 0;
-      for (const auto& cell : row)
-      {
+      for (const auto& cell : row) {
         auto columnName = headerMap[index];
 
         std::string value;
@@ -68,19 +65,17 @@ namespace schedule::gtfs {
                                                                                                                                   : CalendarDate::SERVICE_REMOVED; }},
         };
 
-        if (columnActions.contains(columnName))
-        {
+        if (columnActions.contains(columnName)) {
           columnActions.at(columnName)(tempCalendarDate, value);
         }
         ++index;
       }
-      if (!tempCalendarDate.serviceId.empty())
-      {
+      if (!tempCalendarDate.serviceId.empty()) {
         auto serviceId = tempCalendarDate.serviceId;
         aReader.getData().get().calendarDates[serviceId].emplace_back(
-          std::move(tempCalendarDate.serviceId),
-          std::move(tempCalendarDate.date),
-          tempCalendarDate.exceptionType);
+          std::make_shared<CalendarDate>(std::move(tempCalendarDate.serviceId),
+                                         std::move(tempCalendarDate.date),
+                                         tempCalendarDate.exceptionType));
       }
     }
   }

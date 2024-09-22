@@ -3,12 +3,7 @@ project("schedule_tests"
 )
 
 add_executable(${PROJECT_NAME})
-
-target_sources(${PROJECT_NAME} PRIVATE
-        test_gtfsReaderTxt.cpp
-        test_main.cpp
-        test_gtfsReaderCsv.cpp
-)
+add_subdirectory(src)
 
 find_package(GTest CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
@@ -30,7 +25,7 @@ gtest_discover_tests(${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/schedule/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/schedule/include/model)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/src)
+# target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/src)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/logging/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/geometry/include)
 

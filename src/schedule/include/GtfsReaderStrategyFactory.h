@@ -18,7 +18,7 @@ namespace schedule::gtfs {
     CSV_PARALLEL
   };
 
-  SCHEDULE_API std::unique_ptr<IGtfsReaderStrategyFactory> createGtfsReaderStrategyFactory(ReaderType type, std::string&& aGtfsFileDirectory);
+  SCHEDULE_API std::unique_ptr<IGtfsReaderStrategyFactory> createGtfsReaderStrategyFactory(ReaderType type, std::string aGtfsFileDirectory);
 
 } // gtfs
 // schedule

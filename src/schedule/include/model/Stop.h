@@ -5,28 +5,29 @@
 #ifndef STOP_H
 #define STOP_H
 
+#include "Transfer.h"
+
+
 #include <spatial/Coordinate.h>
 #include <spatial/CoordinateComponent.h>
 
 
 #include <string>
 #include <stdexcept>
+#include <schedule_export.h>
 
 // https://gtfs.org/schedule/reference/#stopstxt
-// Required
 
 namespace schedule::gtfs {
-  struct Stop
-  {
-    // TODO consider float instead of double for lat/lon
-    Stop(std::string&& aStopId, std::string&& aStopName, const geometry::Coordinate<double> aStopLat, const geometry::Coordinate<double> aStopLon, std::string&& aParentStation)
+  struct SCHEDULE_API Stop {
+    Stop(std::string aStopId, std::string&& aStopName, const geometry::Coordinate<double> aStopLat, const geometry::Coordinate<double> aStopLon, std::string&& aParentStation)
       : stopId(std::move(aStopId))
       , stopName(std::move(aStopName))
       , stopPoint(aStopLat, aStopLon)
-      , parentStation(std::move(aParentStation)) {
+      , parentStation(std::move(aParentStation))
+    {
       if (stopId.empty()
-          || stopName.empty())
-      {
+          || stopName.empty()) {
         throw std::invalid_argument("Mandatory stop fields must not be empty");
       }
     }
@@ -34,6 +35,9 @@ namespace schedule::gtfs {
     std::string stopName;
     geometry::CoordinateComponent<geometry::Coordinate<double>> stopPoint;
     std::string parentStation;
+    std::vector<std::string> stopIdsChildren;
+    std::vector<const Transfer*> transferItems;
+    std::vector<std::string> stopTimes;
   };
 
   inline auto stopHash = [](const Stop& stop) {

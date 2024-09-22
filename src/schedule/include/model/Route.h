@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <set>
 #include <unordered_set>
+#include <schedule_export.h>
 
 // https://gtfs.org/schedule/reference/#routestxt
 // Required
@@ -20,10 +21,8 @@ namespace schedule::gtfs {
   struct Trip;
 }
 namespace schedule::gtfs {
-  struct Route
-  {
-    enum RouteType : uint16_t
-    {
+  struct SCHEDULE_API Route {
+    enum RouteType : uint16_t {
       Tram = 0,
       Subway = 1,
       Rail = 2,
@@ -37,20 +36,16 @@ namespace schedule::gtfs {
       Undefined = 9'999
     };
 
-    Route(std::string&& aRouteId, std::string&& aRouteShortName, std::string&& aRouteLongName, const RouteType aRouteType, std::string&& aAgencyId)
+    Route(std::string aRouteId, std::string&& aRouteShortName, std::string&& aRouteLongName, const RouteType aRouteType, std::string&& aAgencyId)
       : routeId(std::move(aRouteId))
       , routeShortName(std::move(aRouteShortName))
       , routeLongName(std::move(aRouteLongName))
       , routeType(aRouteType)
-      , agencyId(std::move(aAgencyId)) {
-      if (routeId.empty()) // || routeShortName.empty()  || routeLongName.empty()
+      , agencyId(std::move(aAgencyId))
+    {
+      if (routeId.empty())
       {
         throw std::invalid_argument("Mandatory route fields must not be empty");
-      }
-      if (routeType > 12)
-      {
-        // TODO Log error - there are some route types that are not defined in the GTFS standard
-        // throw std::invalid_argument("Invalid route type");
       }
     }
     std::string routeId;
@@ -58,7 +53,8 @@ namespace schedule::gtfs {
     std::string routeLongName;
     RouteType routeType;
     std::string agencyId;
-    std::vector<std::string> trips;
+    std::unordered_set<std::string> trips;
+    bool isRouteActive = false;
   };
 
   inline auto routeHash = [](const Route& route) {

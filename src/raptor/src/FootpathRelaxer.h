@@ -14,17 +14,16 @@
 
 namespace raptor {
 
-  class FootpathRelaxer
-  {
+  class FootpathRelaxer {
   public:
     FootpathRelaxer(StopLabelsAndTimes& stopLabelsAndTimes, const RaptorData& raptorData, types::raptorInt minimumTransferDuration, types::raptorInt maximumWalkingDuration);
 
-    [[nodiscard]] std::unordered_set<types::raptorIdx> relaxInitial(const std::vector<types::raptorIdx>& stopIndices) const;
+    void relaxInitial() const;
 
-    [[nodiscard]] std::unordered_set<types::raptorIdx> relax(types::raptorInt round, const std::unordered_set<types::raptorIdx>& stopIndices) const;
+    void relax(int round) const;
 
   private:
-    void expandFootpathsFromStop(types::raptorIdx stopIdx, types::raptorInt round, std::unordered_set<types::raptorInt>& markedStops) const;
+    void expandFootpathsFromStop(types::raptorIdx stopIdx, types::raptorInt round) const;
 
     const std::vector<Transfer>& transfers;
     const std::vector<Stop>& stops;

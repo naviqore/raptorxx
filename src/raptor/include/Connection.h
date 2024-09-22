@@ -35,6 +35,6 @@ namespace raptor {
 
     [[nodiscard]] virtual types::raptorInt getNumberOfTotalTransfers() const = 0;
 
-    [[nodiscard]] virtual std::vector<std::shared_ptr<Leg>> getLegs() const = 0;
+    [[nodiscard]] virtual const std::vector<std::shared_ptr<Leg>>& getLegs() const = 0;
   };
 }

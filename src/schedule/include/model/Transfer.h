@@ -8,10 +8,11 @@
 #include <string>
 #include <stdexcept>
 #include <cstdint>
+#include <schedule_export.h>
 
 // https://gtfs.org/schedule/reference/#transferstxt
 namespace schedule::gtfs {
-  struct Transfer
+  struct SCHEDULE_API Transfer
   {
 
     enum TransferType : uint8_t
@@ -22,7 +23,7 @@ namespace schedule::gtfs {
       NOT_POSSIBLE
     };
 
-    Transfer(std::string&& aFromStopId, std::string&& aToStopId, TransferType const aTransferType, const int minTransferTime)
+    Transfer(std::string aFromStopId, std::string&& aToStopId, TransferType const aTransferType, const int minTransferTime)
       : fromStopId(std::move(aFromStopId))
       , toStopId(std::move(aToStopId))
       , transferType(aTransferType)

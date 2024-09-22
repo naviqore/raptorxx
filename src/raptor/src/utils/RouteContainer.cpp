@@ -11,24 +11,37 @@ namespace raptor {
   RouteContainer::RouteContainer(std::string id, const std::map<int, std::string>& stopSequence, const std::map<std::string, std::vector<StopTime>>& trips)
     : routeContainerId(std::move(id))
     , StopSequenceMap(stopSequence)
-    , idTripsMap(trips) {}
+    , idTripsMap(trips)
+  {
+  }
 
-  const std::string& RouteContainer::id() const {
+  const std::string& RouteContainer::id() const
+  {
     return routeContainerId;
   }
 
-  bool RouteContainer::operator<(const RouteContainer& other) const {
-    const StopTime& thisFirstStopTime = this->idTripsMap.begin()->second[0];
-    const StopTime& otherFirstStopTime = other.idTripsMap.begin()->second[0];
+  // bool RouteContainer::operator<(const RouteContainer& other) const
+  // {
+  //   if (this->idTripsMap.empty()) {
+  //     return true;
+  //   }
+  //   const StopTime& thisFirstStopTime = this->idTripsMap.begin()->second[0];
+  //
+  //   if (other.idTripsMap.empty()) {
+  //     return true;
+  //   }
+  //   const StopTime& otherFirstStopTime = other.idTripsMap.begin()->second[0];
+  //
+  //   return thisFirstStopTime.departure < otherFirstStopTime.departure;
+  // }
 
-    return thisFirstStopTime.departure < otherFirstStopTime.departure;
-  }
-
-  const std::map<int, std::string>& RouteContainer::stopSequence() const {
+  const std::map<int, std::string>& RouteContainer::stopSequence() const
+  {
     return StopSequenceMap;
   }
 
-  const std::map<std::string, std::vector<StopTime>>& RouteContainer::trips() const {
+  const std::map<std::string, std::vector<StopTime>>& RouteContainer::trips() const
+  {
     return idTripsMap;
   }
 } // raptor

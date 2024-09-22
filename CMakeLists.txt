@@ -9,7 +9,11 @@ if (CMAKE_CXX_STANDARD LESS 23)
 endif ()
 
 if (MSVC)
-    add_compile_options(/W3 /WX /wd4251 /experimental:module /std:c++latest) #/W4 /WX https://github.com/open-simulation-platform/libcosim/issues/307
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_compile_options(/W3 /WX /wd4251 /experimental:module /std:c++latest /RTC1)
+    else()
+        add_compile_options(/W3 /WX /wd4251 /experimental:module /std:c++latest /O2)
+    endif()
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     add_compile_options(-Wall -Wextra -pedantic -std=c++23) # -Werror => this is too strict for now - causes break when building CSV library
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
@@ -42,17 +46,21 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/rel
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/release)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/release)
 
+# SOURCE
 add_subdirectory(src/interfaces)
 add_subdirectory(src/logging)
 add_subdirectory(src/geometry)
 add_subdirectory(src/schedule)
-add_subdirectory(test/test_schedule)
-add_subdirectory(src/schedule/benchmarks)
-add_subdirectory(src/raptor)
 add_subdirectory(src/gtfsRaptorConfig)
+add_subdirectory(src/raptor)
 # TESTS
 add_subdirectory(test/test_raptor)
 add_subdirectory(test/test_geometry)
+add_subdirectory(test/test_schedule)
+add_subdirectory(test/test_gtfsRaptorConfig)
+# BECHMARKS
+add_subdirectory(benchmark/benchmark_schedule)
+add_subdirectory(benchmark/benchmark_gtfsRaptor)
 
 include(CTest)
 enable_testing()

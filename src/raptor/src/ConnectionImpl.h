@@ -16,7 +16,7 @@ namespace raptor {
   public:
     explicit ConnectionImpl(std::vector<std::shared_ptr<Leg>>&& legs);
 
-    [[nodiscard]] std::vector<std::shared_ptr<Leg>> getLegs() const override;
+    [[nodiscard]] const std::vector<std::shared_ptr<Leg>>& getLegs() const override;
 
     [[nodiscard]] types::raptorInt getDepartureTime() const override;
 

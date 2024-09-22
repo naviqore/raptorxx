@@ -10,11 +10,11 @@ namespace raptor {
 
   struct ActiveTrip
   {
-    int tripOffset;
-    int entryTime;
+    types::raptorInt tripOffset;
+    types::raptorInt entryTime;
     const StopLabelsAndTimes::Label* previousLabel;
 
-    ActiveTrip(const int tripOffset, const int entryTime, const StopLabelsAndTimes::Label* previousLabel)
+    ActiveTrip(const types::raptorInt tripOffset, const types::raptorInt entryTime, const StopLabelsAndTimes::Label* previousLabel)
       : tripOffset(tripOffset)
       , entryTime(entryTime)
       , previousLabel(previousLabel) {}

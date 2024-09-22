@@ -5,54 +5,87 @@
 #include "TimetableManager.h"
 
 #include <algorithm>
+#include <iostream>
 #include <ranges>
 #include <utility>
 
 
 namespace converter {
 
-  TimetableManager::TimetableManager(schedule::gtfs::GtfsData&& data)
+  TimetableManager::TimetableManager(schedule::gtfs::GtfsData&& data, const raptor::utils::LocalDateTime& localDateTime)
     : data(std::make_unique<schedule::gtfs::GtfsData>(std::move(data)))
+    , localDateTime(localDateTime)
   {
     createRelations();
+
     routePartitioner = std::make_unique<RoutePartitioner>(this->data.get());
   }
 
   void TimetableManager::createRelations() const
   {
+    markActiveTrips(this->localDateTime);
     buildTripsToRoutesRelations();
     buildStopTimesToTripsAndRoutesRelations();
+    buildStopRelations();
   }
 
   void TimetableManager::buildTripsToRoutesRelations() const
   {
-    std::ranges::for_each(data->trips | std::views::values, [this](const schedule::gtfs::Trip& trip) {
-      data->routes.at(trip.routeId).trips.push_back(trip.tripId);
+    std::ranges::for_each(data->trips | std::views::values, [this](const std::shared_ptr<schedule::gtfs::Trip>& trip) {
+      if (trip->isTripActive) {
+        data->getRoute(trip->routeId)->trips.insert(trip->tripId);
+      }
     });
   }
 
+
   void TimetableManager::buildStopTimesToTripsAndRoutesRelations() const
   {
-    std::string scannedTripId{};
-    bool addStops{false};
+    std::ranges::for_each(data->stopTimes | std::views::values | std::views::join, [this](const std::shared_ptr<schedule::gtfs::StopTime>& stopTime) {
+      if (const auto tripServingStopTime = data->getTrip(stopTime->tripId);
+          tripServingStopTime->isTripActive) {
+        if (this->localDateTime.getSeconds() < stopTime->arrivalTime.toSeconds()) {
+          tripServingStopTime->stopTimes.insert(stopTime.get());
+        }
+      }
+    });
+  }
 
-    for (const auto& stopTime : data->stopTimes | std::views::values | std::views::join) {
-      // Add stopTime to trip
-      schedule::gtfs::Trip& tripServingStopTime = data->trips.at(stopTime.tripId);
-      tripServingStopTime.stopTimes.push_back(stopTime);
-      // tripServingStopTime.stopTimes.push_back(&stopTime);
-      // TODO check if this is necessary
-      // tripServingStopTime.addTimesAtStop(stopTime.arrivalTime.toSeconds(), stopTime.departureTime.toSeconds());
+  void TimetableManager::buildStopRelations() const
+  {
+    std::unordered_map<std::string, std::vector<const schedule::gtfs::Transfer*>> transferMap;
+    std::ranges::for_each(data->transfers | std::views::values | std::views::join, [&transferMap](const std::shared_ptr<schedule::gtfs::Transfer>& transfer) {
+      transferMap[transfer->fromStopId].push_back(transfer.get());
+    });
 
-      // Stop that is served by the stopTime
-      // Add stopTime to route and stop if not already present
-      // if (Stop& stopServedByStopTime = data->stops.at(stopTime.stopId);
-      //     std::ranges::find_if(stopServedByStopTime.routesServedByStop, [&tripServingStopTime](const std::string& routeId) { return routeId == tripServingStopTime.routeId; })
-      //     == stopServedByStopTime.routesServedByStop.end())
-      // {
-      //   stopServedByStopTime.routesServedByStop.push_back(tripServingStopTime.routeId);
-      // }
+    std::ranges::for_each(data->stops | std::views::values, [this, &transferMap](const std::shared_ptr<schedule::gtfs::Stop>& stop) {
+      for (const auto transfer : transferMap[stop->stopId]) {
+        stop->transferItems.push_back(transfer);
+      }
+    });
+  }
+
+  bool TimetableManager::isServiceAvailable(const std::string& serviceId, const raptor::utils::LocalDateTime& localDateTime) const
+  {
+
+    const auto& calendarDates = data->calendarDates;
+    const auto currentDate = localDateTime.toYearMonthDay();
+
+    if (const auto calendarDateIt = calendarDates.find(serviceId);
+        calendarDateIt != calendarDates.end()) {
+      for (const auto& calendarDate : calendarDateIt->second) {
+        if (calendarDate->date == currentDate) {
+          return calendarDate->exceptionType == schedule::gtfs::CalendarDate::ExceptionType::SERVICE_ADDED;
+        }
+      }
     }
+
+    if (const auto calendarIt = data->calendars.find(serviceId);
+        calendarIt != data->calendars.end()) {
+      return calendarIt->second->isServiceAvailable(localDateTime.toYearMonthDay());
+    }
+
+    return false;
   }
 
   const schedule::gtfs::GtfsData& TimetableManager::getData() const
@@ -74,116 +107,32 @@ namespace converter {
     return *routePartitioner;
   }
 
-  const std::string& TimetableManager::getStopNameFromStopId(std::string const& aStopId) const
+  void TimetableManager::markActiveTrips(const raptor::utils::LocalDateTime& localDateTime) const
   {
-    return data->stops.at(aStopId).stopName;
-  }
-
-  const std::string& TimetableManager::getStopIdFromStopName(std::string const& aStopName) const
-  {
-    return std::ranges::find_if(data->stops,
-                                [&aStopName](const auto& stop) { return stop.second.stopName == aStopName; })
-      ->first;
-  }
-
-  std::vector<std::string> TimetableManager::getStopIdsFromStopName(std::string const& aStopName) const
-  {
-#if defined(__cpp_lib_ranges_to_container)
-    return data->stops | std::views::filter([&aStopName](const auto& stop) { return stop.second.stopName == aStopName; })
-           | std::views::keys | std::ranges::to<std::vector<std::string>>();
-#else
-    std::vector<std::string> stopNames;
-    auto filteredStops = data->stops
-                        | std::views::filter([&aStopName](const auto& stop) { return stop.second.stopName == aStopName; });
-    std::ranges::transform(filteredStops, std::back_inserter(stopNames), [](const auto& stop) {
-      return stop.first;
-    });
-    return stopNames;
-#endif
-  }
-  const schedule::gtfs::StopTime& TimetableManager::getStopTimeFromStopId(std::string const& aStopId) const
-  {
-    return data->stopTimes.at(aStopId).front();
-  }
-
-  std::vector<schedule::gtfs::Stop> TimetableManager::getAllStopsOnTrip(std::string const& aTripId) const
-  {
-    // Retrieve all StopTimes for the given tripId, sorted by departure time
-#if defined(__cpp_lib_ranges_to_container)
-    auto stopTimesMatchingTripId
-      = data->stopTimes | std::views::values | std::views::join
-        | std::views::filter([&](const schedule::gtfs::StopTime& stopTime) { return stopTime.tripId == aTripId; })
-        | std::ranges::to<std::vector<schedule::gtfs::StopTime>>();
-#else
-    std::vector<schedule::gtfs::StopTime> stopTimesMatchingTripId;
-
-    // Filter and transform the values into a vector
-    auto filteredStopTimes = data->stopTimes
-                             | std::views::values // Extract values from the map
-                             | std::views::join   // Flatten the range of ranges
-                             | std::views::filter([&](const schedule::gtfs::StopTime& stopTime) {
-                                 return stopTime.tripId == aTripId;
+    auto filteredCalendars = data->calendars | std::views::values
+                             | std::views::filter([&localDateTime, this](const std::shared_ptr<schedule::gtfs::Calendar>& calendar) {
+                                 return this->isServiceAvailable(calendar->serviceId, localDateTime);
                                });
+    std::unordered_set<std::string> serviceIds;
+    for (const auto& item : filteredCalendars) {
+      serviceIds.insert(item->serviceId);
+    }
+    std::vector<std::shared_ptr<schedule::gtfs::Trip>> activeTrips;
 
-    std::ranges::transform(filteredStopTimes, std::back_inserter(stopTimesMatchingTripId), [](const auto& stopTime) {
-      return stopTime;
-    });
-#endif
-
-
-    std::ranges::sort(stopTimesMatchingTripId,
-                      [](const schedule::gtfs::StopTime& a, const schedule::gtfs::StopTime& b) { return a.departureTime < b.departureTime; });
-
-    std::vector<schedule::gtfs::Stop> stopsForTrip;
-    for (const auto& stopTime : stopTimesMatchingTripId) {
-      stopsForTrip.push_back(data->stops.at(stopTime.stopId));
+    for (const auto& trip : data->trips | std::views::values) {
+      if (serviceIds.contains(trip->serviceId)) {
+        activeTrips.push_back(trip);
+      }
     }
 
-    return stopsForTrip;
-  }
-
-  const std::vector<schedule::gtfs::StopTime>& TimetableManager::getStopTimesFromStopId(std::string const& aStopId) const
-  {
-    return data->stopTimes.at(aStopId);
-  }
-
-  schedule::gtfs::Route TimetableManager::getRouteFromTripId(std::string const& aTripId) const
-  {
-    const auto& trip = data->trips.at(aTripId);
-    return data->routes.at(trip.routeId);
-  }
-
-  std::vector<schedule::gtfs::StopTime> TimetableManager::getStopTimesFromStopIdStartingFromSpecificTime(std::string const& aStopId, unsigned int secondsGreaterThan) const
-  {
-#if defined(__cpp_lib_ranges_to_container)
-    return data->stopTimes.at(aStopId)
-           | std::views::filter([secondsGreaterThan, this](const schedule::gtfs::StopTime& stopTime) {
-               return stopTime.departureTime.toSeconds() > secondsGreaterThan;
-             })
-           | std::ranges::to<std::vector<schedule::gtfs::StopTime>>();
-#else
-    std::vector<schedule::gtfs::StopTime> stopTimesFiltered;
-    auto departureTimeGreaterThan = [secondsGreaterThan](const schedule::gtfs::StopTime& stopTime) {
-      return stopTime.departureTime.toSeconds() > secondsGreaterThan;
-    };
-    std::ranges::transform(data->stopTimes.at(aStopId) | std::views::filter(departureTimeGreaterThan), std::back_inserter(stopTimesFiltered), [secondsGreaterThan](const schedule::gtfs::StopTime& stopTime) {
-        return stopTime;
-    });
-    std::erase_if(stopTimesFiltered, [](const schedule::gtfs::StopTime& stopTime) {
-      return stopTime.tripId.empty();
-    });
-    return stopTimesFiltered;
-#endif
-  }
-
-  bool TimetableManager::isServiceActiveOnDay(std::string const& aServiceId, const std::chrono::weekday aDay) const
-  {
-    return data->calendars.at(aServiceId).weekdayService.contains(aDay);
-  }
-
-  const schedule::gtfs::Trip& TimetableManager::getTripsFromStopTimeTripId(std::string const& aTripId) const
-  {
-    return data->trips.at(aTripId);
+    for (const auto& trip : std::views::filter(data->trips
+                                                 | std::views::values,
+                                               [&serviceIds, this](const std::shared_ptr<schedule::gtfs::Trip>& currentTrip) {
+                                                 return serviceIds.contains(currentTrip->serviceId);
+                                               })) {
+      trip->isTripActive = true;
+      this->data->getRoute(trip->routeId)->isRouteActive = true;
+    }
   }
 
 } // gtfs

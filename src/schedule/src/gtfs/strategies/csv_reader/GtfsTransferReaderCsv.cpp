@@ -11,8 +11,7 @@
 namespace schedule::gtfs {
 
 
-  struct TempTransfer
-  {
+  struct TempTransfer {
     std::string fromStopId;
     std::string toStopId;
     std::string transferType;
@@ -20,24 +19,24 @@ namespace schedule::gtfs {
   };
 
   GtfsTransferReaderCsv::GtfsTransferReaderCsv(std::string&& filename)
-    : filename(std::move(filename)) {
-    if (this->filename.empty())
-    {
+    : filename(std::move(filename))
+  {
+    if (this->filename.empty()) {
       throw std::invalid_argument("Filename is empty");
     }
   }
   GtfsTransferReaderCsv::GtfsTransferReaderCsv(std::string const& filename)
-    : filename(filename) {
-    if (this->filename.empty())
-    {
+    : filename(filename)
+  {
+    if (this->filename.empty()) {
       throw std::invalid_argument("Filename is empty");
     }
   }
 
-  void GtfsTransferReaderCsv::operator()(GtfsReader& aReader) const {
+  void GtfsTransferReaderCsv::operator()(GtfsReader& aReader) const
+  {
     auto reader = csv2::Reader();
-    if (!reader.mmap(filename))
-    {
+    if (!reader.mmap(filename)) {
       throw std::runtime_error("Cannot read file");
     }
     const auto header = reader.header();
@@ -46,12 +45,10 @@ namespace schedule::gtfs {
     std::map<size_t, std::string> headerMap = utils::createHeaderMap(headerItems);
 
     int index = 0;
-    for (const auto& row : reader)
-    {
+    for (const auto& row : reader) {
       TempTransfer tempStop;
       index = 0;
-      for (const auto& cell : row)
-      {
+      for (const auto& cell : row) {
         auto columnName = headerMap[index];
 
         std::string value;
@@ -67,21 +64,19 @@ namespace schedule::gtfs {
           {"min_transfer_time", [](TempTransfer& transfer, const std::string& val) { transfer.minTransferTime = val; }},
         };
 
-        if (columnActions.contains(columnName))
-        {
+        if (columnActions.contains(columnName)) {
           columnActions.at(columnName)(tempStop, value);
         }
         ++index;
       }
-      if (!tempStop.fromStopId.empty())
-      {
+      if (!tempStop.fromStopId.empty()) {
         auto fromStopId = tempStop.fromStopId;
 
-        aReader.getData().get().transfer[fromStopId].emplace_back(
-          std::move(tempStop.fromStopId),
-          std::move(tempStop.toStopId),
-          static_cast<Transfer::TransferType>(std::stoi(tempStop.transferType)),
-          std::stoi(tempStop.minTransferTime));
+        aReader.getData().get().transfers[fromStopId].emplace_back(
+          std::make_shared<Transfer>(std::move(tempStop.fromStopId),
+                                     std::move(tempStop.toStopId),
+                                     static_cast<Transfer::TransferType>(std::stoi(tempStop.transferType)),
+                                     std::stoi(tempStop.minTransferTime)));
       }
     }
   }

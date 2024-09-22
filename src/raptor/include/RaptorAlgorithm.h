@@ -18,8 +18,7 @@
 namespace raptor {
 
 
-  class RAPTOR_API RaptorAlgorithm
-  {
+  class RAPTOR_API RaptorAlgorithm {
   public:
     // Destructor
     virtual ~RaptorAlgorithm() = default;

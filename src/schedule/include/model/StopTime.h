@@ -8,18 +8,18 @@
 #include "ServiceDayTime.h"
 #include <string>
 #include <stdexcept>
+#include <schedule_export.h>
 
 namespace schedule::gtfs {
-  struct StopTime
-  {
-    StopTime(std::string&& aTripId, std::string&& aArrivalTime, std::string&& aDepartureTime, std::string&& aStopId, int const aStopSequence)
+  struct SCHEDULE_API StopTime {
+    StopTime(std::string&& aTripId, std::string&& aArrivalTime, std::string&& aDepartureTime, std::string aStopId, int const aStopSequence)
       : tripId(std::move(aTripId))
       , arrivalTime(utils::ServiceDayTime::fromString(std::move(aArrivalTime)))
       , departureTime(utils::ServiceDayTime::fromString(std::move(aDepartureTime)))
       , stopId(std::move(aStopId))
-      , stopSequence(aStopSequence) {
-      if (tripId.empty())
-      {
+      , stopSequence(aStopSequence)
+    {
+      if (tripId.empty()) {
         throw std::invalid_argument("Mandatory stop time fields must not be empty");
       }
     }
@@ -29,17 +29,13 @@ namespace schedule::gtfs {
     std::string stopId{};
     int stopSequence{};
   };
-  // TODO create hash with tripId and stopSequence
 
   inline auto stopTimeHash = [](StopTime const& stopTime) noexcept {
     return std::hash<std::string>{}(stopTime.stopId);
-    // const std::size_t tripIdHash = std::hash<std::string>{}(stopTime.tripId);
-
-    //  return stopIdHash ^ (tripIdHash << 1);
   };
 
   inline auto stopTimeEqual = [](StopTime const& lhs, StopTime const& rhs) noexcept {
-    return lhs.stopId == rhs.stopId; // && lhs.tripId == rhs.tripId;
+    return lhs.stopId == rhs.stopId;
   };
 
   inline auto stopTimeLessByStopSequence = [](StopTime const& lhs, StopTime const& rhs) noexcept {

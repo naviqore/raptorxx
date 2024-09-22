@@ -12,11 +12,12 @@
 #include <chrono>
 #include <cstdint>
 #include <model/helperFunctions.h>
+#include <schedule_export.h>
 
 // https://gtfs.org/schedule/reference/#calendar_datestxt
 
 namespace schedule::gtfs {
-  struct CalendarDate
+  struct SCHEDULE_API CalendarDate
   {
 
     enum ExceptionType : uint8_t
@@ -25,9 +26,9 @@ namespace schedule::gtfs {
       SERVICE_REMOVED = 2
     };
 
-    CalendarDate(std::string&& aServiceId, std::string&& aDate, ExceptionType const aExceptionType)
+    CalendarDate(std::string aServiceId, std::string&& aDate, ExceptionType const aExceptionType)
       : serviceId(std::move(aServiceId))
-      , date(schedule::utils::parseDate(aDate))
+      , date(utils::parseDate(aDate))
       , exceptionType(aExceptionType) {
       if (serviceId.empty()
           || aDate.empty())
@@ -37,7 +38,7 @@ namespace schedule::gtfs {
     }
     std::string serviceId;
     std::chrono::year_month_day date;
-    ExceptionType exceptionType;
+    ExceptionType exceptionType{SERVICE_REMOVED};
   };
 
   inline auto calendarDateHash = [](const Calendar& calendarDate) {

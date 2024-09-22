@@ -11,26 +11,25 @@
 #include <chrono>
 #include <unordered_map>
 #include <model/helperFunctions.h>
-
+#include <schedule_export.h>
 
 inline auto weekdayHash = [](const std::chrono::weekday& wd) {
   return static_cast<size_t>(wd.c_encoding());
 };
 
 namespace schedule::gtfs {
-  struct Calendar
-  {
+  struct SCHEDULE_API Calendar {
     using WeekdayServiceHashMap = std::unordered_map<std::chrono::weekday, int, decltype(weekdayHash), std::equal_to<>>;
 
-    Calendar(std::string&& aServiceId, WeekdayServiceHashMap&& aWeekdayService, std::string&& aStartDate, std::string&& aEndDate)
+    Calendar(std::string aServiceId, WeekdayServiceHashMap&& aWeekdayService, std::string&& aStartDate, std::string&& aEndDate)
       : serviceId(std::move(aServiceId))
       , weekdayService(std::move(aWeekdayService))
       , startDate(schedule::utils::parseDate(aStartDate))
-      , endDate(schedule::utils::parseDate(aEndDate)) {
+      , endDate(schedule::utils::parseDate(aEndDate))
+    {
       if (serviceId.empty()
           || aStartDate.empty()
-          || aEndDate.empty())
-      {
+          || aEndDate.empty()) {
         throw std::invalid_argument("Mandatory calendar fields must not be empty");
       }
     }
@@ -38,6 +37,15 @@ namespace schedule::gtfs {
     WeekdayServiceHashMap weekdayService;
     std::chrono::year_month_day startDate;
     std::chrono::year_month_day endDate;
+
+    [[nodiscard]] bool isServiceAvailable(const std::chrono::year_month_day& ymd) const
+    {
+      if (ymd < startDate || ymd > endDate) {
+        return false;
+      }
+      const auto weekday = std::chrono::weekday{std::chrono::sys_days{ymd}};
+      return weekdayService.contains(weekday) && weekdayService.at(weekday) == 1; // 1 = service is available
+    }
   };
 
   inline auto calendarHash = [](const Calendar& calendar) {

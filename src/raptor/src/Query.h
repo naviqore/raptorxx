@@ -18,8 +18,7 @@
 
 namespace raptor {
 
-  struct QueryParams
-  {
+  struct QueryParams {
     const RaptorData& raptorData;
     std::vector<types::raptorIdx> sourceStopIndices;
     std::vector<types::raptorIdx> targetStopIndices;
@@ -28,11 +27,9 @@ namespace raptor {
     config::QueryConfig config;
   };
 
-  class Query
-  {
+  class Query {
   public:
-
-    explicit Query(const QueryParams& params);
+    explicit Query(QueryParams params);
 
     const std::vector<std::vector<std::unique_ptr<StopLabelsAndTimes::Label>>>& run();
 
@@ -45,12 +42,12 @@ namespace raptor {
     RaptorData raptorData;
     config::QueryConfig config;
 
-    std::vector<types::raptorInt>targetStops;
+    std::vector<types::raptorInt> targetStops;
     types::raptorInt cutoffTime;
     StopLabelsAndTimes stopLabelsAndTimes;
 
-    std::unordered_set<types::raptorIdx> initialize();
-    std::unordered_set<types::raptorIdx> removeSuboptimalLabelsForRound(types::raptorInt round, const std::unordered_set<types::raptorIdx>& markedStops);
+    void initialize();
+    void removeSuboptimalLabelsForRound(int round);
     [[nodiscard]] types::raptorInt getBestTimeForAllTargetStops() const;
     [[nodiscard]] types::raptorInt determineCutoffTime() const;
   };

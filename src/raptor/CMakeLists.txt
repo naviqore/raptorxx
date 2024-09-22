@@ -25,6 +25,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
 
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/raptor/include)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
         logging
         schedule
@@ -44,6 +46,6 @@ generate_export_header(${PROJECT_NAME}
 set(INCLUDE_INSTALL_DIR include)
 
 install(FILES
-        src/Raptor.h
-        ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_export.h DESTINATION ${INCLUDE_INSTALL_DIR}
-)
+        ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_export.h
+        DESTINATION
+        ${INCLUDE_INSTALL_DIR})

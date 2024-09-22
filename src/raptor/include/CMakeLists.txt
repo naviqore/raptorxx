@@ -9,7 +9,7 @@ target_sources(${PROJECT_NAME}
         raptorTypes.h
         RouteBuilder.h
         usingTypes.h
-        RaptorDataBuilder.h
+        RaptorRouterBuilder.h
         Leg.h
         RaptorRouter.h
         RaptorData.h

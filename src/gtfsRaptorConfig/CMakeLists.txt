@@ -2,21 +2,14 @@ project(gtfsRaptorConfig)
 
 add_library(${PROJECT_NAME} SHARED)
 
-target_sources(${PROJECT_NAME} PRIVATE
-        src/GtfsToRaptorConverter.cpp
-        src/RoutePartitioner.cpp
-        src/TimetableManager.cpp
-        src/SubRoute.cpp
-        PUBLIC
-        include/GtfsToRaptorConverter.h
-        include/RoutePartitioner.h
-        include/TimetableManager.h
-        include/SubRoute.h
-)
+add_subdirectory(src)
+add_subdirectory(include)
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/gtfsRaptorConfig/src)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/gtfsRaptorConfig/include) # check if public is needed
+# subset writer - helper tool to write a subset of the GTFS data
+# add_subdirectory(src/agencySubsetWriter)
+
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/schedule/include)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/raptor/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/logging/include)
 target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
@@ -29,6 +22,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         logging
         geometry
         schedule
+        raptor
 )
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -50,4 +44,3 @@ install(FILES
         ${INCLUDE_INSTALL_DIR}
 )
 
-add_subdirectory(src/agencySubsetWriter)

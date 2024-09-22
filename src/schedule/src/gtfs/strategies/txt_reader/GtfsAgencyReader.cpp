@@ -18,12 +18,11 @@
 
 namespace schedule::gtfs {
 
-  void GtfsAgencyReader::operator()(GtfsReader& aReader) const {
-    MEASURE_FUNCTION(std::source_location().file_name());
+  void GtfsAgencyReader::operator()(GtfsReader& aReader) const
+  {
+    MEASURE_FUNCTION();
     std::ifstream infile(filename);
-    if (!infile.is_open())
-    {
-      // TODO log error
+    if (!infile.is_open()) {
       throw std::runtime_error("Error opening file: " + std::string(filename));
     }
     getLogger(Target::CONSOLE, LoggerName::GTFS)->info(std::format("Reading file: {}", filename));
@@ -32,23 +31,21 @@ namespace schedule::gtfs {
     std::map<std::string, size_t> headerMap = utils::getGtfsColumnIndices(line);
     std::vector<std::string_view> fields;
     fields.reserve(4);
-    while (std::getline(infile, line))
-    {
+    while (std::getline(infile, line)) {
       fields = utils::splitLineAndRemoveQuotes(line);
-      if (fields.size() < 4)
-      {
-        // TODO: Handle error
+      if (fields.size() < 4) {
         continue;
       }
       aReader.getData().get().agencies.emplace(std::string(fields[headerMap["agency_name"]]),
-                                               Agency{std::string(fields[headerMap["agency_id"]]),
-                                                      std::string(fields[headerMap["agency_name"]]),
-                                                      std::string(fields[headerMap["agency_timezone"]])});
+                                               std::make_shared<Agency>(std::string(fields[headerMap["agency_id"]]),
+                                                                        std::string(fields[headerMap["agency_name"]]),
+                                                                        std::string(fields[headerMap["agency_timezone"]])));
     }
   }
 
   GtfsAgencyReader::GtfsAgencyReader(std::string filename)
-    : filename(std::move(filename)) {
+    : filename(std::move(filename))
+  {
   }
 
 } // gtfs

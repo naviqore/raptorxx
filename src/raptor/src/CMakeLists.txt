@@ -11,8 +11,6 @@ target_sources(${PROJECT_NAME}
         Query.cpp
         Query.h
         QueryConfig.cpp
-        RaptorAlgorithmFactory.cpp
-        RaptorAlgorithmFactory.h
         RaptorConnection.cpp
         RaptorConnection.h
         RaptorRouter.cpp

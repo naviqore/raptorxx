@@ -16,8 +16,7 @@
 
 namespace schedule::gtfs {
 
-  struct TempAgency
-  {
+  struct TempAgency {
     std::string id;
     std::string name;
     std::string timezone;
@@ -25,25 +24,25 @@ namespace schedule::gtfs {
   };
 
   GtfsAgencyReaderCsv::GtfsAgencyReaderCsv(std::string&& filename)
-    : filename(std::move(filename)) {
-    if (this->filename.empty())
-    {
+    : filename(std::move(filename))
+  {
+    if (this->filename.empty()) {
       throw std::invalid_argument("Filename is empty");
     }
   }
   GtfsAgencyReaderCsv::GtfsAgencyReaderCsv(std::string const& filename)
-    : filename(filename) {
-    if (this->filename.empty())
-    {
+    : filename(filename)
+  {
+    if (this->filename.empty()) {
       throw std::invalid_argument("Filename is empty");
     }
   }
 
-  void GtfsAgencyReaderCsv::operator()(GtfsReader& aReader) const {
+  void GtfsAgencyReaderCsv::operator()(GtfsReader& aReader) const
+  {
     auto reader = csv2::Reader();
 
-    if (false == reader.mmap(filename))
-    {
+    if (false == reader.mmap(filename)) {
       throw std::runtime_error("can not read file");
     }
     const auto header = reader.header();
@@ -52,12 +51,10 @@ namespace schedule::gtfs {
     std::map<size_t, std::string> headerMap = utils::createHeaderMap(headerItems);
 
     int index = 0;
-    for (const auto& row : reader)
-    {
+    for (const auto& row : reader) {
       TempAgency tempAgency;
       index = 0;
-      for (const auto& cell : row)
-      {
+      for (const auto& cell : row) {
         auto columnName = headerMap[index];
 
         std::string value;
@@ -72,19 +69,17 @@ namespace schedule::gtfs {
           {"agency_timezone", [](TempAgency& agency, const std::string& val) { agency.timezone = val; }},
           {"agency_phone", [](TempAgency& agency, const std::string& val) { agency.phone = val; }}};
 
-        if (columnActions.contains(columnName))
-        {
+        if (columnActions.contains(columnName)) {
           columnActions.at(columnName)(tempAgency, value);
         }
         ++index;
       }
-      if (!tempAgency.name.empty())
-      {
+      if (!tempAgency.name.empty()) {
         auto tempName = tempAgency.name;
         aReader.getData().get().agencies.try_emplace(tempName,
-                                                     Agency{std::move(tempAgency.id),
-                                                            std::move(tempAgency.name),
-                                                            std::move(tempAgency.timezone)});
+                                                     std::make_shared<Agency>(std::move(tempAgency.id),
+                                                                              std::move(tempAgency.name),
+                                                                              std::move(tempAgency.timezone)));
       }
     }
   }

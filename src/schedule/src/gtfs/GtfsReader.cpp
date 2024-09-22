@@ -20,8 +20,6 @@ schedule::gtfs::GtfsReader::GtfsReader(std::vector<GtfsStrategy<GtfsReader>>&& s
 }
 
 void schedule::gtfs::GtfsReader::readData() {
-// TODO test on Apple Clang
-// execute registered strategies
 #if defined(HAS_EXECUTION) && !(defined(__clang__) && defined(__apple_build_version__)) // https://en.cppreference.com/w/cpp/compiler_support
   std::for_each(std::execution::par, strategies.begin(), strategies.end(), [this](const auto& strategy) {
     strategy(*this);

@@ -9,21 +9,22 @@
 namespace schedule::gtfs {
 
   GtfsCalendarReaderCsvParser::GtfsCalendarReaderCsvParser(std::string&& filename)
-    : filename(std::move(filename)) {
-    if (this->filename.empty())
-    {
+    : filename(std::move(filename))
+  {
+    if (this->filename.empty()) {
       throw std::invalid_argument("Filename is empty");
     }
   }
   GtfsCalendarReaderCsvParser::GtfsCalendarReaderCsvParser(std::string const& filename)
-    : filename(filename) {
-    if (this->filename.empty())
-    {
+    : filename(filename)
+  {
+    if (this->filename.empty()) {
       throw std::invalid_argument("Filename is empty");
     }
   }
 
-  void GtfsCalendarReaderCsvParser::operator()(GtfsReader& aReader) const {
+  void GtfsCalendarReaderCsvParser::operator()(GtfsReader& aReader) const
+  {
 
     auto reader = io::CSVReader<10, io::trim_chars<'"'>, io::double_quote_escape<',', '\"'>>(filename); // , io::trim_chars<'"'>
 
@@ -39,11 +40,7 @@ namespace schedule::gtfs {
     std::string start_date;
     std::string end_date;
     reader.read_header(io::ignore_no_column, "service_id", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "start_date", "end_date");
-    while (reader.read_row(serviceId, monday, tuesday, wednesday, thursday, friday, saturday, sunday, start_date, end_date))
-    {
-
-      auto temp = serviceId;
-
+    while (reader.read_row(serviceId, monday, tuesday, wednesday, thursday, friday, saturday, sunday, start_date, end_date)) {
       Calendar::WeekdayServiceHashMap weekdayService = {
         {std::chrono::Monday, monday},
         {std::chrono::Tuesday, tuesday},
@@ -54,11 +51,11 @@ namespace schedule::gtfs {
         {std::chrono::Sunday, sunday}};
 
       aReader.getData().get().calendars.try_emplace(
-        temp,
-        Calendar{std::move(serviceId),
-                 std::move(weekdayService),
-                 std::move(start_date),
-                 std::move(end_date)});
+        serviceId,
+        std::make_shared<Calendar>(serviceId,
+                                   std::move(weekdayService),
+                                   std::move(start_date),
+                                   std::move(end_date)));
     }
   }
   // gtfs
