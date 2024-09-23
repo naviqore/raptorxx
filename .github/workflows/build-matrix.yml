@@ -67,6 +67,18 @@ jobs:
           echo "Contents of output directory:"
           ls -R ${{ github.workspace }}/output/bin/release
 
-      - name: Run tests
+      - name: Run tests on both platforms
         run: |
-          ctest --test-dir ${{ github.workspace }}/output/bin/release --output-on-failure -C Release
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            for test_exe in ${{ github.workspace }}/build/*_tests; do
+              echo "Running $test_exe"
+              "$test_exe"
+            done
+          elif [[ "$RUNNER_OS" == "Windows" ]]; then
+            Get-ChildItem -Path "${{ github.workspace }}\build\*_tests.exe" | ForEach-Object {
+              echo "Running $($_.FullName)"
+              & $_.FullName
+            }
+          fi
+        shell: bash
+
