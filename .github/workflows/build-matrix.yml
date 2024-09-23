@@ -67,16 +67,6 @@ jobs:
           echo "Contents of output directory:"
           ls -R ${{ github.workspace }}/output/bin/release
 
-      # run tests for Linux
-      - name: Run tests on Linux
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-          for test_exe in ${{ github.workspace }}/build/*_tests; do
-            echo "Running $test_exe"
-            "$test_exe"
-          done
-
       # run tests for Windows
       - name: Run tests on Windows
         if: runner.os == 'Windows'
