@@ -58,22 +58,18 @@ jobs:
         run: |
           cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
-      - name: Build
-        run: |
-          cmake --build build --config Release
+      - name: Configure and Build Project
+        uses: threeal/cmake-action@v1.3.0
+        with:
+          run-build: true
 
       - name: List contents of output directory
         run: |
           echo "Contents of output directory:"
           ls -R ${{ github.workspace }}/output/bin/release
 
-      # run tests for Windows
-      - name: Run tests on Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Get-ChildItem -Path "${{ github.workspace }}\build\*_tests.exe" | ForEach-Object {
-            echo "Running $($_.FullName)"
-            & $_.FullName
-          }
+      - name: Test RaptorXX
+        uses: threeal/ctest-action@v1.1.0
+        with:
+          build-config: Release
 
