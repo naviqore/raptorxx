@@ -58,10 +58,9 @@ jobs:
         run: |
           cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
-      - name: Configure and Build Project
-        uses: threeal/cmake-action@v1.3.0
-        with:
-          run-build: true
+      - name: Build
+        run: |
+          cmake --build build --config Release
 
       - name: List contents of output directory
         run: |
@@ -72,4 +71,5 @@ jobs:
         uses: threeal/ctest-action@v1.1.0
         with:
           build-config: Release
+          test-dir: ${{ github.workspace }}/output/bin/release
 
