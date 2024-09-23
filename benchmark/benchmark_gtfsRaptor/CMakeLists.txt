@@ -1,7 +1,5 @@
 project(benchmark_gtfsRaptor)
 
-# file(GLOB CHAPTER_SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-
 add_executable(${PROJECT_NAME}
         gtfsRaptor_benchmark.cpp
 )
@@ -39,7 +37,7 @@ foreach(EXECUTABLE IN LISTS EXECUTABLES)
     target_include_directories(${EXECUTABLE} PRIVATE ${CMAKE_SOURCE_DIR}/src/gtfsRaptorConfig/include)
 endforeach()
 
-add_definitions(-DTEST_DATA_DIR="C:/Users/MichaelBrunner/Downloads/switzerland/")
+add_definitions(-DTEST_DATA_DIR="${CMAKE_SOURCE_DIR}/resources/gtfs_switzerland/")
 
 
 

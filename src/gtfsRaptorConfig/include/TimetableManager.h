@@ -27,8 +27,6 @@ namespace converter {
   public:
     explicit TimetableManager(schedule::gtfs::GtfsData&& data, const raptor::utils::LocalDateTime& localDateTime);
 
-    void createRelations() const;
-
     [[nodiscard]] const schedule::gtfs::GtfsData& getData() const;
 
     [[nodiscard]] schedule::gtfs::GtfsData& getData();
@@ -38,6 +36,7 @@ namespace converter {
     [[nodiscard]] const RoutePartitioner& getRoutePartitioner() const;
 
   private:
+    void createRelations() const;
     void buildTripsToRoutesRelations() const;
     void buildStopTimesToTripsAndRoutesRelations() const;
     void buildStopRelations() const;

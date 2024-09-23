@@ -54,4 +54,3 @@ static void BM_read_gtfs_schedule(benchmark::State& state) {
 
 BENCHMARK(BM_read_gtfs_schedule);
 
-BENCHMARK_MAIN();

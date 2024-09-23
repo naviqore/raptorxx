@@ -61,6 +61,11 @@ namespace converter {
     addedSubRoutes.insert(subRoute);
   }
 
+  RoutePartitioner& GtfsToRaptorConverter::getRoutePartitioner() const
+  {
+    return *routePartitioner;
+  }
+
   void GtfsToRaptorConverter::addStopTimesToRouterBuilder(schedule::gtfs::StopTime const& stopTime, std::string const& tripId, std::string const& subRouteId, const int position)
   {
     raptorRouterBuilder.addStopTime(subRouteId,

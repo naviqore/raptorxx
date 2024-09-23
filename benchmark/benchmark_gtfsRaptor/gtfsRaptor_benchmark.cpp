@@ -85,13 +85,13 @@ BENCHMARK_F(GtfsRaptorFixture, BM_route_vonwilSG_mels)
 (benchmark::State& state)
 {
   // Route 1: vonwilSG -> mels
-  BenchmarkRoute(state, "8589640", "8579885", time.secondsOfDay(), time.secondsOfDay() + 60 * 60 * 2, *raptorRouter, queryConfig);
+  BenchmarkRoute(state, "8589640", "8579885", time.secondsOfDay(), 0, *raptorRouter, queryConfig);
 }
 
 BENCHMARK_F(GtfsRaptorFixture, BM_route_AbtwilDorf_Westcenter)
 (benchmark::State& state)
 {
-  BenchmarkRoute(state, "8588889", "8589644", time.secondsOfDay(), time.secondsOfDay() + 60 * 60 * 2, *raptorRouter, queryConfig);
+  BenchmarkRoute(state, "8588889", "8589644", time.secondsOfDay(), 0, *raptorRouter, queryConfig);
 }
 
 BENCHMARK_REGISTER_F(GtfsRaptorFixture, BM_route_vonwilSG_mels)->Iterations(50);
