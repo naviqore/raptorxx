@@ -67,9 +67,8 @@ jobs:
           echo "Contents of output directory:"
           ls -R ${{ github.workspace }}/output/bin/release
 
-      - name: Test RaptorXX
-        uses: threeal/ctest-action@v1.1.0
-        with:
-          build-config: Release
-          test-dir: ${{ github.workspace }}/output/bin/release
+      - name: Run Tests with CTest
+        run: |
+          cd build
+          ctest --output-on-failure -C Release
 
