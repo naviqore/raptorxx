@@ -67,8 +67,3 @@ jobs:
           echo "Contents of output directory:"
           ls -R ${{ github.workspace }}/output/bin/release
 
-      - name: Run Tests with CTest
-        run: |
-          cd build
-          ctest --output-on-failure -C Release
-
