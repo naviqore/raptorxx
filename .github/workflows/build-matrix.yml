@@ -67,7 +67,6 @@ jobs:
           echo "Contents of output directory:"
           ls -R ${{ github.workspace }}/output/bin/release
 
-
-#      - name: Run tests
-#        run: |
-#          ctest --test-dir ${{ github.workspace }}/output/bin/release --output-on-failure -C Release
+      - name: Run tests
+        run: |
+          ctest --test-dir ${{ github.workspace }}/output/bin/release --output-on-failure -C Release
