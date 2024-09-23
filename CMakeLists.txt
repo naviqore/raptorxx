@@ -22,6 +22,9 @@ else ()
     message(WARNING "You are using an unsupported compiler! Compilation has only been tested with MSVC, GCC and Clang.")
 endif ()
 
+include(CTest)
+enable_testing()
+
 configure_file(
         "src/ProjectConfig.h.in"
         "${PROJECT_BINARY_DIR}/ProjectConfig.h"
@@ -61,6 +64,3 @@ add_subdirectory(test/test_gtfsRaptorConfig)
 # BECHMARKS
 add_subdirectory(benchmark/benchmark_schedule)
 add_subdirectory(benchmark/benchmark_gtfsRaptor)
-
-include(CTest)
-enable_testing()
