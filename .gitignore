@@ -48,3 +48,4 @@
 /packages/*
 /vcpkg_installed/*
 /src/gtfsRaptorConfig/src/agencySubsetWriter/__pycache__
+/resources/*

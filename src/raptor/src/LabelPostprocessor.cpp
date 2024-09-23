@@ -34,6 +34,7 @@ namespace raptor {
   {
     MEASURE_FUNCTION();
     std::vector<std::unique_ptr<Connection>> connections{};
+
     for (const auto& labels : bestLabelsPerRound) {
       const StopLabelsAndTimes::Label* bestLabel = nullptr;
       auto bestTime = types::INFINITY_VALUE_MAX;
@@ -55,37 +56,35 @@ namespace raptor {
         continue;
       }
 
-      if (auto connection = reconstructConnectionFromLabel(bestLabel, referenceDate)) {
+      if (auto connection = reconstructConnectionFromLabel(bestLabel)) {
         connections.push_back(std::move(connection));
       }
     }
     return connections;
   }
 
-  std::unique_ptr<Connection> LabelPostprocessor::reconstructConnectionFromLabel(const StopLabelsAndTimes::Label* label, const types::raptorInt& referenceDate) const
+  std::unique_ptr<Connection> LabelPostprocessor::reconstructConnectionFromLabel(const StopLabelsAndTimes::Label* label) const
   {
-    //  MEASURE_FUNCTION();
-    auto connection = std::make_unique<RaptorConnection>();
+    MEASURE_FUNCTION();
+
     std::vector<const StopLabelsAndTimes::Label*> labels;
+    // labels.reserve(12); // Wild guess for the number of labels - can improve about 1ms
 
     while (label->type != StopLabelsAndTimes::LabelType::INITIAL) {
-      assert(label->previous);
       labels.push_back(label);
       label = label->previous;
     }
-
-    for (const auto& currentLabel : labels) {
+    labels.shrink_to_fit();
+    auto connection = std::make_unique<RaptorConnection>();
+    for (const auto currentLabel : labels) {
       std::string routeId;
       std::string tripId;
       std::string fromStopId;
       std::string toStopId;
       Leg::Type type;
 
-      assert(currentLabel->previous != nullptr);
-
       fromStopId = stops[currentLabel->previous->stopIdx].id;
       toStopId = stops[currentLabel->stopIdx].id;
-
 
       const types::raptorIdx departureTimestamp = currentLabel->sourceTime;
       const types::raptorIdx arrivalTimestamp = currentLabel->targetTime;
@@ -97,14 +96,20 @@ namespace raptor {
         type = Leg::Type::ROUTE;
       }
       else if (currentLabel->type == StopLabelsAndTimes::LabelType::TRANSFER) {
-        routeId = std::format("transfer_{}_{}", fromStopId, toStopId);
+        routeId = std::string("transfer_").append(fromStopId).append("_").append(toStopId);
         type = Leg::Type::WALK_TRANSFER;
       }
       else {
         throw std::runtime_error("Unknown label type");
       }
 
-      connection->addLeg(std::make_shared<LegImpl>(routeId, tripId, fromStopId, toStopId, departureTimestamp, arrivalTimestamp, type));
+      connection->addLeg(std::make_shared<LegImpl>(std::move(routeId),
+                                                   std::move(tripId),
+                                                   std::move(fromStopId),
+                                                   std::move(toStopId),
+                                                   departureTimestamp,
+                                                   arrivalTimestamp,
+                                                   type));
     }
 
     if (!connection->getLegs().empty()) {

@@ -39,7 +39,7 @@ namespace raptor {
     std::vector<types::raptorInt> sourceTimes;
     std::vector<types::raptorInt> walkingDurationsToTarget;
 
-    RaptorData raptorData;
+    const RaptorData& raptorData;
     config::QueryConfig config;
 
     std::vector<types::raptorInt> targetStops;

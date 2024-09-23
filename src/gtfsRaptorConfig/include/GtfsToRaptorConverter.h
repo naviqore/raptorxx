@@ -40,6 +40,7 @@ namespace converter {
     std::shared_ptr<raptor::RaptorData> convert();
     void processTrip(const std::shared_ptr<schedule::gtfs::Trip>& trip);
     void addSubRoute(const SubRoute& subRoute);
+    [[nodiscard]] RoutePartitioner& getRoutePartitioner() const;
 
   private:
     void addStopTimesToRouterBuilder(schedule::gtfs::StopTime const& stopTime, std::string const& tripId, std::string const& subRouteId, int position);

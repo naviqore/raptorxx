@@ -27,7 +27,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE gtfs_EXPORTS)
 
-add_definitions(-DTEST_DATA_DIR="C:/Users/MichaelBrunner/Downloads/gtfs_fp2024_2024-05-27/")
+add_definitions(-DTEST_DATA_DIR="${CMAKE_SOURCE_DIR}/resources/gtfs_switzerland/")
 
 
 
