@@ -16,8 +16,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         logging
 )
 
-set(BINARY ${PROJECT_NAME})
-
 include(GoogleTest)
 gtest_discover_tests(${PROJECT_NAME})
 
