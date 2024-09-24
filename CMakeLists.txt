@@ -36,7 +36,7 @@ set(CPM_DOWNLOAD_LOCATION "${CMAKE_SOURCE_DIR}/cmake/CPM.cmake")
 
 # Download GTFS Switzerland
 include(${CMAKE_SOURCE_DIR}/CMake/DownloadAndUnzip.cmake)
-set(ZIP_URL "https://opentransportdata.swiss/en/dataset/timetable-2024-gtfs2020/permalink/gtfs_fp2024_2024-09-23.zip")
+set(ZIP_URL "https://opentransportdata.swiss/dataset/7cc000ea-0973-40c1-a557-7971a4939da3/resource/756b62d2-3b63-4e74-8693-03212eeb0fac/download/gtfs_fp2024_2024-09-23.zip")
 set(UNZIP_DIR "${CMAKE_SOURCE_DIR}/resources/gtfs_switzerland")
 
 download_and_unzip(${ZIP_URL} ${UNZIP_DIR})
@@ -67,3 +67,10 @@ add_subdirectory(test/test_gtfsRaptorConfig)
 # BECHMARKS
 add_subdirectory(benchmark/benchmark_schedule)
 add_subdirectory(benchmark/benchmark_gtfsRaptor)
+
+# TEST COMMANDS
+add_test(NAME GtfsRaptorConfigTest COMMAND "gtfsRaptorConfig_tests")
+add_test(NAME ScheduleTest COMMAND "schedule_tests")
+add_test(NAME RaptorTest COMMAND "raptor_tests")
+add_test(NAME geomety COMMAND "geometry_tests")
+add_test(NAME TestK2dTree COMMAND "geometry_tests")

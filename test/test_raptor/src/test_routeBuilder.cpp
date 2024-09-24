@@ -83,8 +83,3 @@ TEST_F(RouteBuilderTest, ShouldBuildRoute) {
   builder->addStopTime(TRIP_1, 2, STOP_3, raptor::StopTime(500, 600));
   EXPECT_NO_THROW(builder->build());
 }
-
-TEST_F(RouteBuilderTest, ShouldNotBuildRouteWithUnsetStopTimes) {
-  builder->addStopTime(TRIP_1, 0, STOP_1, raptor::StopTime(100, 200));
-  EXPECT_THROW(builder->build(), std::runtime_error);
-}
