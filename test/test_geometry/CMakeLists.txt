@@ -18,8 +18,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 set(BINARY ${PROJECT_NAME})
 
-add_test(NAME geomety COMMAND ${BINARY})
-add_test(NAME TestK2dTree COMMAND ${BINARY})
+include(GoogleTest)
+gtest_discover_tests(${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/geometry/utils)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/src)
