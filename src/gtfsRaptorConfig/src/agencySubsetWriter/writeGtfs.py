@@ -41,14 +41,6 @@ def write_gtfs_files(output_directory: str, agency_id: str, gtfs_data: Dict):
                                 transfer.from_stop_id == stop.stop_id}
     logger.info(f"Found {len(transfers)} transfers for agency {agency_id}")
 
-    # calendars = [calendar for trip in trips for calendar in gtfs_data['calendars'] if
-    #              calendar.service_id == trip.service_id]
-    # logger.info(f"Found {len(calendars)} calendars for agency {agency_id}")
-    #
-    # calendar_dates = [calendar_date for calendar in calendars for calendar_date in gtfs_data['calendar_dates'] if
-    #                   calendar_date.service_id == calendar.service_id]
-    # logger.info(f"Found {len(calendar_dates)} calendar dates for agency {agency_id}")
-
     os.makedirs(output_directory, exist_ok=True)
 
     #
@@ -80,15 +72,6 @@ def write_gtfs_files(output_directory: str, agency_id: str, gtfs_data: Dict):
         ("transfers.txt", ["from_stop_id", "to_stop_id", "transfer_type", "min_transfer_time"],
          [[transfer.from_stop_id, transfer.to_stop_id, transfer.transfer_type, transfer.min_transfer_time] for transfer
           in transfers]),
-
-        # ("calendar.txt",
-        #  ["service_id", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "start_date",
-        #   "end_date"],
-        #  [[cal.service_id, cal.monday, cal.tuesday, cal.wednesday, cal.thursday, cal.friday, cal.saturday, cal.sunday,
-        #    cal.start_date, cal.end_date] for cal in calendars]),
-        #
-        # ("calendar_dates.txt", ["service_id", "date", "exception_type"],
-        #  [[cd.service_id, cd.date, cd.exception_type] for cd in calendar_dates])
     ]
 
     logger.info(f"Writing GTFS files to {output_directory}")
