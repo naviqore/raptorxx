@@ -13,7 +13,6 @@ if (MSVC)
         add_compile_options(/W3 /WX /wd4251 /experimental:module /std:c++latest /RTC1)
     else ()
         add_compile_options(/W3 /WX /wd4251 /experimental:module /std:c++latest /O2)
-        add_link_options(--coverage)
     endif ()
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     add_compile_options(-Wall -Wextra -pedantic -std=c++23) # -Werror => this is too strict for now - causes break when building CSV library
