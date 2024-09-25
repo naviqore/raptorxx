@@ -16,8 +16,6 @@ namespace raptor::config {
   public:
     QueryConfig();
 
-    // QueryConfig(int maxWalkingDuration, int minTransferDuration, int maxTransferNumber, int maxTravelTime);
-
     explicit QueryConfig(const WalkingConfig& walkingConfig, const TransferConfig& transferConfig, const TravelConfig& travelConfig);
 
     [[nodiscard]] auto getMaximumWalkingDuration() const -> types::raptorInt;

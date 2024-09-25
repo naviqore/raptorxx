@@ -189,7 +189,3 @@ def load_gtfs_data(directory: str):
             route.trips.append(trip)
 
     return gtfs_data_dict
-
-# if __name__ == '__main__':
-#     gtfs_data = load_gtfs_data('C:\\Users\\MichaelBrunner\\source\\master-thesis\\raptorxx\\test\\test_gtfsRaptorConfig\\test-data\\Verkehrsbetriebe_der_Stadt_St_Gallen')
-#     print(gtfs_data)

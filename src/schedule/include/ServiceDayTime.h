@@ -12,7 +12,6 @@
 
 namespace schedule::gtfs::utils {
 
-  /// @brief std::chrono is way too slow for this purpose, so we use our own implementation
   class SCHEDULE_API ServiceDayTime
   {
     unsigned int totalSeconds = 0;
