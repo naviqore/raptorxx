@@ -20,21 +20,6 @@ namespace raptor {
     return routeContainerId;
   }
 
-  // bool RouteContainer::operator<(const RouteContainer& other) const
-  // {
-  //   if (this->idTripsMap.empty()) {
-  //     return true;
-  //   }
-  //   const StopTime& thisFirstStopTime = this->idTripsMap.begin()->second[0];
-  //
-  //   if (other.idTripsMap.empty()) {
-  //     return true;
-  //   }
-  //   const StopTime& otherFirstStopTime = other.idTripsMap.begin()->second[0];
-  //
-  //   return thisFirstStopTime.departure < otherFirstStopTime.departure;
-  // }
-
   const std::map<int, std::string>& RouteContainer::stopSequence() const
   {
     return StopSequenceMap;

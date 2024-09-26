@@ -25,6 +25,7 @@ namespace schedule::gtfs::utils {
     {
       fields.push_back(field);
     }
+    // Unfortunatly, the following line does not work with the current version of the compiler on Linux. =( std::expected is not available.
     // auto result = std::unexpected("Error: insufficient number of fields.");
     return fields;
   }

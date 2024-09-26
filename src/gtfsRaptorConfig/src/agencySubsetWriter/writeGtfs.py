@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def quote(value):
-    return f'"{value}"'  # if value else '""'
+    return f'"{value}"'
 
 
 def write_gtfs_files(output_directory: str, agency_id: str, gtfs_data: Dict):
@@ -40,14 +40,6 @@ def write_gtfs_files(output_directory: str, agency_id: str, gtfs_data: Dict):
     transfers: Set[Transfer] = {transfer for stop in stops for transfer in gtfs_data['transfers'] if
                                 transfer.from_stop_id == stop.stop_id}
     logger.info(f"Found {len(transfers)} transfers for agency {agency_id}")
-
-    # calendars = [calendar for trip in trips for calendar in gtfs_data['calendars'] if
-    #              calendar.service_id == trip.service_id]
-    # logger.info(f"Found {len(calendars)} calendars for agency {agency_id}")
-    #
-    # calendar_dates = [calendar_date for calendar in calendars for calendar_date in gtfs_data['calendar_dates'] if
-    #                   calendar_date.service_id == calendar.service_id]
-    # logger.info(f"Found {len(calendar_dates)} calendar dates for agency {agency_id}")
 
     os.makedirs(output_directory, exist_ok=True)
 
@@ -80,15 +72,6 @@ def write_gtfs_files(output_directory: str, agency_id: str, gtfs_data: Dict):
         ("transfers.txt", ["from_stop_id", "to_stop_id", "transfer_type", "min_transfer_time"],
          [[transfer.from_stop_id, transfer.to_stop_id, transfer.transfer_type, transfer.min_transfer_time] for transfer
           in transfers]),
-
-        # ("calendar.txt",
-        #  ["service_id", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "start_date",
-        #   "end_date"],
-        #  [[cal.service_id, cal.monday, cal.tuesday, cal.wednesday, cal.thursday, cal.friday, cal.saturday, cal.sunday,
-        #    cal.start_date, cal.end_date] for cal in calendars]),
-        #
-        # ("calendar_dates.txt", ["service_id", "date", "exception_type"],
-        #  [[cd.service_id, cd.date, cd.exception_type] for cd in calendar_dates])
     ]
 
     logger.info(f"Writing GTFS files to {output_directory}")
@@ -100,51 +83,10 @@ def write_gtfs_files(output_directory: str, agency_id: str, gtfs_data: Dict):
 
 
 if __name__ == '__main__':
-    directory = 'C:\\Users\\MichaelBrunner\\Downloads\\gtfs_fp2024_2024-05-27'
+    directory = 'SomeDrive:\\...\\...\\...\\gtfs_fp2024_2024-05-27'
     gtfs_data = load_gtfs_data(directory)
 
-    output_directory = 'C:\\Users\\MichaelBrunner\\Downloads\\filtered_gtfs'
+    output_directory = 'SomeDrive:\\...\\...\\...\\filtered_gtfs'
     agency_id = "885"  # "Verkehrsbetriebe der Stadt St.Gallen"
     write_gtfs_files(output_directory, agency_id, gtfs_data)
 
-    # stop_times = list(filter(lambda stop_time_item: stop_time_item.trip_id in [trip.trip_id for trip in trips], gtfs_data['stop_times']))
-    # stops_set = set(filter(lambda stop_item: stop_item.stop_id in [stop_time.stop_id for stop_time in stop_times], gtfs_data['stops']))
-    # transfers_set = set(filter(lambda transfer_item: transfer_item.from_stop_id in [stop.stop_id for stop in stops_set], gtfs_data['transfers']))
-    # calendars = list(filter(lambda calendar_item: calendar_item.service_id in [trip.service_id for trip in trips], gtfs_data['calendars']))
-    # calendar_dates = list(filter(lambda calendar_date_item: calendar_date_item.service_id in [calendar.service_id for calendar in calendars], gtfs_data['calendar_dates']))
-    #
-    #
-    #
-    # stop_times_dict = {st.trip_id: [] for st in gtfs_data['stop_times']}
-    # for st in gtfs_data['stop_times']:
-    #     stop_times_dict[st.trip_id].append(st)
-    # stops_dict = {stop.stop_id: stop for stop in gtfs_data['stops']}
-    # transfers_dict = {stop.stop_id: [] for stop in gtfs_data['stops']}
-    # for transfer in gtfs_data['transfers']:
-    #     transfers_dict[transfer.from_stop_id].append(transfer)
-    # calendars_dict = {cal.service_id: cal for cal in gtfs_data['calendars']}
-    # calendar_dates_dict = {cal.service_id: [] for cal in gtfs_data['calendars']}
-    # for cd in gtfs_data['calendar_dates']:
-    #     calendar_dates_dict[cd.service_id].append(cd)
-    #
-    # for route in routes_to_write:
-    #     logger.info(f"Processing route {route.route_id}")
-    #     for trip in gtfs_data['trips']:
-    #         if trip.route_id == route.route_id:
-    #             trips.append(trip)
-    #             stop_times.extend(stop_times_dict[trip.trip_id])
-    #
-    #             for stop_time in stop_times_dict[trip.trip_id]:
-    #                 stop = stops_dict.get(stop_time.stop_id)
-    #                 if stop:
-    #                     stops_set.add(stop)
-    #
-    #             for stop in stops_set:
-    #                 transfers_set.update(transfers_dict[stop.stop_id])
-    #
-    #             calendar = calendars_dict.get(trip.service_id)
-    #             if calendar:
-    #                 calendars.append(calendar)
-    #                 calendar_dates.extend(calendar_dates_dict[trip.service_id])
-    #
-    # os.makedirs(output_directory, exist_ok=True)
